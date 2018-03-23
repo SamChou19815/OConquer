@@ -1,7 +1,15 @@
 type state
 
-val run : Command.t -> state -> state
+type game_info = {
+  info: string;
+}
+
+val init : Command.program -> Command.program -> state
+
+val run : state -> state
 
 (* TODO getter methods *)
 
 val get_mil_unit : int -> int -> state -> string
+
+val get_game_info : state -> game_info
