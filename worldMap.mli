@@ -12,10 +12,11 @@ type t = {
 }
 
 (**
- * [init p1 p2] initializes a world map from two given parsed program [p1] [p2].
+ * [init (m1 m2)] initializes a world map from two given military units [m1]
+ * and [m2].
  *
- * Requires: [p1] and [p2] are legal programs.
+ * Requires: [m1] and [m2] are legal military units.
  * Returns: a constructed world map that contains some random mountains and two
- * military units with program [p1] [p2] on opposite corners.
+ * military units [m1] [m2] on opposite corners.
 *)
-val init : Command.program -> Command.program -> t
+val init : MilUnit.t -> MilUnit.t -> t

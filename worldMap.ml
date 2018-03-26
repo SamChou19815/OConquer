@@ -5,7 +5,7 @@ type t = {
   tile_map: Tile.t PosMap.t;
 }
 
-let init (p1: Command.program) (p2: Command.program) : t =
+let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
   {
     (* TODO fix dummy implementation *)
     mil_unit_map = PosMap.empty;

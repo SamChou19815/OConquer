@@ -9,11 +9,14 @@ type state = {
   execution_queue: MilUnit.t list;
 }
 
-let init (p1: Command.program) (p2: Command.program) : state = {
-  turns = 0;
-  world_map = WorldMap.init p1 p2;
-  execution_queue = [ MilUnit.default_init 0 0 p1; MilUnit.default_init 1 3 p2 ];
-}
+let init (p1: Command.program) (p2: Command.program) : state =
+  let m1 = MilUnit.default_init 0 0 in
+  let m2 = MilUnit.default_init 1 3 in
+  {
+    turns = 0;
+    world_map = WorldMap.init m1 m2;
+    execution_queue = [ m1; m2 ];
+  }
 
 let exec (mil_unit: MilUnit.t) (action: command) (s: state) : state =
   match action with

@@ -5,7 +5,47 @@ type program
 (** [Context] is used to give relevant information to program interpreter. *)
 module type Context = sig
 
-  val get_mil_unit : int -> int -> string
+  open Common
+
+  (**
+   * [get_mil_unit pos] returns the military unit at the given position [pos].
+   * The military unit may or may not exist.
+   *
+   * Requires: [pos] is a legal representation of position.
+   * Returns: [Some m] where [m] is a military unit if [m] is at [pos]; [None]
+   * if [pos] has no military units.
+  *)
+  val get_mil_unit : Position.t -> MilUnit.t option
+
+  (**
+   * [get_tile pos] returns the tile at the given position [pos].
+   * The tile may or may not exist.
+   *
+   * Requires: [pos] is a legal representation of position.
+   * Returns: [Some t] where [t] is a tile if there exists a tile at pos; [None]
+   * if there is no tile at [pos].
+  *)
+  val get_tile : Position.t -> Tile.t option
+
+  (**
+   * [get_position mil_unit] returns the position of the given military unit
+   * [mil_unit].
+   * The position may not exist when there is no such military unit [mil_unit].
+   *
+   * Requires: [mil_unit] is a legal military unit.
+   * Returns: [Some pos] where [pos] is the position of the military unit;
+   * [None] if there is no such military unit [mil_unit].
+  *)
+  val get_position : MilUnit.t -> Position.t option
+
+  (**
+   * [get_map] reports the current world map of the game.
+   *
+   * Requires: None
+   * Returns: the current world map of the game state [s].
+  *)
+  val get_map : WorldMap.t
+
 
 end
 

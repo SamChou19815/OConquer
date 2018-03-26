@@ -7,32 +7,30 @@ type t
 (**
  * [init id direction num_soliders morale leadership program] creates a
  * new military unit with the given initial value of [id] [direction]
- * [num_soliders] [morale] [leadership] [program].
+ * [num_soliders] [morale] [leadership].
  *
  * Requires:
  * - [id] must be unique in the system and non-negative.
  * - [direction] must be 0, 1, 2, 3.
  * - [num_soliders], [morale], [leadership] must be positive.
- * - [program] must be a legal program.
  * Returns: a new legal military unit with the prescribed information specified
  * in arguments.
 *)
-val init : int -> int -> int -> int -> int -> Command.program -> t
+val init : int -> int -> int -> int -> int -> t
 
 (**
  * [default_init id direction program] creates a new military unit with the
- * prescribed [id] [direction] and [program], but with default values for its
+ * prescribed [id] and [direction], but with default values for its
  * number of soldiers, morale, and leadership.
  *
  * Requires:
  * - [id] must be unique in the system and non-negative.
  * - [direction] must be 0, 1, 2, 3.
- * - [program] must be a legal program.
  * Returns: a new legal military unit with the prescribed information specified
  * in arguments and default values for its number of soldiers, morale, and
  * leadership.
 *)
-val default_init : int -> int -> Command.program -> t
+val default_init : int -> int -> t
 
 (**
  * [num_soliders mil_unit] reports the number of soldiers for the given
