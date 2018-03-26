@@ -10,7 +10,7 @@ module type Context = sig
   val get_map : WorldMap.t
 end
 
-let from_string (p_str: string) : program = ()
+let from_string (p_str: string) : program option = None
 
 module ProgramInterpreter (Cxt: Context) = struct
   let rec run_program (program: program) : command = Attack (* TODO Dummy Impl *)

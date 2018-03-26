@@ -49,8 +49,16 @@ module type Context = sig
 
 end
 
-(** [from_string] parses a string into a program AST. *)
-val from_string : string -> program
+(**
+ * [from_string program_str] parses a string [program_str] into a program AST.
+ * If the [program_str] is not a legal program, [None] will be returned;
+ * otherwise, [Some p] is returned, where [p] is a parsed legal AST.
+ *
+ * Requires: [string] can be any string.
+ * Returns: [Some p] where [p] is the AST of the program is [program_str] is
+ * well-formed; [None] if the program is illegal.
+*)
+val from_string : string -> program option
 
 module ProgramInterpreter (Cxt: Context) : sig
   val run_program : program -> command

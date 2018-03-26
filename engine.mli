@@ -81,3 +81,12 @@ val get_game_status : state -> game_status
  * Returns: the current world map of the game state [s].
 *)
 val get_map : state -> WorldMap.t
+
+(**
+ * [get_context s] creates a specialized Context module that reports various
+ * aspects of the map for a given state [s] infused into the context.
+ *
+ * Requires: [s] is a legal state.
+ * Returns: a context with the given state [s] infused in it.
+*)
+val get_context : state -> (module Command.Context)
