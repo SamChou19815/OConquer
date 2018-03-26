@@ -12,7 +12,7 @@ type state = {
 let init (p1: Command.program) (p2: Command.program) : state = {
   turns = 0;
   world_map = WorldMap.init p1 p2;
-  execution_queue = [ MilUnit.default_init 0 p1; MilUnit.default_init 3 p2 ];
+  execution_queue = [ MilUnit.default_init 0 0 p1; MilUnit.default_init 1 3 p2 ];
 }
 
 let exec (mil_unit: MilUnit.t) (action: command) (s: state) : state =

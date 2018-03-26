@@ -1,4 +1,5 @@
 type t = {
+  id: int;
   direction: int;
   num_soliders: int;
   morale: int;
@@ -6,12 +7,12 @@ type t = {
   program: Command.program;
 }
 
-let init (direction: int) (num_soliders: int) (morale: int)
+let init (id: int) (direction: int) (num_soliders: int) (morale: int)
     (leadership: int) (program: Command.program) =
-  { direction; num_soliders; morale; leadership; program }
+  { id; direction; num_soliders; morale; leadership; program }
 
-let default_init (direction: int) (program: Command.program) =
-  { direction; num_soliders = 10000; morale = 1; leadership = 1; program }
+let default_init (id: int) (direction: int) (program: Command.program) =
+  init id direction 10000 1 1 program
 
 let num_soliders (mil_unit: t) : int = mil_unit.num_soliders
 
