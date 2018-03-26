@@ -1,3 +1,3 @@
-type terrain = Empty | Fort | City
+type terrain = Empty | Mountain | Fort | City of int
 
 type t

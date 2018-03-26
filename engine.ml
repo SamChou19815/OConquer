@@ -1,40 +1,43 @@
 open Definitions
-
-module Position : Map.OrderedType = struct
-  type t = int * int
-
-  let compare ((p1x, p1y): t) ((p2x, p2y): t) : int =
-    let c = compare p1x p2x in
-    if c = 0 then compare p1y p2y else c
-end
+open Common
 
 module Map = Map.Make (Position)
 
 type state = {
   turns: int;
-  game_map: MilUnit.t Map.t;
+  world_map: WorldMap.t;
   execution_queue: MilUnit.t list;
-}
-
-type game_info = {
-  info: string;
 }
 
 let init (p1: Command.program) (p2: Command.program) : state = {
   turns = 0;
-  game_map = Map.empty; (* TODO not empty *)
-  execution_queue = [];
+  world_map = WorldMap.init p1 p2;
+  execution_queue = [ MilUnit.default_init 0 p1; MilUnit.default_init 3 p2 ];
 }
 
 let exec (mil_unit: MilUnit.t) (action: command) (s: state) : state =
   match action with
+  | DoNothing -> failwith "Bad!"
   | Attack -> failwith "Bad!"
-  | _ -> failwith "Bad!"
+  | Train -> failwith "Bad!"
+  | TurnLeft -> failwith "Bad!"
+  | TurnRight -> failwith "Bad!"
+  | MoveForward -> failwith "Bad!"
+  | RetreatBackward -> failwith "Bad!"
+  | Divide -> failwith "Bad!"
+  | Upgrade -> failwith "Bad!"
 
 let next (s: state) : state = failwith "Bad!"
 
-(* TODO getter methods *)
+let get_mil_unit (pos: Position.t) (s: state) : MilUnit.t option =
+  Map.find_opt pos s.world_map.mil_unit_map
 
-let get_mil_unit : int -> int -> state -> string = failwith ""
+let get_tile (pos: Position.t) (s: state) : Tile.terrain option =
+  Map.find_opt pos s.world_map.tile_map
 
-let get_game_info (s: state) : game_info = failwith ""
+let get_position (mil_unit: MilUnit.t) (s: state) : Position.t option =
+  failwith "Unimplemented"
+
+let get_game_status (s: state) : game_status = InProgress
+
+let get_map (s: state) : WorldMap.t = s.world_map

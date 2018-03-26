@@ -1,15 +1,25 @@
 type t = {
   direction: int;
   num_soliders: int;
-  morale_level: int;
-  leadership_level: int
+  morale: int;
+  leadership: int;
+  program: Command.program;
 }
+
+let init (direction: int) (num_soliders: int) (morale: int)
+    (leadership: int) (program: Command.program) =
+  { direction; num_soliders; morale; leadership; program }
+
+let default_init (direction: int) (program: Command.program) =
+  { direction; num_soliders = 10000; morale = 1; leadership = 1; program }
 
 let num_soliders (mil_unit: t) : int = mil_unit.num_soliders
 
-let morale_level (mil_unit: t) : int = mil_unit.morale_level
+let morale (mil_unit: t) : int = mil_unit.morale
 
-let leadership_level (mil_unit: t) : int = mil_unit.leadership_level
+let leadership (mil_unit: t) : int = mil_unit.leadership
+
+let program (mil_unit: t) : Command.program = mil_unit.program
 
 let attack (u1, u2: t * t) : (t option * t option) =
   failwith "Unimplemented"
