@@ -51,7 +51,7 @@ val get_mil_unit : Position.t -> state -> MilUnit.t option
  * Returns: [Some t] where [t] is a tile if there exists a tile at pos; [None]
  * if there is no tile at [pos].
 *)
-val get_tile : Position.t -> state -> Tile.terrain option
+val get_tile : Position.t -> state -> Tile.t option
 
 (**
  * [get_position mil_unit s] returns the position of the given military unit

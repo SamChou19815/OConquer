@@ -1,3 +1,1 @@
-type terrain = Empty | Mountain | Fort | City of int
-
-type t = unit
+type t = Empty | Mountain | Fort | City of int

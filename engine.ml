@@ -32,7 +32,7 @@ let next (s: state) : state = failwith "Bad!"
 let get_mil_unit (pos: Position.t) (s: state) : MilUnit.t option =
   Map.find_opt pos s.world_map.mil_unit_map
 
-let get_tile (pos: Position.t) (s: state) : Tile.terrain option =
+let get_tile (pos: Position.t) (s: state) : Tile.t option =
   Map.find_opt pos s.world_map.tile_map
 
 let get_position (mil_unit: MilUnit.t) (s: state) : Position.t option =
