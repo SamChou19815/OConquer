@@ -1,4 +1,4 @@
-type t = Attack | DoNothing
+open Definitions
 
 type program
 
@@ -13,5 +13,5 @@ end
 val from_string : string -> program
 
 module ProgramInterpreter (Cxt: Context) : sig
-  val run_program : program -> t
+  val run_program : program -> command
 end

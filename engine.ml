@@ -1,4 +1,14 @@
-module Map = Map.Make (String) (* String should actually be a position tuple. *)
+open Definitions
+
+module Position : Map.OrderedType = struct
+  type t = int * int
+
+  let compare ((p1x, p1y): t) ((p2x, p2y): t) : int =
+    let c = compare p1x p2x in
+    if c = 0 then compare p1y p2y else c
+end
+
+module Map = Map.Make (Position)
 
 type state = {
   turns: int;
@@ -16,12 +26,12 @@ let init (p1: Command.program) (p2: Command.program) : state = {
   execution_queue = [];
 }
 
-let exec (mil_unit: MilUnit.t) (action: Command.t) (s: state) : state =
+let exec (mil_unit: MilUnit.t) (action: command) (s: state) : state =
   match action with
   | Attack -> failwith "Bad!"
   | _ -> failwith "Bad!"
 
-let run (s: state) : state = failwith "Bad!"
+let next (s: state) : state = failwith "Bad!"
 
 (* TODO getter methods *)
 

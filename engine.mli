@@ -6,7 +6,7 @@ type game_info = {
 
 val init : Command.program -> Command.program -> state
 
-val run : state -> state
+val next : state -> state
 
 (* TODO getter methods *)
 
