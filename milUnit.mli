@@ -1,3 +1,5 @@
+open Definitions
+
 (**
  * [t] is the type of the military unit.
  * The exact representation should not be known to the client.
@@ -5,8 +7,8 @@
 type t
 
 (**
- * [init id direction num_soliders morale leadership program] creates a
- * new military unit with the given initial value of [id] [direction]
+ * [init identity id direction num_soliders morale leadership program] creates a
+ * new military unit with the given initial value of [identity] [id] [direction]
  * [num_soliders] [morale] [leadership].
  *
  * Requires:
@@ -16,12 +18,12 @@ type t
  * Returns: a new legal military unit with the prescribed information specified
  * in arguments.
 *)
-val init : int -> int -> int -> int -> int -> t
+val init : player_identity -> int -> int -> int -> int -> int -> t
 
 (**
- * [default_init id direction program] creates a new military unit with the
- * prescribed [id] and [direction], but with default values for its
- * number of soldiers, morale, and leadership.
+ * [default_init identity id direction program] creates a new military unit with
+ * the prescribed [identity], [id], and [direction], but with default values
+ * for its number of soldiers, morale, and leadership.
  *
  * Requires:
  * - [id] must be unique in the system and non-negative.
@@ -30,7 +32,7 @@ val init : int -> int -> int -> int -> int -> t
  * in arguments and default values for its number of soldiers, morale, and
  * leadership.
 *)
-val default_init : int -> int -> t
+val default_init : player_identity -> int -> int -> t
 
 (**
  * [num_soliders mil_unit] reports the number of soldiers for the given

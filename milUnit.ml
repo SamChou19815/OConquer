@@ -1,4 +1,7 @@
+open Definitions
+
 type t = {
+  identity: player_identity;
   id: int;
   direction: int;
   num_soliders: int;
@@ -6,11 +9,12 @@ type t = {
   leadership: int;
 }
 
-let init (id: int) (direction: int) (num_soliders: int) (morale: int)
-    (leadership: int) =
-  { id; direction; num_soliders; morale; leadership }
+let init (identity: player_identity) (id: int) (direction: int)
+    (num_soliders: int) (morale: int) (leadership: int) =
+  { identity; id; direction; num_soliders; morale; leadership }
 
-let default_init (id: int) (direction: int) = init id direction 10000 1 1
+let default_init (identity: player_identity) (id: int) (direction: int) =
+  init identity id direction 10000 1 1
 
 let num_soliders (mil_unit: t) : int = mil_unit.num_soliders
 

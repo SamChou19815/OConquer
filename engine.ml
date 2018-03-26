@@ -10,8 +10,8 @@ type state = {
 }
 
 let init (p1: Command.program) (p2: Command.program) : state =
-  let m1 = MilUnit.default_init 0 0 in
-  let m2 = MilUnit.default_init 1 3 in
+  let m1 = MilUnit.default_init Black 0 0 in
+  let m2 = MilUnit.default_init White 1 3 in
   {
     turns = 0;
     world_map = WorldMap.init m1 m2;
