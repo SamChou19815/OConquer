@@ -1,12 +1,12 @@
 open Definitions
 open Common
 
-module Map = Map.Make (Position)
-
 type state = {
   turns: int;
   world_map: WorldMap.t;
   execution_queue: MilUnit.t list;
+  black_program: Command.program;
+  white_program: Command.program;
 }
 
 let init (p1: Command.program) (p2: Command.program) : state =
@@ -16,6 +16,8 @@ let init (p1: Command.program) (p2: Command.program) : state =
     turns = 0;
     world_map = WorldMap.init m1 m2;
     execution_queue = [ m1; m2 ];
+    black_program = p1;
+    white_program = p2;
   }
 
 let exec (mil_unit: MilUnit.t) (action: command) (s: state) : state =
@@ -33,10 +35,10 @@ let exec (mil_unit: MilUnit.t) (action: command) (s: state) : state =
 let next (s: state) : state = failwith "Bad!"
 
 let get_mil_unit (pos: Position.t) (s: state) : MilUnit.t option =
-  Map.find_opt pos s.world_map.mil_unit_map
+  PosMap.find_opt pos s.world_map.mil_unit_map
 
 let get_tile (pos: Position.t) (s: state) : Tile.t option =
-  Map.find_opt pos s.world_map.tile_map
+  PosMap.find_opt pos s.world_map.tile_map
 
 let get_position (mil_unit: MilUnit.t) (s: state) : Position.t option =
   failwith "Unimplemented"
