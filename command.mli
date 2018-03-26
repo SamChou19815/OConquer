@@ -4,7 +4,6 @@ type program
 
 (** [Context] is used to give relevant information to program interpreter. *)
 module type Context = sig
-
   open Common
 
   (**
@@ -46,7 +45,6 @@ module type Context = sig
   *)
   val get_map : WorldMap.t
 
-
 end
 
 (**
@@ -60,6 +58,16 @@ end
 *)
 val from_string : string -> program option
 
+(**
+ * [ProgramInterpreter] is responsible for interpret the program with the
+ * given [Context].
+*)
 module ProgramInterpreter (Cxt: Context) : sig
+  (**
+   * [run_program program] should run the program to produce a command.
+   *
+   * Requires: [program] is a legal program.
+   * Returns: the command chosen by the program.
+  *)
   val run_program : program -> command
 end
