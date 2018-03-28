@@ -1,4 +1,6 @@
 open Engine
+open LocalServer
+open RemoteServer
 
 (*
  * Mainly responsible for connecting different parts of the application.
