@@ -7,7 +7,7 @@ open Definitions
 type t
 
 (**
- * [init identity id direction num_soliders morale leadership program] creates a
+ * [init identity id direction num_soliders morale leadership] creates a
  * new military unit with the given initial value of [identity] [id] [direction]
  * [num_soliders] [morale] [leadership].
  *
