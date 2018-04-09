@@ -1,9 +1,11 @@
-module Position : (Map.OrderedType with type t = int * int) = struct
+module Position = struct
   type t = int * int
 
   let compare ((p1x, p1y): t) ((p2x, p2y): t) : int =
     let c = compare p1x p2x in
     if c = 0 then compare p1y p2y else c
+
+  let to_string (x, y: t) : string = string_of_int x ^ " " ^ string_of_int y
 end
 
 module PosMap = struct

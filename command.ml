@@ -60,9 +60,7 @@ module ProgramRunner (Cxt: Context) = struct
 
   let writer (i: input) (o: out_channel) : unit =
     let s = match i with
-      | Req MyPosition ->
-        let (x, y) = Cxt.get_my_pos in
-        string_of_int x ^ " " ^ string_of_int y
+      | Req MyPosition -> Position.to_string Cxt.get_my_pos
       | Req (MilitaryUnit p) ->
         p |> Cxt.get_mil_unit |>
         (function

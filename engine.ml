@@ -49,7 +49,7 @@ let get_game_status (s: state) : game_status = InProgress
 
 let get_map (s: state) : WorldMap.t = s.world_map
 
-let get_context (s: state) (id: int) : (module Command.Context) =
+let get_context (s: state) : (module Command.Context) =
   (module struct
     open Common
 
