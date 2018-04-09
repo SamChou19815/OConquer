@@ -1,7 +1,3 @@
-(**
- * [Position] is an adapter for the [Map] module. It defines how tuple
- * positions should be ordered.
-*)
 module Position : (Map.OrderedType with type t = int * int) = struct
   type t = int * int
 
@@ -10,7 +6,6 @@ module Position : (Map.OrderedType with type t = int * int) = struct
     if c = 0 then compare p1y p2y else c
 end
 
-(** [PosMap] is a map where the key is always a tuple position. *)
 module PosMap = struct
   include Map.Make (Position)
 
