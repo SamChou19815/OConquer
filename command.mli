@@ -58,10 +58,10 @@ end
 val from_string : player_identity -> string -> program option
 
 (**
- * [ProgramInterpreter] is responsible for interpret the program with the
+ * [ProgramRunner] is responsible for interpret the program with the
  * given [Context].
 *)
-module ProgramInterpreter (Cxt: Context) : sig
+module ProgramRunner (Cxt: Context) : sig
   (**
    * [run_program program] should run the program to produce a command.
    *
