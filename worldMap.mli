@@ -20,3 +20,12 @@ type t = {
  * military units [m1] [m2] on opposite corners.
 *)
 val init : MilUnit.t -> MilUnit.t -> t
+
+(**
+ * [to_string m] returns the standard string representation of the map [m].
+ * The representation is used as a contract in IO.
+ *
+ * Requires: [m] is a legal world map.
+ * Returns: the standard string representation of the map [m].
+*)
+val to_string : t -> string

@@ -38,7 +38,24 @@ module ProgramRunner (Cxt: Context) = struct
     | ["REQUEST"; "TILE"; p1; p2] ->
       Some (Req (Tile (strings_to_pos_coerce (p1, p2))))
     | ["REQUEST"; "MAP"] -> Some (Req Map)
-    | ["COMMAND"; cmd] -> Some (Cmd Attack)
+    | ["COMMAND"; c] ->
+      let cmd_opt = match c with
+        | "DO_NOTHING" -> Some DoNothing
+        | "ATTACK" -> Some Attack
+        | "TRAIN" -> Some Train
+        | "TURN_LEFT" -> Some TurnLeft
+        | "TURN_RIGHT" -> Some TurnRight
+        | "MOVE_FORWARD" -> Some MoveForward
+        | "RETREAT_BACKWARD" -> Some RetreatBackward
+        | "DIVIDE" -> Some Divide
+        | "UPGRADE" -> Some Upgrade
+        | _ -> None
+      in
+      begin
+        match cmd_opt with
+        | Some cmd -> Some (Cmd cmd)
+        | None -> None
+      end
     | _ -> None
 
   let writer (i: input) (o: out_channel) : unit =
@@ -47,14 +64,13 @@ module ProgramRunner (Cxt: Context) = struct
         let (x, y) = Cxt.get_my_pos in
         string_of_int x ^ " " ^ string_of_int y
       | Req (MilitaryUnit p) ->
-        begin match Cxt.get_mil_unit p with
+        p |> Cxt.get_mil_unit |>
+        (function
           | Some m -> MilUnit.to_string m
           | None -> "NONE"
-        end
-      | Req (Tile p) ->
-        let t = Cxt.get_tile p in
-        Tile.to_string t
-      | Req Map -> "MAP UNIMPLEMENTED"
+        )
+      | Req (Tile p) -> p |> Cxt.get_tile |> Tile.to_string
+      | Req Map -> WorldMap.to_string Cxt.get_map
       | Cmd _ -> failwith "Impossible Situation"
     in
     output_string o s;

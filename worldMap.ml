@@ -11,3 +11,5 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
     mil_unit_map = PosMap.empty;
     tile_map = PosMap.empty;
   }
+
+let to_string (m: t) : string = ""
