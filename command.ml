@@ -1,6 +1,6 @@
 open Definitions
 
-type program = unit (* TODO Dummy Impl *)
+type program = string
 
 module type Context = sig
   open Common
@@ -10,7 +10,17 @@ module type Context = sig
   val get_map : WorldMap.t
 end
 
-let from_string (p_str: string) : program option = None
+let from_string (i: player_identity) (p_str: string) : program option =
+  let class_name = match i with
+    | Black -> "BlackProgram"
+    | White -> "WhiteProgram"
+  in
+  let fd = Unix.openfile class_name [O_CREAT; O_WRONLY; O_TRUNC] 0o640 in
+  let l = Unix.single_write_substring fd p_str 0 (String.length p_str) in
+  Unix.close fd;
+  if l > 0 then
+    if Runner.compile_program class_name then Some class_name else None
+  else None
 
 module ProgramInterpreter (Cxt: Context) = struct
   let rec run_program (program: program) : command = Attack (* TODO Dummy Impl *)

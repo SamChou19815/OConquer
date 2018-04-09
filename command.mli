@@ -48,15 +48,17 @@ module type Context = sig
 end
 
 (**
- * [from_string program_str] parses a string [program_str] into a program AST.
+ * [from_string i program_str] parses a string [program_str] into a program.
  * If the [program_str] is not a legal program, [None] will be returned;
- * otherwise, [Some p] is returned, where [p] is a parsed legal AST.
+ * otherwise, [Some p] is returned, where [p] represents a legal program.
  *
- * Requires: [string] can be any string.
- * Returns: [Some p] where [p] is the AST of the program is [program_str] is
- * well-formed; [None] if the program is illegal.
+ * Requires:
+ * - [i] is the player identity.
+ * - [string] can be any string.
+ * Returns: [Some p] where  where [p] represents a legal program.
+ * [None] if the program is illegal.
 *)
-val from_string : string -> program option
+val from_string : player_identity -> string -> program option
 
 (**
  * [ProgramInterpreter] is responsible for interpret the program with the
