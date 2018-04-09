@@ -83,3 +83,12 @@ val attack : (t * t) -> (t option * t option)
  * number of soldiers.
 *)
 val divide : t -> (t * t) option
+
+(**
+ * [to_string mil_unit] returns the standard string representation of the
+ * military unit [mil_unit]. The representation is used as a contract in IO.
+ *
+ * Requires: [mil_unit] is a legal military unit.
+ * Returns: the standard string representation of the military unit [mil_unit].
+*)
+val to_string : t -> string

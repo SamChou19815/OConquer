@@ -43,15 +43,14 @@ val get_mil_unit : Position.t -> state -> MilUnit.t option
 
 (**
  * [get_tile pos s] returns the tile at the given position [pos] for a given
- * game state [s]. The tile may or may not exist.
+ * game state [s]. If the tile is out of bound, mountain will be returned.
  *
  * Requires:
  * - [pos] is a legal representation of position.
  * - [s] is a legal state.
- * Returns: [Some t] where [t] is a tile if there exists a tile at pos; [None]
- * if there is no tile at [pos].
+ * Returns: the tile at the given position [pos] for a given game state [s].
 *)
-val get_tile : Position.t -> state -> Tile.t option
+val get_tile : Position.t -> state -> Tile.t
 
 (**
  * [get_position mil_unit s] returns the position of the given military unit
@@ -83,10 +82,11 @@ val get_game_status : state -> game_status
 val get_map : state -> WorldMap.t
 
 (**
- * [get_context s] creates a specialized Context module that reports various
- * aspects of the map for a given state [s] infused into the context.
+ * [get_context s id] creates a specialized Context module that reports various
+ * aspects of the map for a given state [s] and military program [id], which are
+ * both infused into the context.
  *
  * Requires: [s] is a legal state.
  * Returns: a context with the given state [s] infused in it.
 *)
-val get_context : state -> (module Command.Context)
+val get_context : state -> int -> (module Command.Context)

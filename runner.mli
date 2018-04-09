@@ -1,19 +1,16 @@
 (**
- * [compile_program class_name] compiles a Java program with the specified
- * [class_name].
- * A source file with the same name (without extension .java) should be in
- * the directory ./programs relative to this program.
+ * [compile_program class_name program_string] compiles a Java program with the
+ * specified [class_name] and [program_string].
  * If it compiles, a compiled .class file will be generated and return true.
  * Otherwise, it will return false.
  *
- * Requires: [class_name] is the class name of a Java program. A source file
- * with the same name (without extension .java) should be in the directory
- * ./programs before running this function.
+ * Requires: [class_name] is the class name of a Java program and
+ * [program_string] is its code.
  * Returns: whether the program with the specified [class_name] compiles.
  * Effects: a valid .class file will be generated in the directory ./programs
  * if it compiles.
 *)
-val compile_program : string -> bool
+val compile_program : string -> string -> bool
 
 (**
  * [get_value reader writer to_final_value class_name] obtains a value from a

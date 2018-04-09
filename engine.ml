@@ -37,8 +37,10 @@ let next (s: state) : state = failwith "Bad!"
 let get_mil_unit (pos: Position.t) (s: state) : MilUnit.t option =
   PosMap.find_opt pos s.world_map.mil_unit_map
 
-let get_tile (pos: Position.t) (s: state) : Tile.t option =
-  PosMap.find_opt pos s.world_map.tile_map
+let get_tile (pos: Position.t) (s: state) : Tile.t =
+  match PosMap.find_opt pos s.world_map.tile_map with
+  | Some t -> t
+  | None -> Tile.Mountain
 
 let get_position (mil_unit: MilUnit.t) (s: state) : Position.t option =
   failwith "Unimplemented"
@@ -47,16 +49,17 @@ let get_game_status (s: state) : game_status = InProgress
 
 let get_map (s: state) : WorldMap.t = s.world_map
 
-let get_context (s: state) : (module Command.Context) = (module struct
-  open Common
-  let get_mil_unit (pos: Position.t) : MilUnit.t option =
-    get_mil_unit pos s
+let get_context (s: state) (id: int) : (module Command.Context) =
+  (module struct
+    open Common
 
-  let get_tile (pos: Position.t) : Tile.t option =
-    get_tile pos s
+    let get_my_pos : Position.t = (0, 0) (* TODO fix dummy implementation. *)
 
-  let get_position (mil_unit: MilUnit.t) : Position.t option =
-    get_position mil_unit s
+    let get_mil_unit (pos: Position.t) : MilUnit.t option =
+      get_mil_unit pos s
 
-  let get_map : WorldMap.t = get_map s
-end: Command.Context)
+    let get_tile (pos: Position.t) : Tile.t =
+      get_tile pos s
+
+    let get_map : WorldMap.t = get_map s
+  end: Command.Context)

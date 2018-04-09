@@ -7,6 +7,14 @@ module type Context = sig
   open Common
 
   (**
+   * [get_my_pos] returns the position of the owner of the program.
+   *
+   * Requires: None.
+   * Returns: the position of the owner of the program.
+  *)
+  val get_my_pos : Position.t
+
+  (**
    * [get_mil_unit pos] returns the military unit at the given position [pos].
    * The military unit may or may not exist.
    *
@@ -17,25 +25,14 @@ module type Context = sig
   val get_mil_unit : Position.t -> MilUnit.t option
 
   (**
-   * [get_tile pos] returns the tile at the given position [pos].
-   * The tile may or may not exist.
+   * [get_tile pos s] returns the tile at the given position [pos].
+   * If the tile is out of bound, mountain will be returned.
    *
-   * Requires: [pos] is a legal representation of position.
-   * Returns: [Some t] where [t] is a tile if there exists a tile at pos; [None]
-   * if there is no tile at [pos].
+   * Requires:
+   * - [pos] is a legal representation of position.
+   * Returns: the tile at the given position [pos].
   *)
-  val get_tile : Position.t -> Tile.t option
-
-  (**
-   * [get_position mil_unit] returns the position of the given military unit
-   * [mil_unit].
-   * The position may not exist when there is no such military unit [mil_unit].
-   *
-   * Requires: [mil_unit] is a legal military unit.
-   * Returns: [Some pos] where [pos] is the position of the military unit;
-   * [None] if there is no such military unit [mil_unit].
-  *)
-  val get_position : MilUnit.t -> Position.t option
+  val get_tile : Position.t -> Tile.t
 
   (**
    * [get_map] reports the current world map of the game.
