@@ -81,5 +81,3 @@ let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
     else
       failwith "Update operation cannot change the identity of a military unit.
       This is a programmer error."
-
-let tile_map (m: t) : pos_2_tile_map = m.pos_2_tile_map

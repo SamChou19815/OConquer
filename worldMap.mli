@@ -89,11 +89,3 @@ val get_tile_opt_by_mil_id : int -> t -> Tile.t option
  * to a non-existing military unit. The new map is legal.
 *)
 val update_mil_unit : int -> (MilUnit.t -> MilUnit.t) -> t -> t
-
-(**
- * [tile_map m] returns the tile map in the world map.
- *
- * Requires: None.
- * Returns: the tile map in the world map [m].
-*)
-val tile_map : t -> Tile.t PosMap.t
