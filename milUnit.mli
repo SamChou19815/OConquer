@@ -69,6 +69,15 @@ val morale : t -> int
 val leadership : t -> int
 
 (**
+ * [turn m right] lets the military unit [m] turn right or left depending on
+ * whether [right] is true.
+ *
+ * Requires: [m] is a legal military unit.
+ * Returns: the result of turning for that military unit.
+*)
+val turn : t -> bool -> t
+
+(**
  * [attack (m1, m2)] lets [m1] attacks [m2] and returns the result of the
  * attack as a tuple. Each component in the tuple correspondes to the resultant
  * state after attack for [m1] and [m2]. If the component is [None], it means

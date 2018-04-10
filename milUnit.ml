@@ -24,6 +24,11 @@ let morale (m: t) : int = m.morale
 
 let leadership (m: t) : int = m.leadership
 
+let turn (m: t) (right: bool) : t =
+  let offset = if right then 1 else -1 in
+  let direction' = (m.direction + offset + 4) mod 4 in
+  { m with direction = direction' }
+
 let attack (u1, u2: t * t) : (t option * t option) =
   failwith "Unimplemented"
 
