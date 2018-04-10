@@ -13,3 +13,8 @@ module PosMap = struct
 
   (* prepare for future extension *)
 end
+
+module IntMap = Map.Make (struct
+    type t = int
+    let compare i1 i2 = Pervasives.compare i1 i2
+  end)

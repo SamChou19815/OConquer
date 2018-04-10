@@ -21,3 +21,8 @@ module PosMap : sig
   include Map.S with type key = Position.t
 
 end
+
+(** [IntMap] is a map where the key is always an int. *)
+module IntMap : sig
+  include Map.S with type key = int
+end
