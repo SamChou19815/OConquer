@@ -7,7 +7,6 @@ module type Context = sig
   val get_my_pos : Position.t
   val get_mil_unit : Position.t -> MilUnit.t option
   val get_tile : Position.t -> Tile.t
-  val get_map : WorldMap.t
 end
 
 let from_string (i: player_identity) (p_str: string) : program option =
@@ -24,8 +23,7 @@ end
 module ProgramRunner (Cxt: Context) = struct
 
   (** [request] defines a set of all supported request types. *)
-  type request =
-    | MyPosition | MilitaryUnit of Position.t | Tile of Position.t | Map
+  type request = MyPosition | MilitaryUnit of Position.t | Tile of Position.t
 
   type input = Cmd of command | Req of request
 
@@ -41,7 +39,6 @@ module ProgramRunner (Cxt: Context) = struct
       Some (Req (MilitaryUnit (strings_to_pos_coerce (p1, p2))))
     | ["REQUEST"; "TILE"; p1; p2] ->
       Some (Req (Tile (strings_to_pos_coerce (p1, p2))))
-    | ["REQUEST"; "MAP"] -> Some (Req Map)
     | ["COMMAND"; c] ->
       let cmd_opt = match c with
         | "DO_NOTHING" -> Some DoNothing
@@ -72,7 +69,6 @@ module ProgramRunner (Cxt: Context) = struct
           | None -> "NONE"
         )
       | Req (Tile p) -> p |> Cxt.get_tile |> Tile.to_string
-      | Req Map -> WorldMap.to_string Cxt.get_map
       | Cmd _ -> failwith "Impossible Situation"
     in
     output_string o s;

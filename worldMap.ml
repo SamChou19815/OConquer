@@ -28,7 +28,7 @@ let get_mil_unit_opt (id: int) (m: t) : MilUnit.t option =
 let get_mil_unit (id: int) (m: t) : MilUnit.t =
   IntMap.find id m.id_2_mil_unit_map
 
-let update_mil_unit (f: MilUnit.t -> MilUnit.t) (id: int) (m: t) : t =
+let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
   match IntMap.find_opt id m.id_2_mil_unit_map with
   | None -> m
   | Some mil_unit ->
@@ -42,12 +42,3 @@ let update_mil_unit (f: MilUnit.t -> MilUnit.t) (id: int) (m: t) : t =
 let mil_unit_map (m: t) : MilUnit.t PosMap.t = failwith "Unimplemented"
 
 let tile_map (m: t) : pos_2_tile_map = m.pos_2_tile_map
-
-let to_string (m: t) : string =
-  let f1 pos mil_unit acc =
-    acc ^ Position.to_string pos ^ " " ^ MilUnit.to_string mil_unit ^ " "
-  in
-  let f2 pos tile acc =
-    acc ^ Position.to_string pos ^ " " ^ Tile.to_string tile ^ " "
-  in
-  PosMap.fold f1 (mil_unit_map m) "" ^ "\n" ^ PosMap.fold f2 (tile_map m) ""

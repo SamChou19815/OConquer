@@ -35,7 +35,7 @@ val get_mil_unit_opt : int -> t -> MilUnit.t option
 val get_mil_unit : int -> t -> MilUnit.t
 
 (**
- * [update_mil_unit f id m] updates a military unit with [id] on the map [m] by
+ * [update_mil_unit id f m] updates a military unit with [id] on the map [m] by
  * the given function [f] and produces a new map with the updated state.
  *
  * Requires:
@@ -46,7 +46,7 @@ val get_mil_unit : int -> t -> MilUnit.t
  * Returns: a new map with the updated state, or the old map if the [id] refers
  * to a non-existing military unit.
 *)
-val update_mil_unit : (MilUnit.t -> MilUnit.t) -> int -> t -> t
+val update_mil_unit : int -> (MilUnit.t -> MilUnit.t) -> t -> t
 
 (**
  * [mil_unit_map m] returns the military unit map in the world map.
@@ -63,12 +63,3 @@ val mil_unit_map : t -> MilUnit.t PosMap.t
  * Returns: the tile map in the world map [m].
 *)
 val tile_map : t -> Tile.t PosMap.t
-
-(**
- * [to_string m] returns the standard string representation of the map [m].
- * The representation is used as a contract in IO.
- *
- * Requires: None.
- * Returns: the standard string representation of the map [m].
-*)
-val to_string : t -> string

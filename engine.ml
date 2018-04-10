@@ -4,7 +4,6 @@ open Common
 type state = {
   turns: int;
   world_map: WorldMap.t;
-  current_mil_unit: int;
   execution_queue: int list;
   black_program: Command.program;
   white_program: Command.program;
@@ -16,7 +15,6 @@ let init (p1: Command.program) (p2: Command.program) : state =
   {
     turns = 0;
     world_map = WorldMap.init m1 m2;
-    current_mil_unit = 0;
     execution_queue = [ 0; 1 ]; (* TODO fix dummy implementation *)
     black_program = p1;
     white_program = p2;
@@ -38,19 +36,20 @@ let get_game_status (s: state) : game_status = InProgress
 let get_map (s: state) : WorldMap.t = s.world_map
 
 (**
- * [get_context s] creates a specialized Context module that reports various
- * aspects of the map for a given state [s], which is infused into the context.
+ * [get_context id s] creates a specialized Context module that reports various
+ * aspects of the map for a given state [s] and military unit id [id], which are
+ * both infused into the context.
  *
- * Requires: [s] is a legal state.
+ * Requires: [s] is a legal state and [id] refers to an existing id.
  * Returns: a context with the given state [s] infused in it.
 *)
-let get_context (s: state) : (module Command.Context) =
+let get_context (id: int) (s: state) : (module Command.Context) =
   (* Some hack with first class module *)
   (module struct
     open Common
 
     let get_my_pos : Position.t =
-      let mil_unit = WorldMap.get_mil_unit s.current_mil_unit s.world_map in
+      let mil_unit = WorldMap.get_mil_unit id s.world_map in
       match get_position mil_unit s with
       | Some p -> p
       | None -> failwith "Impossible Situation"
@@ -60,38 +59,36 @@ let get_context (s: state) : (module Command.Context) =
 
     let get_tile (pos: Position.t) : Tile.t =
       get_tile pos s
-
-    let get_map : WorldMap.t = get_map s
   end: Command.Context)
 
 (**
- * [exec action s] executes the action for the current military unit in
+ * [exec id action s] executes the action for the current military unit in
  * state [s] to produce a new updated world map.
  *
- * Requires: [s] is a legal state.
+ * Requires: [s] is a legal state and [id] refers to an existing id.
  * Returns: a new updated world map after the [action] has been done.
 *)
-let exec (action: command) (s: state) : WorldMap.t =
-  let turn_right m =
-    WorldMap.update_mil_unit MilUnit.turn_right s.current_mil_unit m
+let exec (id: int) (action: command) (s: state) : WorldMap.t =
+  let update : (MilUnit.t -> MilUnit.t) -> WorldMap.t -> WorldMap.t =
+    WorldMap.update_mil_unit id
   in
-  let move_forward m = failwith "Unimplemented" in (* TODO move forward *)
+  let move_forward m : WorldMap.t = failwith "Unimplemented" in (* TODO *)
   match action with
   | DoNothing -> s.world_map
   | Attack -> failwith "Bad!"
-  | Train ->
-    WorldMap.update_mil_unit MilUnit.train s.current_mil_unit s.world_map
-  | TurnLeft ->
-    WorldMap.update_mil_unit MilUnit.turn_left s.current_mil_unit s.world_map
-  | TurnRight ->
-    WorldMap.update_mil_unit MilUnit.turn_right s.current_mil_unit s.world_map
+  | Train -> update MilUnit.train s.world_map
+  | TurnLeft -> update MilUnit.turn_left s.world_map
+  | TurnRight -> update MilUnit.turn_right s.world_map
   | MoveForward -> move_forward s.world_map
   | RetreatBackward ->
-    let reduce_morale m =
+    let reduce_morale =
       (* TODO fix numeric value *)
-      WorldMap.update_mil_unit (MilUnit.reduce_morale_by 1) s.current_mil_unit m
+      update (MilUnit.reduce_morale_by 1)
     in
-    s.world_map |> turn_right |> turn_right |> move_forward |> reduce_morale
+    s.world_map
+    |> update MilUnit.turn_right |> update MilUnit.turn_right (* turn back *)
+    |> move_forward (* move forward is moving back since we turned back *)
+    |> reduce_morale (* retreat morale penalty *)
   | Divide -> failwith "Bad!"
   | Upgrade -> failwith "Bad!"
 
@@ -106,16 +103,15 @@ let next (s: state) : state =
       in
       let open Command in
       (* Some hack with first class module *)
-      let (module Cxt) = get_context st in
+      let (module Cxt) = get_context mil_unit_id st in
       let (module R: Runner) = (module ProgramRunner (Cxt)) in
       let cmd = R.run_program program in
-      let world_map' = exec cmd s in
+      let world_map' = exec mil_unit_id cmd s in
       (* TODO check whether the military unit is in a city and increase its
        * number of soldiers accordingly. *)
       let s' = {
         s with
         turns = s.turns + 1; world_map = world_map';
-        current_mil_unit = s.current_mil_unit (* TODO fix this *)
       } in
       next_helper s' tl
   in

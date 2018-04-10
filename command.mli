@@ -33,15 +33,6 @@ module type Context = sig
    * Returns: the tile at the given position [pos].
   *)
   val get_tile : Position.t -> Tile.t
-
-  (**
-   * [get_map] reports the current world map of the game.
-   *
-   * Requires: None
-   * Returns: the current world map of the game state [s].
-  *)
-  val get_map : WorldMap.t
-
 end
 
 (**
@@ -57,6 +48,7 @@ end
 *)
 val from_string : player_identity -> string -> program option
 
+(** [Runner] is the module type for a runner of program. *)
 module type Runner = sig
   (**
    * [run_program program] should run the program to produce a command.
