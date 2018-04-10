@@ -17,22 +17,31 @@ type t
 val init : MilUnit.t -> MilUnit.t -> t
 
 (**
- * [get_mil_unit_opt id m] tries to find the military unit with [id] in the
- * map [m].
- *
- * Requires: None.
- * Returns: [Some v] if [v] has [id] and is in the map [m]; [None] otherwise.
-*)
-val get_mil_unit_opt : int -> t -> MilUnit.t option
-
-(**
  * [get_mil_unit id m] tries to find the military unit with [id] in the map [m].
  *
  * Requires: None.
  * Returns: [v] where [v] has [id] and is in the map [m].
  * Raises: [Not_found] if there is no military unit in the map that has [id].
 *)
-val get_mil_unit : int -> t -> MilUnit.t
+val get_mil_unit_by_id : int -> t -> MilUnit.t
+
+(**
+ * [get_mil_unit_opt id m] tries to find the military unit with [id] in the
+ * map [m].
+ *
+ * Requires: None.
+ * Returns: [Some v] if [v] has [id] and is in the map [m]; [None] otherwise.
+*)
+val get_mil_unit_by_id_opt : int -> t -> MilUnit.t option
+
+(**
+ * [get_mil_unit_by_pos_opt pos m] tries to find the military unit with
+ * position [pos] in the map [m].
+ *
+ * Requires: None.
+ * Returns: [Some v] if [v] has position [pos]; [None] otherwise.
+*)
+val get_mil_unit_by_pos_opt : Position.t -> t -> MilUnit.t option
 
 (**
  * [update_mil_unit id f m] updates a military unit with [id] on the map [m] by
@@ -47,14 +56,6 @@ val get_mil_unit : int -> t -> MilUnit.t
  * to a non-existing military unit.
 *)
 val update_mil_unit : int -> (MilUnit.t -> MilUnit.t) -> t -> t
-
-(**
- * [mil_unit_map m] returns the military unit map in the world map.
- *
- * Requires: None.
- * Returns: the military unit map in the world map [m].
-*)
-val mil_unit_map : t -> MilUnit.t PosMap.t
 
 (**
  * [tile_map m] returns the tile map in the world map.

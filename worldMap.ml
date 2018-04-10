@@ -11,6 +11,18 @@ type t = {
   id_2_mil_unit_map: id_2_mil_unit_map;
 }
 
+(**
+ * [rep_ok m] checks that the value [m]'s maps are all in sync.
+ * i.e. Their records of military units and tiles agree with each other.
+ * If so, [m] will be returned without modification.
+ * Else, an exception will be thrown.
+ *
+ * Requires: None.
+ * Returns: [m].
+ * Raises: [Failure _] if [m] is not well-formed.
+*)
+let rep_ok (m: t) : t = m (* TODO check that all maps are in sync. *)
+
 let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
   if MilUnit.same_mil_unit m1 m2 then
     failwith "Cannot initialize the map with two same military units"
@@ -22,11 +34,19 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
       id_2_mil_unit_map = IntMap.empty;
     }
 
-let get_mil_unit_opt (id: int) (m: t) : MilUnit.t option =
+let get_mil_unit_by_id (id: int) (m: t) : MilUnit.t =
+  IntMap.find id m.id_2_mil_unit_map
+
+let get_mil_unit_by_id_opt (id: int) (m: t) : MilUnit.t option =
   IntMap.find_opt id m.id_2_mil_unit_map
 
-let get_mil_unit (id: int) (m: t) : MilUnit.t =
-  IntMap.find id m.id_2_mil_unit_map
+let get_mil_unit_by_pos_opt (pos: Position.t) (m: t) : MilUnit.t option =
+  match PosMap.find_opt pos m.pos_2_id_map with
+  | None -> None
+  | Some id ->
+    match get_mil_unit_by_id_opt id m with
+    | None -> failwith "ERROR! Data is not well synced!"
+    | Some _ as v -> v
 
 let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
   match IntMap.find_opt id m.id_2_mil_unit_map with
@@ -38,7 +58,5 @@ let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
     else
       failwith "Update operation cannot change the identity of a military unit.
       This is a programmer error."
-
-let mil_unit_map (m: t) : MilUnit.t PosMap.t = failwith "Unimplemented"
 
 let tile_map (m: t) : pos_2_tile_map = m.pos_2_tile_map

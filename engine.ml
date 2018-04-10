@@ -21,7 +21,7 @@ let init (p1: Command.program) (p2: Command.program) : state =
   }
 
 let get_mil_unit (pos: Position.t) (s: state) : MilUnit.t option =
-  s.world_map |> WorldMap.mil_unit_map |> PosMap.find_opt pos
+  WorldMap.get_mil_unit_by_pos_opt pos s.world_map
 
 let get_tile (pos: Position.t) (s: state) : Tile.t =
   match s.world_map |> WorldMap.tile_map |> PosMap.find_opt pos with
@@ -49,7 +49,7 @@ let get_context (id: int) (s: state) : (module Command.Context) =
     open Common
 
     let get_my_pos : Position.t =
-      let mil_unit = WorldMap.get_mil_unit id s.world_map in
+      let mil_unit = WorldMap.get_mil_unit_by_id id s.world_map in
       match get_position mil_unit s with
       | Some p -> p
       | None -> failwith "Impossible Situation"
@@ -94,7 +94,7 @@ let next (s: state) : state =
   let rec next_helper (st: state) : int list -> state = function
     | [] -> st
     | mil_unit_id::tl ->
-      let mil_unit = WorldMap.get_mil_unit mil_unit_id s.world_map in
+      let mil_unit = WorldMap.get_mil_unit_by_id mil_unit_id s.world_map in
       let program = match MilUnit.identity mil_unit with
         | Black -> s.black_program
         | White -> s.white_program
