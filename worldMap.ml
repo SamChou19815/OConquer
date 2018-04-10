@@ -12,6 +12,10 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
     tile_map = PosMap.empty;
   }
 
+let mil_unit_map (m: t) : MilUnit.t PosMap.t = m.mil_unit_map
+
+let tile_map (m: t) : Tile.t PosMap.t = m.tile_map
+
 let to_string (m: t) : string =
   let f1 pos mil_unit acc =
     acc ^ Position.to_string pos ^ " " ^ MilUnit.to_string mil_unit ^ " "

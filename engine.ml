@@ -23,10 +23,10 @@ let init (p1: Command.program) (p2: Command.program) : state =
   }
 
 let get_mil_unit (pos: Position.t) (s: state) : MilUnit.t option =
-  PosMap.find_opt pos s.world_map.mil_unit_map
+  s.world_map |> WorldMap.mil_unit_map |> PosMap.find_opt pos
 
 let get_tile (pos: Position.t) (s: state) : Tile.t =
-  match PosMap.find_opt pos s.world_map.tile_map with
+  match s.world_map |> WorldMap.tile_map |> PosMap.find_opt pos with
   | Some t -> t
   | None -> Tile.Mountain
 
