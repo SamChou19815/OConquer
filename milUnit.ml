@@ -49,6 +49,10 @@ let train (m: t) : t =
   (* TODO fix value *)
   { m with morale = m.morale + 1; leadership = m.leadership + 1 }
 
+let reduce_morale_by (amount: int) (m: t) : t =
+  if amount > 0 then { m with morale = m.morale - amount }
+  else failwith "Amount should be positive."
+
 let attack (t1, t2: Tile.t * Tile.t) (m1, m2: t * t) : (t option * t option) =
   failwith "Unimplemented"
 

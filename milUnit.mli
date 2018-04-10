@@ -114,6 +114,14 @@ val turn_right : t -> t
 val train : t -> t
 
 (**
+ * [reduce_morale_by a m] reduces the morale of the military unit [m] by [a].
+ *
+ * Requires: [a] must be positive.
+ * Returns: the result of reducing the morale of the military unit.
+*)
+val reduce_morale_by : int -> t -> t
+
+(**
  * [attack (t1, t2) (m1, m2)] lets [m1] attacks [m2] under their tile [t1] and
  * [t2]. It returns the result of attack as a tuple. Each component in the tuple
  * correspondes to the resultant state after attack for [m1] and [m2].

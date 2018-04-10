@@ -72,6 +72,10 @@ let get_context (s: state) : (module Command.Context) =
  * Returns: a new updated world map after the [action] has been done.
 *)
 let exec (action: command) (s: state) : WorldMap.t =
+  let turn_right m =
+    WorldMap.update_mil_unit MilUnit.turn_right s.current_mil_unit m
+  in
+  let move_forward m = failwith "Unimplemented" in (* TODO move forward *)
   match action with
   | DoNothing -> s.world_map
   | Attack -> failwith "Bad!"
@@ -81,17 +85,13 @@ let exec (action: command) (s: state) : WorldMap.t =
     WorldMap.update_mil_unit MilUnit.turn_left s.current_mil_unit s.world_map
   | TurnRight ->
     WorldMap.update_mil_unit MilUnit.turn_right s.current_mil_unit s.world_map
-  | MoveForward -> failwith "Bad!" (* TODO move forward *)
+  | MoveForward -> move_forward s.world_map
   | RetreatBackward ->
-    (* Step 1: Turn back *)
-    let turn_right m =
-      WorldMap.update_mil_unit MilUnit.turn_right s.current_mil_unit m
+    let reduce_morale m =
+      (* TODO fix numeric value *)
+      WorldMap.update_mil_unit (MilUnit.reduce_morale_by 1) s.current_mil_unit m
     in
-    let world_map' = s.world_map |> turn_right |> turn_right in
-    (* Step 2: Move forward *)
-    ignore(world_map'); (* TODO move forward *)
-    (* Step 3: Reduce morale TODO *)
-    failwith "Bad!" (* TODO reduce morale *)
+    s.world_map |> turn_right |> turn_right |> move_forward |> reduce_morale
   | Divide -> failwith "Bad!"
   | Upgrade -> failwith "Bad!"
 
