@@ -16,6 +16,8 @@ let init (identity: player_identity) (id: int) (direction: int)
 let default_init (identity: player_identity) (id: int) (direction: int) =
   init identity id direction 10000 1 1
 
+let identity (m: t) : player_identity = m.identity
+
 let num_soliders (m: t) : int = m.num_soliders
 
 let morale (m: t) : int = m.morale

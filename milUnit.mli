@@ -35,6 +35,14 @@ val init : player_identity -> int -> int -> int -> int -> int -> t
 val default_init : player_identity -> int -> int -> t
 
 (**
+ * [identity mil_unit] reports the identity of the military unit.
+ *
+ * Requires: [mil_unit] is a legal military unit.
+ * Returns: the identity of the military unit [mil_unit].
+*)
+val identity : t -> player_identity
+
+(**
  * [num_soliders mil_unit] reports the number of soldiers for the given
  * military unit [mil_unit].
  *

@@ -57,11 +57,7 @@ end
 *)
 val from_string : player_identity -> string -> program option
 
-(**
- * [ProgramRunner] is responsible for interpret the program with the
- * given [Context].
-*)
-module ProgramRunner (Cxt: Context) : sig
+module type Runner = sig
   (**
    * [run_program program] should run the program to produce a command.
    *
@@ -70,3 +66,9 @@ module ProgramRunner (Cxt: Context) : sig
   *)
   val run_program : program -> command
 end
+
+(**
+ * [ProgramRunner] is responsible for interpret the program with the
+ * given [Context].
+*)
+module ProgramRunner (Cxt: Context) : Runner

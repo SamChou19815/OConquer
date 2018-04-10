@@ -17,6 +17,10 @@ let from_string (i: player_identity) (p_str: string) : program option =
   in
   if Runner.compile_program class_name p_str then Some class_name else None
 
+module type Runner = sig
+  val run_program : program -> command
+end
+
 module ProgramRunner (Cxt: Context) = struct
 
   (** [request] defines a set of all supported request types. *)

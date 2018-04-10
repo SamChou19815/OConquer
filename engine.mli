@@ -17,19 +17,6 @@ type state
 val init : Command.program -> Command.program -> state
 
 (**
- * [next s] produces a new state from the old given state [s]. This function is
- * used to advance the game into a new round. It is not responsible for checking
- * whether the game has ended. For any legal state, it is guaranteed to produce
- * a new legal state regardless whether the game has ended.
- *
- * Requires: [s] must be a legal state.
- * Returns: a new legal state created from the given state [s] where the game
- * has been advanced for one more round by executing programs of each military
- * unit.
-*)
-val next : state -> state
-
-(**
  * [get_mil_unit pos s] returns the military unit at the given position [pos]
  * for a given game state [s]. The military unit may or may not exist.
  *
@@ -89,3 +76,16 @@ val get_map : state -> WorldMap.t
  * Returns: a context with the given state [s] infused in it.
 *)
 val get_context : state -> (module Command.Context)
+
+(**
+ * [next s] produces a new state from the old given state [s]. This function is
+ * used to advance the game into a new round. It is not responsible for checking
+ * whether the game has ended. For any legal state, it is guaranteed to produce
+ * a new legal state regardless whether the game has ended.
+ *
+ * Requires: [s] must be a legal state.
+ * Returns: a new legal state created from the given state [s] where the game
+ * has been advanced for one more round by executing programs of each military
+ * unit.
+*)
+val next : state -> state
