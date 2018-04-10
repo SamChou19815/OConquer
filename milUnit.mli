@@ -105,8 +105,7 @@ val turn_left : t -> t
 val turn_right : t -> t
 
 (**
- * [train m] increases the fighting ability of a military unit, which is
- * defined by the `Train` action.
+ * [train m] increases the fighting ability of a military unit after training.
  *
  * Requires: [m] is a legal military unit.
  * Returns: the result of training the military unit.
@@ -114,12 +113,13 @@ val turn_right : t -> t
 val train : t -> t
 
 (**
- * [reduce_morale_by a m] reduces the morale of the military unit [m] by [a].
+ * [apply_retreat_penalty n] decreases the fighting ability of a military unit
+ * after retreating.
  *
- * Requires: [a] must be positive.
- * Returns: the result of reducing the morale of the military unit.
+ * Requires: [m] is a legal military unit.
+ * Returns: the result of retreating for the military unit.
 *)
-val reduce_morale_by : int -> t -> t
+val apply_retreat_penalty : t -> t
 
 (**
  * [attack (t1, t2) (m1, m2)] lets [m1] attacks [m2] under their tile [t1] and

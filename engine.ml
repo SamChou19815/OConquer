@@ -62,10 +62,12 @@ let get_context (id: int) (s: state) : (module Command.Context) =
   end: Command.Context)
 
 (**
- * [exec id action s] executes the action for the current military unit in
- * state [s] to produce a new updated world map.
+ * [exec id action s] executes the action for the current military unit with
+ * id [id] under state [s] to produce a new updated world map.
  *
- * Requires: [s] is a legal state and [id] refers to an existing id.
+ * Requires:
+ * - [s] is a legal state.
+ * - [id] refers to an existing id.
  * Returns: a new updated world map after the [action] has been done.
 *)
 let exec (id: int) (action: command) (s: state) : WorldMap.t =
@@ -81,14 +83,10 @@ let exec (id: int) (action: command) (s: state) : WorldMap.t =
   | TurnRight -> update MilUnit.turn_right s.world_map
   | MoveForward -> move_forward s.world_map
   | RetreatBackward ->
-    let reduce_morale =
-      (* TODO fix numeric value *)
-      update (MilUnit.reduce_morale_by 1)
-    in
     s.world_map
     |> update MilUnit.turn_right |> update MilUnit.turn_right (* turn back *)
     |> move_forward (* move forward is moving back since we turned back *)
-    |> reduce_morale (* retreat morale penalty *)
+    |> update MilUnit.apply_retreat_penalty (* retreat morale penalty *)
   | Divide -> failwith "Bad!"
   | Upgrade -> failwith "Bad!"
 

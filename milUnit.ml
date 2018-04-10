@@ -1,4 +1,5 @@
 open Definitions
+open GameConstants
 
 type t = {
   identity: player_identity;
@@ -46,12 +47,45 @@ let turn_left : t -> t = turn false
 let turn_right : t -> t = turn true
 
 let train (m: t) : t =
-  (* TODO fix value *)
-  { m with morale = m.morale + 1; leadership = m.leadership + 1 }
+  { m with
+    morale = m.morale + training_morale_boost;
+    leadership = m.leadership + training_leadership_boost
+  }
 
+(**
+ * [reduce_morale_by a m] reduces the morale of the military unit [m] by [a].
+ * If the resultant morale is negative, it will be reset to 0.
+ * If [a] is not-positive, it has no effect.
+ *
+ * Requires: [m] is a legal military unit.
+ * Returns: the result of reducing the morale of the military unit.
+*)
 let reduce_morale_by (amount: int) (m: t) : t =
-  if amount > 0 then { m with morale = m.morale - amount }
-  else failwith "Amount should be positive."
+  if amount > 0 then
+    let morale = m.morale - amount in
+    let morale_normalized = if morale < 0 then 0 else morale in
+    { m with morale = morale_normalized }
+  else m
+
+(**
+ * [reduce_leadership_by a m] reduces the leadership of the military unit [m]
+ * by [a].
+ * If the resultant leadership is negative, it will be reset to 0.
+ * If [a] is not-positive, it has no effect.
+ *
+ * Requires: [m] is a legal military unit.
+ * Returns: the result of reducing the morale of the military unit.
+*)
+let reduce_leadership_by (amount: int) (m: t) : t =
+  if amount > 0 then
+    let leadership = m.leadership - amount in
+    let leadership_normalized = if leadership < 0 then 0 else leadership in
+    { m with leadership = leadership_normalized }
+  else m
+
+let apply_retreat_penalty (m: t) : t =
+  m |> reduce_morale_by retreat_morale_penalty
+  |> reduce_leadership_by retreat_leadership_penalty
 
 let attack (t1, t2: Tile.t * Tile.t) (m1, m2: t * t) : (t option * t option) =
   failwith "Unimplemented"
