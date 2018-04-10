@@ -35,12 +35,32 @@ val init : player_identity -> int -> int -> int -> int -> int -> t
 val default_init : player_identity -> int -> int -> t
 
 (**
+ * [same_mil_unit m1 m2] reports whether two military unit refers to the same
+ * military unit, but in different states.
+ * The check should be performed after performing an in-place update operation
+ * on a military unit.
+ *
+ * Requires: [m1] [m2] are legal military units.
+ * Returns: whether [m1] [m2] refers to the same military unit, just in
+ * different states.
+*)
+val same_mil_unit : t -> t -> bool
+
+(**
  * [identity mil_unit] reports the identity of the military unit.
  *
  * Requires: [mil_unit] is a legal military unit.
  * Returns: the identity of the military unit [mil_unit].
 *)
 val identity : t -> player_identity
+
+(**
+ * [id mil_unit] reports the id of the military unit.
+ *
+ * Requires: [mil_unit] is a legal military unit.
+ * Returns: the id of the military unit [mil_unit].
+*)
+val id : t -> int
 
 (**
  * [num_soliders mil_unit] reports the number of soldiers for the given
@@ -69,24 +89,41 @@ val morale : t -> int
 val leadership : t -> int
 
 (**
- * [turn m right] lets the military unit [m] turn right or left depending on
- * whether [right] is true.
+ * [turn_left m] lets the military unit [m] turn left.
  *
  * Requires: [m] is a legal military unit.
- * Returns: the result of turning for that military unit.
+ * Returns: the result of turning left for that military unit.
 *)
-val turn : t -> bool -> t
+val turn_left : t -> t
 
 (**
- * [attack (m1, m2)] lets [m1] attacks [m2] and returns the result of the
- * attack as a tuple. Each component in the tuple correspondes to the resultant
- * state after attack for [m1] and [m2]. If the component is [None], it means
- * that the military unit has been eliminated as a result of attack.
+ * [turn_right m] lets the military unit [m] turn right.
+ *
+ * Requires: [m] is a legal military unit.
+ * Returns: the result of turning right for that military unit.
+*)
+val turn_right : t -> t
+
+(**
+ * [train m] increases the fighting ability of a military unit, which is
+ * defined by the `Train` action.
+ *
+ * Requires: [m] is a legal military unit.
+ * Returns: the result of training the military unit.
+*)
+val train : t -> t
+
+(**
+ * [attack (t1, t2) (m1, m2)] lets [m1] attacks [m2] under their tile [t1] and
+ * [t2]. It returns the result of attack as a tuple. Each component in the tuple
+ * correspondes to the resultant state after attack for [m1] and [m2].
+ * If the component is [None], it means that the military unit has been
+ * eliminated as a result of attack.
  *
  * Requires: [m1] and [m2] are legal military units.
  * Returns: the result of attack stored in a tuple.
 *)
-val attack : (t * t) -> (t option * t option)
+val attack : (Tile.t * Tile.t) -> (t * t) -> (t option * t option)
 
 (**
  * [divide mil_unit] divides a military unit into two units, each with half of

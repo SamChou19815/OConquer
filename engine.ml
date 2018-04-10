@@ -4,8 +4,8 @@ open Common
 type state = {
   turns: int;
   world_map: WorldMap.t;
-  current_mil_unit: MilUnit.t;
-  execution_queue: MilUnit.t list;
+  current_mil_unit: int;
+  execution_queue: int list;
   black_program: Command.program;
   white_program: Command.program;
 }
@@ -16,8 +16,8 @@ let init (p1: Command.program) (p2: Command.program) : state =
   {
     turns = 0;
     world_map = WorldMap.init m1 m2;
-    current_mil_unit = m1;
-    execution_queue = [ m1; m2 ];
+    current_mil_unit = 0;
+    execution_queue = [ 0; 1 ]; (* TODO fix dummy implementation *)
     black_program = p1;
     white_program = p2;
   }
@@ -37,13 +37,21 @@ let get_game_status (s: state) : game_status = InProgress
 
 let get_map (s: state) : WorldMap.t = s.world_map
 
+(**
+ * [get_context s] creates a specialized Context module that reports various
+ * aspects of the map for a given state [s], which is infused into the context.
+ *
+ * Requires: [s] is a legal state.
+ * Returns: a context with the given state [s] infused in it.
+*)
 let get_context (s: state) : (module Command.Context) =
   (* Some hack with first class module *)
   (module struct
     open Common
 
     let get_my_pos : Position.t =
-      match get_position s.current_mil_unit s with
+      let mil_unit = WorldMap.get_mil_unit s.current_mil_unit s.world_map in
+      match get_position mil_unit s with
       | Some p -> p
       | None -> failwith "Impossible Situation"
 
@@ -56,22 +64,42 @@ let get_context (s: state) : (module Command.Context) =
     let get_map : WorldMap.t = get_map s
   end: Command.Context)
 
-let exec (mil_unit: MilUnit.t) (action: command) (s: state) : state =
+(**
+ * [exec action s] executes the action for the current military unit in
+ * state [s] to produce a new updated world map.
+ *
+ * Requires: [s] is a legal state.
+ * Returns: a new updated world map after the [action] has been done.
+*)
+let exec (action: command) (s: state) : WorldMap.t =
   match action with
-  | DoNothing -> failwith "Bad!"
+  | DoNothing -> s.world_map
   | Attack -> failwith "Bad!"
-  | Train -> failwith "Bad!"
-  | TurnLeft -> failwith "Bad!"
-  | TurnRight -> failwith "Bad!"
-  | MoveForward -> failwith "Bad!"
-  | RetreatBackward -> failwith "Bad!"
+  | Train ->
+    WorldMap.update_mil_unit MilUnit.train s.current_mil_unit s.world_map
+  | TurnLeft ->
+    WorldMap.update_mil_unit MilUnit.turn_left s.current_mil_unit s.world_map
+  | TurnRight ->
+    WorldMap.update_mil_unit MilUnit.turn_right s.current_mil_unit s.world_map
+  | MoveForward -> failwith "Bad!" (* TODO move forward *)
+  | RetreatBackward ->
+    (* Step 1: Turn back *)
+    let turn_right m =
+      WorldMap.update_mil_unit MilUnit.turn_right s.current_mil_unit m
+    in
+    let world_map' = s.world_map |> turn_right |> turn_right in
+    (* Step 2: Move forward *)
+    ignore(world_map'); (* TODO move forward *)
+    (* Step 3: Reduce morale TODO *)
+    failwith "Bad!" (* TODO reduce morale *)
   | Divide -> failwith "Bad!"
   | Upgrade -> failwith "Bad!"
 
 let next (s: state) : state =
-  let rec next_helper (st: state) : MilUnit.t list -> state = function
+  let rec next_helper (st: state) : int list -> state = function
     | [] -> st
-    | mil_unit::tl ->
+    | mil_unit_id::tl ->
+      let mil_unit = WorldMap.get_mil_unit mil_unit_id s.world_map in
       let program = match MilUnit.identity mil_unit with
         | Black -> s.black_program
         | White -> s.white_program
@@ -81,7 +109,14 @@ let next (s: state) : state =
       let (module Cxt) = get_context st in
       let (module R: Runner) = (module ProgramRunner (Cxt)) in
       let cmd = R.run_program program in
-      let s' = exec mil_unit cmd s in
+      let world_map' = exec cmd s in
+      (* TODO check whether the military unit is in a city and increase its
+       * number of soldiers accordingly. *)
+      let s' = {
+        s with
+        turns = s.turns + 1; world_map = world_map';
+        current_mil_unit = s.current_mil_unit (* TODO fix this *)
+      } in
       next_helper s' tl
   in
   next_helper s s.execution_queue

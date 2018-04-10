@@ -69,15 +69,6 @@ val get_game_status : state -> game_status
 val get_map : state -> WorldMap.t
 
 (**
- * [get_context s] creates a specialized Context module that reports various
- * aspects of the map for a given state [s], which is infused into the context.
- *
- * Requires: [s] is a legal state.
- * Returns: a context with the given state [s] infused in it.
-*)
-val get_context : state -> (module Command.Context)
-
-(**
  * [next s] produces a new state from the old given state [s]. This function is
  * used to advance the game into a new round. It is not responsible for checking
  * whether the game has ended. For any legal state, it is guaranteed to produce
