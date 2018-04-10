@@ -89,3 +89,14 @@ val get_tile_opt_by_mil_id : int -> t -> Tile.t option
  * to a non-existing military unit. The new map is legal.
 *)
 val update_mil_unit : int -> (MilUnit.t -> MilUnit.t) -> t -> t
+
+(**
+ * [upgrade_tile pos m] upgrades a tile at position [pos] in map [m].
+ * There must be a tile there that is not a mountain.
+ *
+ * Requires: [pos] in map [m] should contains a tile that is not mountain.
+ * Returns: a new map with the upgraded tile. The new map is legal.
+ * Raises: [NotUpgradable] if the tile cannot be upgraded due to violation of
+ * requirement stated above.
+*)
+val upgrade_tile : Position.t -> t -> t

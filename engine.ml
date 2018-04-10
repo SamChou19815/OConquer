@@ -77,7 +77,11 @@ let exec (id: int) (action: command) (s: state) : WorldMap.t =
     |> move_forward (* move forward is moving back since we turned back *)
     |> update MilUnit.apply_retreat_penalty (* retreat morale penalty *)
   | Divide -> failwith "Bad!"
-  | Upgrade -> failwith "Bad!"
+  | Upgrade -> WorldMap.(
+      match get_position_opt_by_id id s.world_map with
+      | None -> failwith "Impossible Situation"
+      | Some pos -> upgrade_tile pos s.world_map
+    )
 
 let next (s: state) : state =
   let rec next_helper (st: state) : int list -> state = function
