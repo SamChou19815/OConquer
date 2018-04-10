@@ -17,42 +17,6 @@ type state
 val init : Command.program -> Command.program -> state
 
 (**
- * [get_mil_unit pos s] returns the military unit at the given position [pos]
- * for a given game state [s]. The military unit may or may not exist.
- *
- * Requires:
- * - [pos] is a legal representation of position.
- * - [s] is a legal state.
- * Returns: [Some m] where [m] is a military unit if [m] is at [pos]; [None] if
- * [pos] has no military units.
-*)
-val get_mil_unit : Position.t -> state -> MilUnit.t option
-
-(**
- * [get_tile pos s] returns the tile at the given position [pos] for a given
- * game state [s]. If the tile is out of bound, mountain will be returned.
- *
- * Requires:
- * - [pos] is a legal representation of position.
- * - [s] is a legal state.
- * Returns: the tile at the given position [pos] for a given game state [s].
-*)
-val get_tile : Position.t -> state -> Tile.t
-
-(**
- * [get_position mil_unit s] returns the position of the given military unit
- * [mil_unit] for a given game state [s]. The position may not exist when there
- * is no such military unit [mil_unit].
- *
- * Requires:
- * - [mil_unit] is a legal military unit.
- * - [s] is a legal state.
- * Returns: [Some pos] where [pos] is the position of the military unit; [None]
- * if there is no such military unit [mil_unit].
-*)
-val get_position : MilUnit.t -> state -> Position.t option
-
-(**
  * [get_game_status s] reports the winning status of the game.
  *
  * Requires: [s] is a legal state.

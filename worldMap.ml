@@ -3,11 +3,13 @@ open Common
 (* Some type alias to improve readability of code. *)
 type pos_2_id_map = int PosMap.t
 type pos_2_tile_map = Tile.t PosMap.t
+type id_2_pos_map = Position.t IntMap.t
 type id_2_mil_unit_map = MilUnit.t IntMap.t
 
 type t = {
   pos_2_id_map: pos_2_id_map;
   pos_2_tile_map: pos_2_tile_map;
+  id_2_pos_map: id_2_pos_map;
   id_2_mil_unit_map: id_2_mil_unit_map;
 }
 
@@ -31,21 +33,42 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
       (* TODO fix dummy implementation *)
       pos_2_id_map = PosMap.empty;
       pos_2_tile_map = PosMap.empty;
+      id_2_pos_map = IntMap.empty;
       id_2_mil_unit_map = IntMap.empty;
     }
+
+let get_position_opt_by_id (id: int) (m: t) : Position.t option =
+  IntMap.find_opt id m.id_2_pos_map
 
 let get_mil_unit_by_id (id: int) (m: t) : MilUnit.t =
   IntMap.find id m.id_2_mil_unit_map
 
-let get_mil_unit_by_id_opt (id: int) (m: t) : MilUnit.t option =
+let get_mil_unit_opt_by_id (id: int) (m: t) : MilUnit.t option =
   IntMap.find_opt id m.id_2_mil_unit_map
 
-let get_mil_unit_by_pos_opt (pos: Position.t) (m: t) : MilUnit.t option =
+let get_mil_unit_opt_by_pos (pos: Position.t) (m: t) : MilUnit.t option =
   match PosMap.find_opt pos m.pos_2_id_map with
   | None -> None
   | Some id ->
-    match get_mil_unit_by_id_opt id m with
-    | None -> failwith "ERROR! Data is not well synced!"
+    match get_mil_unit_opt_by_id id m with
+    | None ->
+      (* Guard against programmer error! *)
+      failwith "ERROR! Data is not well synced!"
+    | Some _ as v -> v
+
+let get_tile_by_pos (pos: Position.t) (m: t) : Tile.t =
+  match PosMap.find_opt pos m.pos_2_tile_map with
+  | Some t -> t
+  | None -> Tile.Mountain
+
+let get_tile_opt_by_mil_id (id: int) (m: t) : Tile.t option =
+  match get_position_opt_by_id id m with
+  | None -> None
+  | Some pos ->
+    match PosMap.find_opt pos m.pos_2_tile_map with
+    | None ->
+      (* Guard against programmer error! *)
+      failwith "ERROR! Data is not well synced!"
     | Some _ as v -> v
 
 let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
