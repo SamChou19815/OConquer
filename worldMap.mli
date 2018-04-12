@@ -91,12 +91,44 @@ val get_tile_opt_by_mil_id : int -> t -> Tile.t option
 val update_mil_unit : int -> (MilUnit.t -> MilUnit.t) -> t -> t
 
 (**
- * [upgrade_tile pos m] upgrades a tile at position [pos] in map [m].
- * There must be a tile there that is not a mountain.
+ * [remove_map_by_id id m] removes the military unit [id] from the map [m].
+ * The removal can happen when the military unit is eliminated, or when
+ * the military unit is moved to another place. In the second case this
+ * method should be followed by a [put_map] method.
  *
- * Requires: [pos] in map [m] should contains a tile that is not mountain.
- * Returns: a new map with the upgraded tile. The new map is legal.
- * Raises: [NotUpgradable] if the tile cannot be upgraded due to violation of
- * requirement stated above.
-*)
-val upgrade_tile : Position.t -> t -> t
+ * Requires:
+ * - [id] must be a legal key of a military unit in the map.
+ * - [m] is a legal world map.
+ * Returns: A new world map with the military [id] removed.
+ *
+ *)
+val remove_map_by_id : int -> t -> t
+
+(**
+ * [remove_map_by_id pos m] removes the military unit at Position
+ * [pos] from the map [m].
+ * The removal can happen when the military unit is eliminated, or when
+ * the military unit is moved to another place. In the second case this
+ * method should be followed by a [put_map] method.
+ *
+ * Requires:
+ * - [id] must be a legal key of a military unit in the map.
+ * - [m] is a legal world map.
+ * Returns: A new world map with the military [id] removed.
+ *
+ *)
+val remove_map_by_pos : Position.t -> t -> t
+
+(**
+ * [put_map id pos m] puts the military unit [id] with specified position [pos]
+ * into the maps. This can only happen when the unit [id] was moved to another
+ * place, or a new military unit is formed from split.
+ *
+ * Requires:
+ * - [id] is either the id of a moved military unit, or the id of a new military
+ *   unit that is split from another existing one.
+ * - [m] is a legal world map.
+ * Returns: A new world map with the military [id] mapped to position [pos].
+ *
+ *)
+val put_map : int -> Position.t -> t -> t
