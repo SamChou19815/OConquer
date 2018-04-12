@@ -86,3 +86,9 @@ let upgrade_tile (pos: Position.t) (m: t) : t =
   let tile = get_tile_by_pos pos m in
   let tile' = Tile.upgrade_tile tile in
   { m with pos_2_tile_map = PosMap.add pos tile' m.pos_2_tile_map }
+
+let remove_map_by_id (id: int) (m: t) : t = m
+
+let remove_map_by_pos (pos: Position.t) (m: t) : t = m
+
+let put_map (id: int) (pos: Position.t) (m: t) : t = m
