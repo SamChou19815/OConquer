@@ -1,5 +1,5 @@
 test:
-	ocamlbuild -use-ocamlfind engine.byte
+	ocamlbuild -use-ocamlfind main.byte
 
 compile:
 	ocamlbuild -use-ocamlfind engine.cmo

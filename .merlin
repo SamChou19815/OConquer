@@ -3,3 +3,6 @@ PKG oUnit
 PKG str
 PKG unix
 PKG qcheck
+PKG lwt
+PKG cohttp
+PKG cohttp-lwt-unix
