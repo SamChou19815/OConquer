@@ -8,7 +8,7 @@ let query (round_id: int) : WorldMap.t = failwith "Unimplemented"
 
 let delegate (cmd: string) : unit = ()
 
-let server =
+let server : unit Lwt.t =
   let callback _conn req body =
     let uri = req |> Request.uri |> Uri.to_string in
     let meth = req |> Request.meth |> Code.string_of_method in
