@@ -1,8 +1,8 @@
-test:
+main:
 	ocamlbuild -use-ocamlfind main.byte
 
-compile:
-	ocamlbuild -use-ocamlfind engine.cmo
+test:
+	ocamlbuild -use-ocamlfind main.byte
 
 zip:
 	zip submission.zip *.ml* ./sample_sdk/* _tags Makefile
