@@ -7,6 +7,7 @@ open RemoteServer
  * Once those parts are finished, the implementation of main should be trivial.
 *)
 
-let main () = ()
+let main () =
+  start_local_server ()
 
 let () = main ()

@@ -27,3 +27,11 @@ val query: int -> WorldMap.t
  * Effect: the [cmd] has been sent to the remote server.
 *)
 val delegate : string -> unit
+
+(**
+ * [start_local_server ()] starts a local server.
+ * Requires: None.
+ * Returns: None.
+ * Effect: A local server is started at http://localhost:8080.
+*)
+val start_local_server : unit -> unit
