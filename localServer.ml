@@ -10,10 +10,7 @@ let delegate (cmd: string) : unit = ()
 
 let start_local_server () =
   let test_handler = ServerCore.create_handler GET "/test" (fun _ b ->
-      let body =
-        Printf.sprintf "UriPath: %s\nMethod: %s\nBody: %s" "/test" "GET" b
-      in
-      Server.respond_string ~status:`OK ~body ()
+      Printf.sprintf "UriPath: %s\nMethod: %s\nBody: %s" "/test" "GET" b
     )
   in
   ServerCore.start_server [test_handler]

@@ -6,16 +6,18 @@ type accepted_method = GET | POST
 (** [params] is the type of all the parameter map. *)
 type params = (string * string list) list
 
-(** [response] is the type of the response given to the client. *)
-type response = (Response.t * Cohttp_lwt__Body.t) Lwt.t
-
 (**
  * [convenient_handler] handlers a request according to parameters with type
  * [param], body in [string] and give a response.
+ * For example, if [h] is a [convenient_handler], then [h params body] means
+ * [h] will handle the request with parameters in [param] and body in [body].
  * It is a high level concept and it can be used to produce a low level
  * [handler].
+ * When writing a convenient handler, there is no need to convert an unexpected
+ * error into string to match the type. Just throw the exception and this
+ * module will handle it for you.
 *)
-type convenient_handler = params -> string -> response
+type convenient_handler = params -> string -> string
 
 (**
  * [handler] is an abstract type that handle the requests in a low level way.
@@ -33,7 +35,8 @@ type handler
  * Requires:
  * - [m] is [GET] or [POST].
  * - [path] is a legal path that starts with "/" but does not end with "/".
- * - [h] is a high level convenient handler.
+ * - [h] is a high level convenient handler. It is allowed to throw exception
+ *   to indicate a very bad client request.
  * Returns: a constructed corresponding low level handler.
 *)
 val create_handler : accepted_method -> string -> convenient_handler -> handler
