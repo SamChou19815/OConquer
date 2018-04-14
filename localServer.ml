@@ -8,9 +8,4 @@ let query (round_id: int) : WorldMap.t = failwith "Unimplemented"
 
 let delegate (cmd: string) : unit = ()
 
-let start_local_server () =
-  let test_handler = ServerCore.create_handler GET "/test" (fun _ b ->
-      Printf.sprintf "UriPath: %s\nMethod: %s\nBody: %s" "/test" "GET" b
-    )
-  in
-  ServerCore.start_server [test_handler]
+let start_local_server () = let open ServerCore in start_server [test_handler]

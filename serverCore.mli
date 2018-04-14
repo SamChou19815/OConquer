@@ -28,6 +28,12 @@ type convenient_handler = params -> string -> string
 type handler
 
 (**
+ * [test_handler] is a trivial handler that handles GET request at /test which
+ * just prints ["It works!"]. It is used as a quick start.
+*)
+val test_handler : handler
+
+(**
  * [create_handler m path h] produces a low level handler from the prescribed
  * accepted method [m] and accepted path [path] to accept or reject a request.
  * Then it transforms a convenient handler [h] to a fully fledged handler.

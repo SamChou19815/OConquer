@@ -21,24 +21,25 @@ type callback = Server.conn -> Request.t -> Cohttp_lwt__Body.t -> response
 
 let create_handler (m: accepted_method) (path: string)
     (h: convenient_handler) : handler =
-  fun (conn: Server.conn) (req: Request.t) : (string -> string) option -> (
-      (* Only accept GET or POST *)
-      let method_opt = match Request.meth req with
-        | `GET -> Some GET
-        | `POST -> Some POST
-        | _ -> None
-      in
-      match method_opt with
-      (* Refuse to handle unknown methods *)
-      | None -> None
-      | Some m' ->
-        (* Refuse to handle wrong methods *)
-        if m <> m' then None
-        else
-          let uri = Request.uri req in
-          (* Refuse to handle wrong paths. *)
-          if Uri.path uri = path then Some (h (Uri.query uri)) else None
-    )
+  fun (conn: Server.conn) (req: Request.t) : (string -> string) option ->
+    (* Only accept GET or POST *)
+    let method_opt = match Request.meth req with
+      | `GET -> Some GET
+      | `POST -> Some POST
+      | _ -> None
+    in
+    match method_opt with
+    (* Refuse to handle unknown methods *)
+    | None -> None
+    | Some m' ->
+      (* Refuse to handle wrong methods *)
+      if m <> m' then None
+      else
+        let uri = Request.uri req in
+        (* Refuse to handle wrong paths. *)
+        if Uri.path uri = path then Some (h (Uri.query uri)) else None
+
+let test_handler : handler = create_handler GET "/test" (fun _ b -> "It works!")
 
 (**
  * [create_callback handlers] automatically creates a callback that can be used
