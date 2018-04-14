@@ -2,10 +2,16 @@ open Lwt
 open Cohttp
 open Cohttp_lwt_unix
 
-let start_simulation (p1: Command.program) (p2: Command.program) : unit = ()
+module type Kernel = sig
+  type state
 
-let query (round_id: int) : WorldMap.t = failwith "Unimplemented"
+  val init : unit -> state
+  val start_simulation : string -> string -> state ->
+    [ `OK | `DoesNotCompile | `AlreadyRunning ]
+  val query : int -> state -> unit
+end
 
-let delegate (cmd: string) : unit = ()
-
-let start_local_server () = let open ServerCore in start_server [test_handler]
+module Make (K: Kernel) = struct
+  (* TODO fix dummy implementation *)
+  let start_local_server () = let open ServerCore in start_server [test_handler]
+end

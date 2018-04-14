@@ -1,5 +1,4 @@
 open Engine
-open LocalServer
 open RemoteServer
 
 (*
@@ -7,7 +6,8 @@ open RemoteServer
  * Once those parts are finished, the implementation of main should be trivial.
 *)
 
-let main () =
-  start_local_server ()
+module LocalServer = LocalServer.Make (ServerKernels.LocalServerKernel)
+
+let main () = LocalServer.start_local_server ()
 
 let () = main ()
