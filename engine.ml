@@ -85,7 +85,12 @@ let exec (id: int) (action: command) (s: state) : WorldMap.t =
 
 let next (s: state) : state =
   let process_next_id (map: WorldMap.t) (mil_unit_id: int) : WorldMap.t =
-    let mil_unit = WorldMap.get_mil_unit_by_id mil_unit_id map in
+    let m_init = WorldMap.get_mil_unit_by_id mil_unit_id map in
+    (* Step 1: Increase number of soldiers accordingly. *)
+    let tile_of_unit = WorldMap.get_tile_by_mil_id mil_unit_id map in
+    let num_soldier_increase = Tile.num_of_soldier_increase tile_of_unit in
+    let mil_unit = MilUnit.increase_soldier_by num_soldier_increase m_init in
+    (* Step 2: Run the program *)
     let program = match MilUnit.identity mil_unit with
       | Black -> s.black_program
       | White -> s.white_program
@@ -95,8 +100,6 @@ let next (s: state) : state =
     let (module Cxt) = get_context mil_unit_id map in
     let (module R: Runner) = (module ProgramRunner (Cxt)) in
     let cmd = R.run_program program in
-    (* TODO check whether the military unit is in a city and increase its
-     * number of soldiers accordingly. *)
     exec mil_unit_id cmd s
   in
   let rec next_helper (st: state) : int list -> state = function

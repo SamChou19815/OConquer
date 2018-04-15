@@ -65,6 +65,19 @@ val get_mil_unit_opt_by_pos : Position.t -> t -> MilUnit.t option
 val get_tile_by_pos : Position.t -> t -> Tile.t
 
 (**
+ * [get_tile_by_mil_id id m] tries to find the tile where the military unit
+ * with id [id] stays.
+ *
+ * Requires:
+ * - [id] must be an existing military unit id.
+ * - [m] is a legal world map.
+ * Returns: [v], if it is occupied by the military unit with id [id] in the
+ * map [m].
+ * Raises: [Not_found] if there is no military unit in the map that has [id].
+*)
+val get_tile_by_mil_id : int -> t -> Tile.t
+
+(**
  * [get_tile_opt_by_mil_id id m] tries to find the tile where the military unit
  * with id [id] stays.
  *

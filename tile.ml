@@ -1,9 +1,14 @@
 type t = Empty | Mountain | Fort | City of int
 
-exception NotUpgradable
+exception BadTileInput
+
+let num_of_soldier_increase : t -> int = function
+  | Mountain -> raise BadTileInput
+  | Empty | Fort -> 0
+  | City i -> GameConstants.increase_soldier_factor * i
 
 let upgrade_tile : t -> t = function
-  | Mountain -> raise NotUpgradable
+  | Mountain -> raise BadTileInput
   | Empty -> Fort
   | Fort -> City 1
   | City i -> City (i + 1)

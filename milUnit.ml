@@ -30,6 +30,11 @@ let morale (m: t) : int = m.morale
 
 let leadership (m: t) : int = m.leadership
 
+let increase_soldier_by (n: int) (m: t) : t =
+  if n < 0 then failwith "Bad Input n!"
+  else if n = 0 then m
+  else { m with num_soliders = m.num_soliders + n }
+
 (**
  * [turn right m] lets the military unit [m] turn right or left depending on
  * whether [right] is true.

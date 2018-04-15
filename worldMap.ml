@@ -71,6 +71,16 @@ let get_tile_opt_by_mil_id (id: int) (m: t) : Tile.t option =
       failwith "ERROR! Data is not well synced!"
     | Some _ as v -> v
 
+let get_tile_by_mil_id (id: int) (m: t) : Tile.t =
+  match get_position_opt_by_id id m with
+  | None -> raise Not_found
+  | Some pos ->
+    match PosMap.find_opt pos m.pos_2_tile_map with
+    | None ->
+      (* Guard against programmer error! *)
+      failwith "ERROR! Data is not well synced!"
+    | Some t -> t
+
 let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
   match IntMap.find_opt id m.id_2_mil_unit_map with
   | None -> m

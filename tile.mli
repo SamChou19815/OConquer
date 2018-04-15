@@ -4,8 +4,18 @@
 *)
 type t = Empty | Mountain | Fort | City of int
 
-(** [NotUpgradable] is an error indicating that a tile cannot be upgraded. *)
-exception NotUpgradable
+(** [BadTileInput] is an error indicating that a tile is a bad input. *)
+exception BadTileInput
+
+(**
+ * [num_of_soldier_increase t] reports the number of soldier increase for the
+ * tile if a military unit is on it.
+ *
+ * Requires: [t] is not [Mountain].
+ * Returns: number of soldier increase for the tile if a military unit is on it.
+ * Raises: [BadTileInput] if [t = Mountain].
+*)
+val num_of_soldier_increase : t -> int
 
 (**
  * [upgrade_tile t] upgrades a tile [t] to its new level.
@@ -13,7 +23,7 @@ exception NotUpgradable
  *
  * Requires: [t] is not [Mountain].
  * Returns: an upgraded tile.
- * Raises: [NotUpgradable] if [t = Mountain].
+ * Raises: [BadTileInput] if [t = Mountain].
 *)
 val upgrade_tile : t -> t
 

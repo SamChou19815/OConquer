@@ -89,6 +89,17 @@ val morale : t -> int
 val leadership : t -> int
 
 (**
+ * [increase_soldier_by n m] increases the number of the given military unit by
+ * [n].
+ *
+ * Requires:
+ * - [n] is non-negative.
+ * - [m] is a legal military unit.
+ * Returns: the result of increasing soliders for that military unit.
+*)
+val increase_soldier_by : int -> t -> t
+
+(**
  * [turn_left m] lets the military unit [m] turn left.
  *
  * Requires: [m] is a legal military unit.
