@@ -72,10 +72,7 @@ let exec (id: int) (action: command) (m: WorldMap.t) : WorldMap.t =
     |> forward (* move forward is moving back since we turned back *)
     |> update MilUnit.apply_retreat_penalty (* retreat morale penalty *)
   | Divide -> failwith "Bad!"
-  | Upgrade -> WorldMap.(
-      let pos = get_position_by_id id m in
-      upgrade_tile pos m
-    )
+  | Upgrade -> WorldMap.(upgrade_tile (get_position_by_id id m) m)
 
 (**
  * [get_program s mil_unit] obtains the program of a military unit [mil_unit]

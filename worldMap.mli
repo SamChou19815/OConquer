@@ -171,6 +171,19 @@ val move_mil_unit_forward : int -> t -> t
 val attack : int -> t -> t
 
 (**
+ * [divide id m] lets a military unit with [id] do DIVIDE!
+ * If the operation is not possible, it will do nothing.
+ *
+ * Requires:
+ * - [id] can be anything. However, if it refers to a non-existing military unit
+ *   [m] will be directly returned.
+ * - [m] is a legal world map.
+ * Returns: a new world map with the military unit with [id] performed an
+ * divide operation. Or the old map if this operation is impossible.
+*)
+val divide : int -> t -> t
+
+(**
  * [next process_mil_unit m] steps through the entire round for the world map
  * to produce a new world map.
  * [process_mil_unit] does some operation on the military unit to change some
@@ -185,48 +198,3 @@ val attack : int -> t -> t
  * map [m].
 *)
 val next : (int -> t -> t) -> t -> t
-
-(*
-(**
- * [remove_map_by_id id m] removes the military unit [id] from the map [m].
- * The removal can happen when the military unit is eliminated, or when
- * the military unit is moved to another place. In the second case this
- * method should be followed by a [put_map] method.
- *
- * Requires:
- * - [id] must be a legal key of a military unit in the map.
- * - [m] is a legal world map.
- * Returns: A new world map with the military [id] removed.
- *
- *)
-val remove_map_by_id : int -> t -> t
-
-(**
- * [remove_map_by_id pos m] removes the military unit at Position
- * [pos] from the map [m].
- * The removal can happen when the military unit is eliminated, or when
- * the military unit is moved to another place. In the second case this
- * method should be followed by a [put_map] method.
- *
- * Requires:
- * - [id] must be a legal key of a military unit in the map.
- * - [m] is a legal world map.
- * Returns: A new world map with the military [id] removed.
- *
- *)
-val remove_map_by_pos : Position.t -> t -> t
-
-(**
- * [put_map id pos m] puts the military unit [id] with specified position [pos]
- * into the maps. This can only happen when the unit [id] was moved to another
- * place, or a new military unit is formed from split.
- *
- * Requires:
- * - [id] is either the id of a moved military unit, or the id of a new military
- *   unit that is split from another existing one.
- * - [m] is a legal world map.
- * Returns: A new world map with the military [id] mapped to position [pos].
- *
- *)
-val put_map : int -> Position.t -> t -> t
-*)

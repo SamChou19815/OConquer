@@ -264,31 +264,45 @@ let attack (id: int) (m: t) : t =
         | None, Some m2 -> put_mil_unit ahead_pos m2 map'
         | None, None -> map'
 
-  let next (process_mil_unit: int -> t -> t) (m: t) : t =
-    (* To store all the military units' id that can possibly exist. *)
-    let temp_queue : int Queue.t = Queue.create () in
-    (* Iterate through the execution list to execute according to
-     * [process_mil_unit] *)
-    let rec next_process (map: t) : t =
-      if Queue.is_empty map.execution_queue then map
-      else
-        let id = Queue.pop map.execution_queue in
-        (* First check whether the id still exist. *)
-        if IntMap.mem id m.maps.id_2_mil_unit_map then
-          (* Only executed military unit may exist at a later time. *)
-          let () = Queue.push id temp_queue in
-          let map' = process_mil_unit id map in
-          next_process map'
-        else next_process map
-    in
-    (* Add back alive military units. *)
-    let end_of_turn_process (map: t) : t =
-      while Queue.is_empty temp_queue do
-        let id = Queue.pop temp_queue in
-        if IntMap.mem id m.maps.id_2_mil_unit_map then
-          (* Only add back if it still exists *)
-          Queue.push id map.execution_queue
-      done;
-      map
-    in
-    m |> next_process |> end_of_turn_process
+let divide (id: int) (m: t) : t =
+  match IntMap.find_opt id m.maps.id_2_mil_unit_map with
+  | None -> m
+  | Some mil_unit ->
+    let direction = MilUnit.direction mil_unit in
+    let my_pos = get_position_by_id id m in
+    match get_passable_pos_ahead direction my_pos m with
+    | None -> m (* No place to divide *)
+    | Some ahead_pos ->
+      match MilUnit.divide mil_unit with
+      | None -> m (* Impossible to divide *)
+      | Some (m1, m2) ->
+        m |> put_mil_unit my_pos m1 |> put_mil_unit ahead_pos m2
+
+let next (process_mil_unit: int -> t -> t) (m: t) : t =
+  (* To store all the military units' id that can possibly exist. *)
+  let temp_queue : int Queue.t = Queue.create () in
+  (* Iterate through the execution list to execute according to
+   * [process_mil_unit] *)
+  let rec next_process (map: t) : t =
+    if Queue.is_empty map.execution_queue then map
+    else
+      let id = Queue.pop map.execution_queue in
+      (* First check whether the id still exist. *)
+      if IntMap.mem id m.maps.id_2_mil_unit_map then
+        (* Only executed military unit may exist at a later time. *)
+        let () = Queue.push id temp_queue in
+        let map' = process_mil_unit id map in
+        next_process map'
+      else next_process map
+  in
+  (* Add back alive military units. *)
+  let end_of_turn_process (map: t) : t =
+    while Queue.is_empty temp_queue do
+      let id = Queue.pop temp_queue in
+      if IntMap.mem id m.maps.id_2_mil_unit_map then
+        (* Only add back if it still exists *)
+        Queue.push id map.execution_queue
+    done;
+    map
+  in
+  m |> next_process |> end_of_turn_process
