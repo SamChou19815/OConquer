@@ -20,7 +20,8 @@ type maps = {
 
 type t = {
   maps: maps;
-  execution_queue: int Queue.t
+  next_id: int; (* Next ID that can be used by a military unit. *)
+  execution_queue: int Queue.t;
 }
 
 exception IllegalWorldMapOperation of string
@@ -58,15 +59,18 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
   if MilUnit.same_mil_unit m1 m2 then
     illegal_ops "Cannot initialize the map with two same military units"
   else
+    let execution_queue = Queue.create () in
+    let () = Queue.(add 0 execution_queue; add 1 execution_queue) in
     {
       maps = {
         (* TODO fix dummy implementation *)
         id_2_mil_unit_map = IntMap.empty;
         id_2_pos_map = IntMap.empty;
         pos_2_id_map = PosMap.empty;
-        pos_2_tile_map = PosMap.empty;
+        pos_2_tile_map = PosMap.empty; (* TODO Fill tiles *)
       };
-      execution_queue = Queue.create () (* TODO fix dummy implementation *)
+      next_id = 2;
+      execution_queue;
     }
 
 let get_position_by_id (id: int) (m: t) : Position.t =
@@ -276,7 +280,9 @@ let divide (id: int) (m: t) : t =
       match MilUnit.divide mil_unit with
       | None -> m (* Impossible to divide *)
       | Some (m1, m2) ->
-        m |> put_mil_unit my_pos m1 |> put_mil_unit ahead_pos m2
+        let () = Queue.add (MilUnit.id m2) m.execution_queue in
+        let m' = { m with next_id = m.next_id + 1 } in
+        m' |> put_mil_unit my_pos m1 |> put_mil_unit ahead_pos m2
 
 let next (process_mil_unit: int -> t -> t) (m: t) : t =
   (* To store all the military units' id that can possibly exist. *)
