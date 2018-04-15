@@ -25,29 +25,29 @@ let get_game_status (s: state) : game_status = InProgress
 let get_map (s: state) : WorldMap.t = s.world_map
 
 (**
- * [get_context id s] creates a specialized Context module that reports various
- * aspects of the map for a given state [s] and military unit id [id], which are
+ * [get_context id m] creates a specialized Context module that reports various
+ * aspects of the map for a given map [m] and military unit id [id], which are
  * both infused into the context.
  *
- * Requires: [s] is a legal state and [id] refers to an existing id.
+ * Requires: [m] is a legal world map and [id] refers to an existing id.
  * Returns: a context with the given state [s] infused in it.
 *)
-let get_context (id: int) (s: state) : (module Command.Context) =
+let get_context (id: int) (m: WorldMap.t) : (module Command.Context) =
   (* Some hack with first class module *)
   (module struct
     open Common
     open WorldMap
 
     let get_my_pos : Position.t =
-      match get_position_opt_by_id id s.world_map with
+      match get_position_opt_by_id id m with
       | Some p -> p
       | None -> failwith "Impossible Situation"
 
     let get_mil_unit (pos: Position.t) : MilUnit.t option =
-      get_mil_unit_opt_by_pos pos s.world_map
+      get_mil_unit_opt_by_pos pos m
 
     let get_tile (pos: Position.t) : Tile.t =
-      get_tile_by_pos pos s.world_map
+      get_tile_by_pos pos m
   end: Command.Context)
 
 (**
@@ -84,22 +84,25 @@ let exec (id: int) (action: command) (s: state) : WorldMap.t =
     )
 
 let next (s: state) : state =
+  let process_next_id (map: WorldMap.t) (mil_unit_id: int) : WorldMap.t =
+    let mil_unit = WorldMap.get_mil_unit_by_id mil_unit_id map in
+    let program = match MilUnit.identity mil_unit with
+      | Black -> s.black_program
+      | White -> s.white_program
+    in
+    let open Command in
+    (* Some hack with first class module *)
+    let (module Cxt) = get_context mil_unit_id map in
+    let (module R: Runner) = (module ProgramRunner (Cxt)) in
+    let cmd = R.run_program program in
+    (* TODO check whether the military unit is in a city and increase its
+     * number of soldiers accordingly. *)
+    exec mil_unit_id cmd s
+  in
   let rec next_helper (st: state) : int list -> state = function
     | [] -> st
     | mil_unit_id::tl ->
-      let mil_unit = WorldMap.get_mil_unit_by_id mil_unit_id s.world_map in
-      let program = match MilUnit.identity mil_unit with
-        | Black -> s.black_program
-        | White -> s.white_program
-      in
-      let open Command in
-      (* Some hack with first class module *)
-      let (module Cxt) = get_context mil_unit_id st in
-      let (module R: Runner) = (module ProgramRunner (Cxt)) in
-      let cmd = R.run_program program in
-      let world_map' = exec mil_unit_id cmd s in
-      (* TODO check whether the military unit is in a city and increase its
-       * number of soldiers accordingly. *)
+      let world_map' = process_next_id st.world_map mil_unit_id in
       let s' = {
         s with
         turns = s.turns + 1; world_map = world_map';
