@@ -63,6 +63,14 @@ val identity : t -> player_identity
 val id : t -> int
 
 (**
+ * [direction mil_unit] reports the direction of the military unit.
+ *
+ * Requires: [mil_unit] is a legal military unit.
+ * Returns: the direction of the military unit [mil_unit].
+*)
+val direction : t -> int
+
+(**
  * [num_soliders mil_unit] reports the number of soldiers for the given
  * military unit [mil_unit].
  *

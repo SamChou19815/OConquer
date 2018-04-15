@@ -97,6 +97,19 @@ val get_tile_by_mil_id : int -> t -> Tile.t
 val get_tile_opt_by_mil_id : int -> t -> Tile.t option
 
 (**
+ * [get_passable_pos_ahead direction pos m] returns a passable position
+ * directly ahead of the given [pos] pointing to direction [direction].
+ * If there is no such position that is passable, it will give [None].
+ *
+ * Requires:
+ * - [direction] is 0, 1, 2, 3, representing east, north, west, south.
+ * - [pos] can be any position.
+ * Returns: [Some p] if [p] is ahead of [pos] according to [direction]; [None]
+ * if the position ahead is not passable.
+*)
+val get_passable_pos_ahead : int -> Position.t -> t -> Position.t option
+
+(**
  * [update_mil_unit id f m] updates a military unit with [id] on the map [m] by
  * the given function [f] and produces a new map with the updated state.
  *
@@ -122,6 +135,19 @@ val update_mil_unit : int -> (MilUnit.t -> MilUnit.t) -> t -> t
 val upgrade_tile : Position.t -> t -> t
 
 (**
+ * [move_mil_unit_forward id m] moves a military unit with [id] forward by 1.
+ * If the tile in front is not passable, it will do nothing.
+ *
+ * Requires:
+ * - [id] can be anything. However, if it refers to a non-existing military unit
+ *   [m] will be directly returned.
+ * - [m] is a legal world map.
+ * Returns: a new world map with the military unit with [id] moved forward by 1.
+ * Or the old map if this operation is impossible.
+*)
+val move_mil_unit_forward : int -> t -> t
+
+(**
  * [next process_mil_unit m] steps through the entire round for the world map
  * to produce a new world map.
  * [process_mil_unit] does some operation on the military unit to change some
@@ -137,7 +163,7 @@ val upgrade_tile : Position.t -> t -> t
 *)
 val next : (int -> t -> t) -> t -> t
 
-    (*
+(*
 (**
  * [remove_map_by_id id m] removes the military unit [id] from the map [m].
  * The removal can happen when the military unit is eliminated, or when
@@ -180,4 +206,4 @@ val remove_map_by_pos : Position.t -> t -> t
  *
  *)
 val put_map : int -> Position.t -> t -> t
-    *)
+*)

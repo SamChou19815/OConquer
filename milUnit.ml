@@ -4,7 +4,7 @@ open GameConstants
 type t = {
   identity: player_identity;
   id: int;
-  direction: int; (* 0 -> north, 1 -> east, 2 -> south, 3 -> west *)
+  direction: int; (* 0 -> east, 1 -> north, 2 -> west, 3 -> south *)
   num_soliders: int;
   morale: int;
   leadership: int;
@@ -23,6 +23,8 @@ let same_mil_unit (m1: t) (m2: t) : bool =
 let identity (m: t) : player_identity = m.identity
 
 let id (m: t) : int = m.id
+
+let direction (m: t) : int = m.direction
 
 let num_soliders (m: t) : int = m.num_soliders
 

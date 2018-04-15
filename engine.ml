@@ -57,21 +57,22 @@ let get_context (id: int) (m: WorldMap.t) : (module Command.Context) =
  * Returns: a new updated world map after the [action] has been done.
 *)
 let exec (id: int) (action: command) (m: WorldMap.t) : WorldMap.t =
+  (* Update a military unit in some ways. *)
   let update : (MilUnit.t -> MilUnit.t) -> WorldMap.t -> WorldMap.t =
     WorldMap.update_mil_unit id
   in
-  let move_forward m : WorldMap.t = failwith "Unimplemented" in (* TODO *)
+  (* Move forward *)
+  let forward : WorldMap.t -> WorldMap.t = WorldMap.move_mil_unit_forward id in
   match action with
   | DoNothing -> m
   | Attack -> failwith "Bad!"
   | Train -> update MilUnit.train m
   | TurnLeft -> update MilUnit.turn_left m
   | TurnRight -> update MilUnit.turn_right m
-  | MoveForward -> move_forward m
+  | MoveForward -> forward m
   | RetreatBackward ->
-    m
-    |> update MilUnit.turn_right |> update MilUnit.turn_right (* turn back *)
-    |> move_forward (* move forward is moving back since we turned back *)
+    m |> update MilUnit.turn_right |> update MilUnit.turn_right (* turn back *)
+    |> forward (* move forward is moving back since we turned back *)
     |> update MilUnit.apply_retreat_penalty (* retreat morale penalty *)
   | Divide -> failwith "Bad!"
   | Upgrade -> WorldMap.(

@@ -107,6 +107,22 @@ let get_tile_by_mil_id (id: int) (m: t) : Tile.t =
     | None -> raise DataNotSyncedException (* Guard against programmer error! *)
     | Some t -> t
 
+let get_passable_pos_ahead (direction: int)
+    (x, y: Position.t) (m: t) : Position.t option =
+  let new_pos = match direction with
+    | 0 -> (x + 1, y)
+    | 1 -> (x, y + 1)
+    | 2 -> (x - 1, y)
+    | 3 -> (x, y - 1)
+    | _ -> failwith "Bad Direction! Data Corrupted!"
+  in
+  match get_tile_by_pos new_pos m with
+  | Mountain -> None (* Cannot move to mountain! *)
+  | _ ->
+    match PosMap.find_opt new_pos m.maps.pos_2_id_map with
+    | Some _ -> None (* Cannot move onto another military unit! *)
+    | None -> Some new_pos (* OK to move! *)
+
 let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
   match IntMap.find_opt id m.maps.id_2_mil_unit_map with
   | None -> m
@@ -127,9 +143,10 @@ let upgrade_tile (pos: Position.t) (m: t) : t =
   let tile = get_tile_by_pos pos m in
   let tile' = Tile.upgrade_tile tile in
   { m with
-    maps = { m.maps with
-             pos_2_tile_map = PosMap.add pos tile' m.maps.pos_2_tile_map
-           }
+    maps =
+      { m.maps with
+        pos_2_tile_map = PosMap.add pos tile' m.maps.pos_2_tile_map
+      }
   }
 
 (**
@@ -194,6 +211,21 @@ let remove_mil_unit (pos: Position.t) (m: t) : t =
         pos_2_id_map = PosMap.remove pos m.maps.pos_2_id_map;
       }
     }
+
+let move_mil_unit_forward (id: int) (m: t) : t =
+  match IntMap.find_opt id m.maps.id_2_mil_unit_map with
+  | None -> m
+  | Some mil_unit ->
+    let direction = MilUnit.direction mil_unit in
+    let old_pos =
+      match get_position_opt_by_id id m with
+      | None -> raise DataNotSyncedException
+      | Some pos -> pos
+    in
+    match get_passable_pos_ahead direction old_pos m with
+    | None -> m (* Cannot move, do nothing/change nothing. *)
+    | Some new_pos -> (* OK to move now! *)
+      m |> remove_mil_unit old_pos |> put_mil_unit new_pos mil_unit
 
 let next (process_mil_unit: int -> t -> t) (m: t) : t =
   (* To store all the military units' id that can possibly exist. *)
