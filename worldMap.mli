@@ -121,6 +121,22 @@ val update_mil_unit : int -> (MilUnit.t -> MilUnit.t) -> t -> t
 *)
 val upgrade_tile : Position.t -> t -> t
 
+(**
+ * [next process_mil_unit m] steps through the entire round for the world map
+ * to produce a new world map.
+ * [process_mil_unit] does some operation on the military unit to change some
+ * state in the world map [m] for processing each military unit.
+ * This function is reserved for the [Engine] module only.
+ *
+ * Requires:
+ * - [process_next_id] takes a military unit id and the world map to produce a
+ *   new world map.
+ * - [m] is a legal world map.
+ * Returns: a new world map that stepped a whole round from the old given world
+ * map [m].
+*)
+val next : (int -> t -> t) -> t -> t
+
     (*
 (**
  * [remove_map_by_id id m] removes the military unit [id] from the map [m].
