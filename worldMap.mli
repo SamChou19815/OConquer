@@ -7,6 +7,13 @@ open Common
 type t
 
 (**
+ * [IllegalWorldMapOperation error_msg] is an exception indicating that the
+ * developer is incorrectly using this module. The error message is in
+ * [error_msg].
+*)
+exception IllegalWorldMapOperation of string
+
+(**
  * [init (m1 m2)] initializes a world map from two given military units [m1]
  * and [m2].
  *
@@ -114,6 +121,7 @@ val update_mil_unit : int -> (MilUnit.t -> MilUnit.t) -> t -> t
 *)
 val upgrade_tile : Position.t -> t -> t
 
+    (*
 (**
  * [remove_map_by_id id m] removes the military unit [id] from the map [m].
  * The removal can happen when the military unit is eliminated, or when
@@ -156,3 +164,4 @@ val remove_map_by_pos : Position.t -> t -> t
  *
  *)
 val put_map : int -> Position.t -> t -> t
+    *)
