@@ -1,3 +1,5 @@
+(** [WorldMap] encapsulates many operations on the world map. *)
+
 open Common
 
 (**
@@ -18,7 +20,7 @@ exception IllegalWorldMapOperation of string
  * and [m2].
  *
  * Requires: [m1] [m2] should not be the same military unit.
- * Returns: a constructed legal world map that contains some random mountains
+ * @return: a constructed legal world map that contains some random mountains
  * and two military units [m1] [m2] on opposite corners.
 *)
 val init : MilUnit.t -> MilUnit.t -> t
@@ -28,8 +30,8 @@ val init : MilUnit.t -> MilUnit.t -> t
  * unit with id [id].
  *
  * Requires: [m] is a legal world map.
- * Returns: [v] where [v] is the position of the military unit;
- * Raises: [Not_found] if there is no such military unit with id [id].
+ * @return: [v] where [v] is the position of the military unit;
+ * @raise Not_found if there is no such military unit with id [id].
 *)
 val get_position_by_id : int -> t -> Position.t
 
@@ -38,7 +40,7 @@ val get_position_by_id : int -> t -> Position.t
  * unit with id [id].
  *
  * Requires: [m] is a legal world map.
- * Returns: [Some v] where [v] is the position of the military unit; [None] if
+ * @return: [Some v] where [v] is the position of the military unit; [None] if
  * there is no such military unit with id [id].
 *)
 val get_position_opt_by_id : int -> t -> Position.t option
@@ -47,8 +49,8 @@ val get_position_opt_by_id : int -> t -> Position.t option
  * [get_mil_unit id m] tries to find the military unit with [id] in the map [m].
  *
  * Requires: [m] is a legal world map.
- * Returns: [v] where [v] has [id] and is in the map [m].
- * Raises: [Not_found] if there is no military unit in the map that has [id].
+ * @return: [v] where [v] has [id] and is in the map [m].
+ * @raise Not_found if there is no military unit in the map that has [id].
 *)
 val get_mil_unit_by_id : int -> t -> MilUnit.t
 
@@ -57,7 +59,7 @@ val get_mil_unit_by_id : int -> t -> MilUnit.t
  * map [m].
  *
  * Requires: [m] is a legal world map.
- * Returns: [Some v] if [v] has [id] and is in the map [m]; [None] otherwise.
+ * @return: [Some v] if [v] has [id] and is in the map [m]; [None] otherwise.
 *)
 val get_mil_unit_opt_by_id : int -> t -> MilUnit.t option
 
@@ -66,18 +68,18 @@ val get_mil_unit_opt_by_id : int -> t -> MilUnit.t option
  * position [pos] in the map [m].
  *
  * Requires: [m] is a legal world map.
- * Returns: [Some v] if [v] has position [pos]; [None] otherwise.
+ * @return: [Some v] if [v] has position [pos]; [None] otherwise.
 *)
 val get_mil_unit_opt_by_pos : Position.t -> t -> MilUnit.t option
 
 (**
- * [get_tile_by_pos pos m] returns the tile at the given position [pos] for a
+ * [get_tile_by_pos pos m] outputs the tile at the given position [pos] for a
  * given world map [m]. If the tile is out of bound, mountain will be returned.
  *
  * Requires:
  * - [pos] is a legal representation of position.
  * - [m] is a legal world map.
- * Returns: the tile at the given position [pos] for a given world map [m].
+ * @return: the tile at the given position [pos] for a given world map [m].
 *)
 val get_tile_by_pos : Position.t -> t -> Tile.t
 
@@ -88,9 +90,9 @@ val get_tile_by_pos : Position.t -> t -> Tile.t
  * Requires:
  * - [id] must be an existing military unit id.
  * - [m] is a legal world map.
- * Returns: [v], if it is occupied by the military unit with id [id] in the
+ * @return: [v], if it is occupied by the military unit with id [id] in the
  * map [m].
- * Raises: [Not_found] if there is no military unit in the map that has [id].
+ * @raise Not_found if there is no military unit in the map that has [id].
 *)
 val get_tile_by_mil_id : int -> t -> Tile.t
 
@@ -101,20 +103,20 @@ val get_tile_by_mil_id : int -> t -> Tile.t
  * Requires:
  * - [id] can be anything.
  * - [m] is a legal world map.
- * Returns: [Some v] if [v] is occupied by the military unit with id [id] in the
+ * @return: [Some v] if [v] is occupied by the military unit with id [id] in the
  * map [m]; [None] otherwise.
 *)
 val get_tile_opt_by_mil_id : int -> t -> Tile.t option
 
 (**
- * [get_passable_pos_ahead direction pos m] returns a passable position
+ * [get_passable_pos_ahead direction pos m] outputs a passable position
  * directly ahead of the given [pos] pointing to direction [direction].
  * If there is no such position that is passable, it will give [None].
  *
  * Requires:
  * - [direction] is 0, 1, 2, 3, representing east, north, west, south.
  * - [pos] can be any position.
- * Returns: [Some p] if [p] is ahead of [pos] according to [direction]; [None]
+ * @return: [Some p] if [p] is ahead of [pos] according to [direction]; [None]
  * if the position ahead is not passable.
 *)
 val get_passable_pos_ahead : int -> Position.t -> t -> Position.t option
@@ -128,7 +130,7 @@ val get_passable_pos_ahead : int -> Position.t -> t -> Position.t option
  *   change the given military unit to refer to someone else.
  * - [id] can be anything. If it refers to an non-existing unit, nothing
  *   happens.
- * Returns: a new map with the updated state, or the old map if the [id] refers
+ * @return: a new map with the updated state, or the old map if the [id] refers
  * to a non-existing military unit. The new map is legal.
 *)
 val update_mil_unit : int -> (MilUnit.t -> MilUnit.t) -> t -> t
@@ -138,8 +140,8 @@ val update_mil_unit : int -> (MilUnit.t -> MilUnit.t) -> t -> t
  * There must be a tile there that is not a mountain.
  *
  * Requires: [pos] in map [m] should contains a tile that is not mountain.
- * Returns: a new map with the upgraded tile. The new map is legal.
- * Raises: [NotUpgradable] if the tile cannot be upgraded due to violation of
+ * @return: a new map with the upgraded tile. The new map is legal.
+ * @raise BadTileInput if the tile cannot be upgraded due to violation of
  * requirement stated above.
 *)
 val upgrade_tile : Position.t -> t -> t
@@ -152,7 +154,7 @@ val upgrade_tile : Position.t -> t -> t
  * - [id] can be anything. However, if it refers to a non-existing military unit
  *   [m] will be directly returned.
  * - [m] is a legal world map.
- * Returns: a new world map with the military unit with [id] moved forward by 1.
+ * @return: a new world map with the military unit with [id] moved forward by 1.
  * Or the old map if this operation is impossible.
 *)
 val move_mil_unit_forward : int -> t -> t
@@ -165,7 +167,7 @@ val move_mil_unit_forward : int -> t -> t
  * - [id] can be anything. However, if it refers to a non-existing military unit
  *   [m] will be directly returned.
  * - [m] is a legal world map.
- * Returns: a new world map with the military unit with [id] performed an
+ * @return: a new world map with the military unit with [id] performed an
  * attack operation. Or the old map if this operation is impossible.
 *)
 val attack : int -> t -> t
@@ -178,7 +180,7 @@ val attack : int -> t -> t
  * - [id] can be anything. However, if it refers to a non-existing military unit
  *   [m] will be directly returned.
  * - [m] is a legal world map.
- * Returns: a new world map with the military unit with [id] performed an
+ * @return: a new world map with the military unit with [id] performed an
  * divide operation. Or the old map if this operation is impossible.
 *)
 val divide : int -> t -> t
@@ -194,7 +196,7 @@ val divide : int -> t -> t
  * - [process_next_id] takes a military unit id and the world map to produce a
  *   new world map.
  * - [m] is a legal world map.
- * Returns: a new world map that stepped a whole round from the old given world
+ * @return: a new world map that stepped a whole round from the old given world
  * map [m].
 *)
 val next : (int -> t -> t) -> t -> t

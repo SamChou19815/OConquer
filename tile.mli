@@ -18,8 +18,8 @@ exception BadTileInput
  * tile if a military unit is on it.
  *
  * Requires: [t] is not [Mountain].
- * Returns: number of soldier increase for the tile if a military unit is on it.
- * Raises: [BadTileInput] if [t = Mountain].
+ * @return: number of soldier increase for the tile if a military unit is on it.
+ * @raise BadTileInput if [t = Mountain].
 *)
 val num_of_soldier_increase : t -> int
 
@@ -28,16 +28,16 @@ val num_of_soldier_increase : t -> int
  * [t] cannot be [Mountain].
  *
  * Requires: [t] is not [Mountain].
- * Returns: an upgraded tile.
- * Raises: [BadTileInput] if [t = Mountain].
+ * @return: an upgraded tile.
+ * @raise BadTileInput if [t = Mountain].
 *)
 val upgrade_tile : t -> t
 
 (**
- * [to_string tile] returns the standard string representation of the [tile].
+ * [to_string tile] outputs the standard string representation of the [tile].
  * The representation is used as a contract in IO.
  *
  * Requires: None.
- * Returns: the standard string representation of the [tile].
+ * @return: the standard string representation of the [tile].
 *)
 val to_string : t -> string

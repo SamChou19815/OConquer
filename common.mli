@@ -8,12 +8,12 @@ module Position : sig
   include Map.OrderedType with type t = int * int
 
   (**
-   * [to_string p] returns the standard string representation of the
+   * [to_string p] outputs the standard string representation of the
    * position [p].
    * The representation is used as a contract in IO.
    *
    * Requires: [p] is a legal position.
-   * Returns: the standard string representation of the position [p].
+   * @return: the standard string representation of the position [p].
   *)
   val to_string : t -> string
 end

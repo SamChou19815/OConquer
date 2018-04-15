@@ -8,7 +8,7 @@
  *
  * Requires: [class_name] is the class name of a Java program and
  * [program_string] is its code.
- * Returns: whether the program with the specified [class_name] compiles.
+ * @return: whether the program with the specified [class_name] compiles.
  * Effects: a valid .class file will be generated in the directory ./programs
  * if it compiles.
 *)
@@ -34,7 +34,7 @@ val compile_program : string -> string -> bool
  *   input is not a final value.
  * - [class_name] is the class name of a Java program. It should be compiled
  *   already.
- * Returns: the result of the running the program.
+ * @return: the result of the running the program.
 *)
 val get_value : (in_channel -> 'a option) ->
   ('a -> out_channel -> unit) -> ('a -> 'b option) -> string -> 'b option

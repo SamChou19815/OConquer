@@ -1,3 +1,8 @@
+(**
+ * [ServerCore] specifies how server behavior can be specified in function and
+ * pass it to the server.
+*)
+
 open Cohttp
 
 (** [accepted_method] is all possible accepted methods for this app. *)
@@ -37,7 +42,7 @@ type handler
  * - [path] is a legal path that starts with "/" but does not end with "/".
  * - [h] is a high level convenient handler. It is allowed to throw exception
  *   to indicate a very bad client request.
- * Returns: a constructed corresponding low level handler.
+ * @return: a constructed corresponding low level handler.
 *)
 val create_handler : accepted_method -> string -> convenient_handler -> handler
 
@@ -55,7 +60,7 @@ val test_handler : handler
  *
  * Requires: If given, [port] must be a valid port. It should not require root
  * access.
- * Returns: None.
+ * @return: None.
  * Effect: A server with all the given [handlers] has been started at
  * http://localhost:8080.
 *)

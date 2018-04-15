@@ -1,3 +1,8 @@
+(**
+ * [Command] specifies how the main [Engine] and a program interacts with each
+ * other.
+*)
+
 open Definitions
 
 type program
@@ -7,30 +12,30 @@ module type Context = sig
   open Common
 
   (**
-   * [get_my_pos] returns the position of the owner of the program.
+   * [get_my_pos] outputs the position of the owner of the program.
    *
    * Requires: None.
-   * Returns: the position of the owner of the program.
+   * @return: the position of the owner of the program.
   *)
   val get_my_pos : Position.t
 
   (**
-   * [get_mil_unit pos] returns the military unit at the given position [pos].
+   * [get_mil_unit pos] outputs the military unit at the given position [pos].
    * The military unit may or may not exist.
    *
    * Requires: [pos] is a legal representation of position.
-   * Returns: [Some m] where [m] is a military unit if [m] is at [pos]; [None]
+   * @return: [Some m] where [m] is a military unit if [m] is at [pos]; [None]
    * if [pos] has no military units.
   *)
   val get_mil_unit : Position.t -> MilUnit.t option
 
   (**
-   * [get_tile pos s] returns the tile at the given position [pos].
+   * [get_tile pos s] outputs the tile at the given position [pos].
    * If the tile is out of bound, mountain will be returned.
    *
    * Requires:
    * - [pos] is a legal representation of position.
-   * Returns: the tile at the given position [pos].
+   * @return: the tile at the given position [pos].
   *)
   val get_tile : Position.t -> Tile.t
 end
@@ -43,7 +48,7 @@ end
  * Requires:
  * - [i] is the player identity.
  * - [string] can be any string.
- * Returns: [Some p] where  where [p] represents a legal program.
+ * @return: [Some p] where  where [p] represents a legal program.
  * [None] if the program is illegal.
 *)
 val from_string : player_identity -> string -> program option
@@ -54,7 +59,7 @@ module type Runner = sig
    * [run_program program] should run the program to produce a command.
    *
    * Requires: [program] is a legal program.
-   * Returns: the command chosen by the program.
+   * @return: the command chosen by the program.
   *)
   val run_program : program -> command
 end

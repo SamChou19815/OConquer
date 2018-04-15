@@ -12,7 +12,7 @@ module type Kernel = sig
    * This function is used at the start of the server.
    *
    * Requires: None.
-   * Returns: a brand new legal server state.
+   * @return: a brand new legal server state.
   *)
   val init : unit -> state
 
@@ -23,7 +23,7 @@ module type Kernel = sig
    * Requires:
    * - [p1] [p2] are programs that may not compile.
    * - [s] is a legal server state.
-   * Returns: the response of the server, defined by all the return values.
+   * @return: the response of the server, defined by all the return values.
    * Effect: The server starts to run a new local simulation if the response
    * is [OK].
   *)
@@ -31,13 +31,13 @@ module type Kernel = sig
     [`OK | `DoesNotCompile | `AlreadyRunning]
 
   (**
-   * [query round_id s] returns all changes that has occured since the given
+   * [query round_id s] outputs all changes that has occured since the given
    * round id [round_id] in a given server state [s].
    *
    * Requires:
    * - [round_id] is between 0 and the current round id on the server.
    * - [s] is a legal server state.
-   * Returns: TODO the data structure for changed is SUBJECT TO CHANGE!
+   * @return: TODO the data structure for changed is SUBJECT TO CHANGE!
   *)
   val query : int -> state -> unit
 end
@@ -46,7 +46,7 @@ module Make : functor (K: Kernel) -> sig
   (**
    * [start_local_server ()] starts a local server.
    * Requires: None.
-   * Returns: None.
+   * @return: None.
    * Effect: A local server is started at http://localhost:8080.
   *)
   val start_local_server : unit -> unit
