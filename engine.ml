@@ -35,10 +35,7 @@ let get_context (id: int) (m: WorldMap.t) : (module Command.Context) =
   (module struct
     open WorldMap
 
-    let get_my_pos : Position.t =
-      match get_position_opt_by_id id m with
-      | Some p -> p
-      | None -> failwith "Impossible Situation"
+    let get_my_pos : Position.t = get_position_by_id id m
 
     let get_mil_unit (pos: Position.t) : MilUnit.t option =
       get_mil_unit_opt_by_pos pos m
@@ -76,9 +73,8 @@ let exec (id: int) (action: command) (m: WorldMap.t) : WorldMap.t =
     |> update MilUnit.apply_retreat_penalty (* retreat morale penalty *)
   | Divide -> failwith "Bad!"
   | Upgrade -> WorldMap.(
-      match get_position_opt_by_id id m with
-      | None -> failwith "Impossible Situation"
-      | Some pos -> upgrade_tile pos m
+      let pos = get_position_by_id id m in
+      upgrade_tile pos m
     )
 
 (**

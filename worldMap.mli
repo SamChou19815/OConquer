@@ -24,7 +24,17 @@ exception IllegalWorldMapOperation of string
 val init : MilUnit.t -> MilUnit.t -> t
 
 (**
- * [get_tile_opt_by_mil_id id m] tries to find the position of the military
+ * [get_position_by_id id m] tries to find the position of the military
+ * unit with id [id].
+ *
+ * Requires: [m] is a legal world map.
+ * Returns: [v] where [v] is the position of the military unit;
+ * Raises: [Not_found] if there is no such military unit with id [id].
+*)
+val get_position_by_id : int -> t -> Position.t
+
+(**
+ * [get_position_opt_by_id id m] tries to find the position of the military
  * unit with id [id].
  *
  * Requires: [m] is a legal world map.
@@ -146,6 +156,19 @@ val upgrade_tile : Position.t -> t -> t
  * Or the old map if this operation is impossible.
 *)
 val move_mil_unit_forward : int -> t -> t
+
+(**
+ * [attack id m] lets a military unit with [id] do ATTACK!
+ * If the operation is not possible, it will do nothing.
+ *
+ * Requires:
+ * - [id] can be anything. However, if it refers to a non-existing military unit
+ *   [m] will be directly returned.
+ * - [m] is a legal world map.
+ * Returns: a new world map with the military unit with [id] performed an
+ * attack operation. Or the old map if this operation is impossible.
+*)
+val attack : int -> t -> t
 
 (**
  * [next process_mil_unit m] steps through the entire round for the world map

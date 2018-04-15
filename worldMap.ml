@@ -69,6 +69,9 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
       execution_queue = Queue.create () (* TODO fix dummy implementation *)
     }
 
+let get_position_by_id (id: int) (m: t) : Position.t =
+  IntMap.find id m.maps.id_2_pos_map
+
 let get_position_opt_by_id (id: int) (m: t) : Position.t option =
   IntMap.find_opt id m.maps.id_2_pos_map
 
@@ -100,22 +103,30 @@ let get_tile_opt_by_mil_id (id: int) (m: t) : Tile.t option =
     | Some _ as v -> v
 
 let get_tile_by_mil_id (id: int) (m: t) : Tile.t =
-  match get_position_opt_by_id id m with
-  | None -> raise Not_found
-  | Some pos ->
-    match PosMap.find_opt pos m.maps.pos_2_tile_map with
-    | None -> raise DataNotSyncedException (* Guard against programmer error! *)
-    | Some t -> t
+  let pos = get_position_by_id id m in
+  match PosMap.find_opt pos m.maps.pos_2_tile_map with
+  | None -> raise DataNotSyncedException (* Guard against programmer error! *)
+  | Some t -> t
 
-let get_passable_pos_ahead (direction: int)
-    (x, y: Position.t) (m: t) : Position.t option =
-  let new_pos = match direction with
-    | 0 -> (x + 1, y)
-    | 1 -> (x, y + 1)
-    | 2 -> (x - 1, y)
-    | 3 -> (x, y - 1)
-    | _ -> failwith "Bad Direction! Data Corrupted!"
-  in
+(**
+ * [get_pos_ahead direction pos] returns a position directly ahead of the
+ * given [pos] pointing to direction [direction].
+ *
+ * Requires:
+ * - [direction] is 0, 1, 2, 3, representing east, north, west, south.
+ * - [pos] can be any position.
+ * Returns: [p'] such that [p'] is ahead of [pos] according to [direction].
+*)
+let get_pos_ahead (dir: int) (x, y: Position.t) : Position.t =
+  match dir with
+  | 0 -> (x + 1, y)
+  | 1 -> (x, y + 1)
+  | 2 -> (x - 1, y)
+  | 3 -> (x, y - 1)
+  | _ -> failwith "Bad Direction! Data Corrupted!"
+
+let get_passable_pos_ahead (d: int) (p: Position.t) (m: t) : Position.t option =
+  let new_pos = get_pos_ahead d p in
   match get_tile_by_pos new_pos m with
   | Mountain -> None (* Cannot move to mountain! *)
   | _ ->
@@ -217,41 +228,67 @@ let move_mil_unit_forward (id: int) (m: t) : t =
   | None -> m
   | Some mil_unit ->
     let direction = MilUnit.direction mil_unit in
-    let old_pos =
-      match get_position_opt_by_id id m with
-      | None -> raise DataNotSyncedException
-      | Some pos -> pos
-    in
+    let old_pos = get_position_by_id id m in
     match get_passable_pos_ahead direction old_pos m with
     | None -> m (* Cannot move, do nothing/change nothing. *)
     | Some new_pos -> (* OK to move now! *)
       m |> remove_mil_unit old_pos |> put_mil_unit new_pos mil_unit
 
-let next (process_mil_unit: int -> t -> t) (m: t) : t =
-  (* To store all the military units' id that can possibly exist. *)
-  let temp_queue : int Queue.t = Queue.create () in
-  (* Iterate through the execution list to execute according to
-   * [process_mil_unit] *)
-  let rec next_process (map: t) : t =
-    if Queue.is_empty map.execution_queue then map
-    else
-      let id = Queue.pop map.execution_queue in
-      (* First check whether the id still exist. *)
-      if IntMap.mem id m.maps.id_2_mil_unit_map then
-        (* Only executed military unit may exist at a later time. *)
-        let () = Queue.push id temp_queue in
-        let map' = process_mil_unit id map in
-        next_process map'
-      else next_process map
-  in
-  (* Add back alive military units. *)
-  let end_of_turn_process (map: t) : t =
-    while Queue.is_empty temp_queue do
-      let id = Queue.pop temp_queue in
-      if IntMap.mem id m.maps.id_2_mil_unit_map then
-        (* Only add back if it still exists *)
-        Queue.push id map.execution_queue
-    done;
-    map
-  in
-  m |> next_process |> end_of_turn_process
+let attack (id: int) (m: t) : t =
+  match IntMap.find_opt id m.maps.id_2_mil_unit_map with
+  | None -> m
+  | Some mil_unit1 ->
+    let direction = MilUnit.direction mil_unit1 in
+    let my_pos = get_position_by_id id m in
+    let ahead_pos = get_pos_ahead direction my_pos in
+    match get_mil_unit_opt_by_pos ahead_pos m with
+    | None -> m (* Nothing to attack *)
+    | Some mil_unit2 ->
+      (* DO NOT attack the soldiers from the same side *)
+      if MilUnit.(identity mil_unit1 = identity mil_unit2) then m
+      else
+        let id2 = MilUnit.id mil_unit2 in
+        let tile_pair =
+          match get_tile_opt_by_mil_id id m, get_tile_opt_by_mil_id id2 m with
+          | Some t1, Some t2 -> (t1, t2)
+          | _ -> raise DataNotSyncedException
+        in
+        (* Do operations according to attack result.
+         * We first remove all of them, then add back those that are still
+         * alive. *)
+        let map' = m |> remove_mil_unit my_pos |> remove_mil_unit ahead_pos in
+        match MilUnit.attack tile_pair (mil_unit1, mil_unit2) with
+        | Some m1, Some m2 ->
+          map' |> put_mil_unit my_pos m1 |> put_mil_unit ahead_pos m2
+        | Some m1, None -> put_mil_unit my_pos m1 map'
+        | None, Some m2 -> put_mil_unit ahead_pos m2 map'
+        | None, None -> map'
+
+  let next (process_mil_unit: int -> t -> t) (m: t) : t =
+    (* To store all the military units' id that can possibly exist. *)
+    let temp_queue : int Queue.t = Queue.create () in
+    (* Iterate through the execution list to execute according to
+     * [process_mil_unit] *)
+    let rec next_process (map: t) : t =
+      if Queue.is_empty map.execution_queue then map
+      else
+        let id = Queue.pop map.execution_queue in
+        (* First check whether the id still exist. *)
+        if IntMap.mem id m.maps.id_2_mil_unit_map then
+          (* Only executed military unit may exist at a later time. *)
+          let () = Queue.push id temp_queue in
+          let map' = process_mil_unit id map in
+          next_process map'
+        else next_process map
+    in
+    (* Add back alive military units. *)
+    let end_of_turn_process (map: t) : t =
+      while Queue.is_empty temp_queue do
+        let id = Queue.pop temp_queue in
+        if IntMap.mem id m.maps.id_2_mil_unit_map then
+          (* Only add back if it still exists *)
+          Queue.push id map.execution_queue
+      done;
+      map
+    in
+    m |> next_process |> end_of_turn_process
