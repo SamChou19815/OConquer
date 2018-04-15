@@ -1,8 +1,14 @@
+(** [Tile] defines some properties and computations on tile. *)
+
 (**
  * [t] is the collection of all possible tiles in the game.
  * The associated int to [City] is the level of the city.
 *)
-type t = Empty | Mountain | Fort | City of int
+type t =
+  | Empty (** [Empty] represents an empty tile. *)
+  | Mountain (** [Mountain] represents an impassable mountain tile. *)
+  | Fort (** [Fort] represents a fort that increases defense. *)
+  | City of int (** [City level] is a city of level [level]. *)
 
 (** [BadTileInput] is an error indicating that a tile is a bad input. *)
 exception BadTileInput

@@ -1,3 +1,5 @@
+(** [Common] defines some common data structures that are frequently used. *)
+
 (**
  * [Position] is an adapter for the [Map] module. It defines how tuple
  * positions should be ordered.

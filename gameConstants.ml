@@ -21,5 +21,6 @@ let retreat_leadership_penalty = 1
 
 (**
  * [increase_soldier_factor] defines how the number of soldiers increase scales
- * with city level. *)
+ * with city level.
+*)
 let increase_soldier_factor = 1

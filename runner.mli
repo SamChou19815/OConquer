@@ -1,3 +1,5 @@
+(** [Runner] defines how a Java program interacts with the main program. *)
+
 (**
  * [compile_program class_name program_string] compiles a Java program with the
  * specified [class_name] and [program_string].

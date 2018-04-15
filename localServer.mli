@@ -1,3 +1,5 @@
+(** [LocalServer] defines how a local server can be spawned. *)
+
 (**
  * [Kernel] contains all the supporting functions for a local server to run.
 *)
