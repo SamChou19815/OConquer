@@ -84,7 +84,7 @@ let exec (id: int) (action: command) (s: state) : WorldMap.t =
     )
 
 let next (s: state) : state =
-  let process_next_id (map: WorldMap.t) (mil_unit_id: int) : WorldMap.t =
+  let process_next_id (mil_unit_id: int) (map: WorldMap.t) : WorldMap.t =
     let m_init = WorldMap.get_mil_unit_by_id mil_unit_id map in
     (* Step 1: Increase number of soldiers accordingly. *)
     let tile_of_unit = WorldMap.get_tile_by_mil_id mil_unit_id map in
@@ -105,11 +105,9 @@ let next (s: state) : state =
   let rec next_helper (st: state) : int list -> state = function
     | [] -> st
     | mil_unit_id::tl ->
-      let world_map' = process_next_id st.world_map mil_unit_id in
-      let s' = {
-        s with
-        turns = s.turns + 1; world_map = world_map';
-      } in
+      let world_map' = process_next_id mil_unit_id st.world_map in
+      let s' = { s with world_map = world_map' } in
       next_helper s' tl
   in
-  next_helper s s.execution_queue
+  let s' = next_helper s s.execution_queue in
+  { s' with turns = s'.turns + 1 }
