@@ -6,6 +6,7 @@ type pos_2_tile_map = Tile.t PosMap.t
 type id_2_pos_map = Position.t IntMap.t
 type id_2_mil_unit_map = MilUnit.t IntMap.t
 
+(** [maps] contains a collection of all the maps. *)
 type maps = {
   (* Bind id to military unit, allowing quick update on a military unit. *)
   id_2_mil_unit_map: id_2_mil_unit_map;
@@ -21,7 +22,8 @@ type maps = {
 type t = {
   maps: maps;
   next_id: int; (* Next ID that can be used by a military unit. *)
-  execution_queue: int Queue.t;
+  changed_pos: Position.t HashSet.t; (* A set of changed position in a round. *)
+  execution_queue: int Queue.t; (* A queue of military unit id. *)
 }
 
 exception IllegalWorldMapOperation of string
@@ -70,6 +72,7 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
         pos_2_tile_map = PosMap.empty; (* TODO Fill tiles *)
       };
       next_id = 2;
+      changed_pos = HashSet.create ();
       execution_queue;
     }
 
@@ -144,6 +147,8 @@ let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
   | Some mil_unit ->
     let mil_unit' = f mil_unit in
     if MilUnit.same_mil_unit mil_unit mil_unit' then
+      (** Report change in position of the military unit. *)
+      let () = HashSet.add (get_position_by_id id m) m.changed_pos in
       { m with
         maps = {
           m.maps with
@@ -157,6 +162,8 @@ let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
 let upgrade_tile (pos: Position.t) (m: t) : t =
   let tile = get_tile_by_pos pos m in
   let tile' = Tile.upgrade_tile tile in
+  (** Report change in position of the military unit. *)
+  let () = HashSet.add pos m.changed_pos in
   { m with
     maps =
       { m.maps with
@@ -191,6 +198,8 @@ let put_mil_unit (pos: Position.t) (mil_unit: MilUnit.t) (m: t) : t =
     | Mountain -> illegal_ops "Put on mountain"
     | _ ->
       let id = MilUnit.id mil_unit in
+      (** Report change in position of the military unit. *)
+      let () = HashSet.add pos m.changed_pos in
       { m with
         maps = {
           m.maps with
@@ -215,6 +224,8 @@ let remove_mil_unit (pos: Position.t) (m: t) : t =
   match PosMap.find_opt pos m.maps.pos_2_id_map with
   | None -> m
   | Some id ->
+    (** Report change in position of the military unit. *)
+    let () = HashSet.add pos m.changed_pos in
     { m with
       maps = {
         m.maps with
@@ -303,12 +314,13 @@ let next (process_mil_unit: int -> t -> t) (m: t) : t =
   in
   (* Add back alive military units. *)
   let end_of_turn_process (map: t) : t =
-    while Queue.is_empty temp_queue do
+    while temp_queue |> Queue.is_empty |> not do
       let id = Queue.pop temp_queue in
       if IntMap.mem id m.maps.id_2_mil_unit_map then
         (* Only add back if it still exists *)
         Queue.push id map.execution_queue
     done;
+    HashSet.clear map.changed_pos;
     map
   in
   m |> next_process |> end_of_turn_process

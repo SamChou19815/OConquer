@@ -18,3 +18,15 @@ module IntMap = Map.Make (struct
     type t = int
     let compare i1 i2 = Pervasives.compare i1 i2
   end)
+
+module HashSet = struct
+  type 'a t = ('a, unit) Hashtbl.t
+
+  let create () : 'a t = Hashtbl.create ~random:true 16
+
+  let clear : 'a t -> unit = Hashtbl.reset
+
+  let add (i: 'a) (set: 'a t) : unit = Hashtbl.replace set i ()
+
+  let elem (set: 'a t) : 'a list = Hashtbl.fold (fun i () lst -> i::lst) set []
+end
