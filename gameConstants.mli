@@ -1,5 +1,15 @@
 (** [GameConstants] specifies a list of constants used in the game. *)
 
+(** Game Dimension Constants *)
+
+(** [map_width] is the width of the map. *)
+val map_width : int
+
+(** [map_height] is the height of the map. *)
+val map_height : int
+
+(** Game Interaction Constants *)
+
 (** [training_morale_boost] is the value added to morale after training. *)
 val training_morale_boost : int
 

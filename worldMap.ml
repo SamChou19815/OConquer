@@ -1,4 +1,5 @@
 open Common
+open GameConstants
 
 (* Some type alias to improve readability of code. *)
 type pos_2_id_map = int PosMap.t
@@ -61,19 +62,38 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
   if MilUnit.same_mil_unit m1 m2 then
     illegal_ops "Cannot initialize the map with two same military units"
   else
+    (* Init maps *)
+    let id_2_mil_unit_map = IntMap.(empty |> add 0 m1 |> add 1 m2) in
+    let pos_ul = (0, 0) in let pos_lr = (map_width - 1, map_height - 1) in
+    let id_2_pos_map = IntMap.(empty |> add 0 pos_ul |> add 1 pos_lr) in
+    let pos_2_id_map = PosMap.(empty |> add pos_ul 0 |> add pos_lr 1) in
+    let pos_2_tile_map =
+      let open PosMap in
+      (** Fill horizontally from 0 to [map_width] (exclusive) *)
+      let rec fill_map_horizontal_h w_index m' =
+        (** Fill vertically from 0 to [map_height] (exclusive) *)
+        let rec fill_map_vertical_h h_index m'' =
+          if h_index = map_height then m''
+          else
+            let m''' = add (w_index, h_index) Tile.Empty m'' in
+            fill_map_vertical_h (h_index + 1) m'''
+        in
+        if w_index = map_width then m'
+        else
+          let m'' = fill_map_vertical_h 0 m' in
+          fill_map_horizontal_h (w_index + 1) m''
+      in
+      fill_map_horizontal_h 0 empty
+    in
+    (* Init states *)
+    let next_id = 2 in
+    let changed_pos = HashSet.create () in
     let execution_queue = Queue.create () in
     let () = Queue.(add 0 execution_queue; add 1 execution_queue) in
+    (* Assemble! *)
     {
-      maps = {
-        (* TODO fix dummy implementation *)
-        id_2_mil_unit_map = IntMap.empty;
-        id_2_pos_map = IntMap.empty;
-        pos_2_id_map = PosMap.empty;
-        pos_2_tile_map = PosMap.empty; (* TODO Fill tiles *)
-      };
-      next_id = 2;
-      changed_pos = HashSet.create ();
-      execution_queue;
+      maps = { id_2_mil_unit_map; id_2_pos_map; pos_2_id_map; pos_2_tile_map; };
+      next_id; changed_pos; execution_queue;
     }
 
 let get_position_by_id (id: int) (m: t) : Position.t =
