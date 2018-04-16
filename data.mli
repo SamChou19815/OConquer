@@ -38,3 +38,30 @@ type diff_logs
 *)
 val create_map_content : ?mil_unit:MilUnit.t option
   -> pos:Position.t -> tile:Tile.t -> map_content
+
+(**
+ * [create_diff_record f lst] creates a [diff_record] from a list of items [lst]
+ * and a function [f] that maps each item to a [map_content].
+ *
+ * Requires:
+ * - [f] should correctly converts an object to a map_record.
+ * - [lst] should contain a list of things that fits the meaning of map content.
+ * @return a diff record of the list that represents all the changes in one
+ * round.
+*)
+val create_diff_record : ('a -> map_content) -> 'a list -> diff_record
+
+(**
+ * [empty_diff_logs] is an empty diff logs that should be produced at the start
+ * of the game.
+*)
+val empty_diff_logs : diff_logs
+
+(** [append_new_diff_record r l] appends [r] to the end of [l].
+ *
+ * Requires:
+ * - [r] is a legal [diff_record].
+ * - [l] is a legal [diff_logs].
+ * @return the updated diff logs with the new [r] appended to the end.
+*)
+val append_new_diff_record : diff_record -> diff_logs -> diff_logs
