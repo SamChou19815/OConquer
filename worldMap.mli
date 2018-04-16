@@ -26,6 +26,15 @@ exception IllegalWorldMapOperation of string
 val init : MilUnit.t -> MilUnit.t -> t
 
 (**
+ * [randomize_map m] randomizes the map by randomly adding some mountains.
+ *
+ * Requires: [m] is a legal world map.
+ * @return: a new world map with randomly created mountain. We ensure that the
+ * newly created mountain will not collide with existing units.
+*)
+val randomize_map : t -> t
+
+(**
  * [get_position_by_id id m] tries to find the position of the military
  * unit with id [id].
  *

@@ -96,6 +96,26 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
       next_id; changed_pos; execution_queue;
     }
 
+let randomize_map (m: t) : t =
+  let max_num_mountains_to_add = map_width * map_height / 20 in
+  let () = Random.self_init () in
+  let rec add_mountain n m' =
+    if n = 0 then m'
+    else
+      let pos = (Random.int map_width, Random.int map_height) in
+      if PosMap.mem pos m'.maps.pos_2_id_map then add_mountain n m'
+      else
+        let () = HashSet.add pos m'.changed_pos in
+        let pos_2_tile_map' =
+          PosMap.add pos Tile.Mountain m.maps.pos_2_tile_map
+        in
+        let m'' =
+          { m' with maps = { m'.maps with pos_2_tile_map = pos_2_tile_map' } }
+        in
+        add_mountain (n - 1) m''
+  in
+  add_mountain max_num_mountains_to_add m
+
 let get_position_by_id (id: int) (m: t) : Position.t =
   IntMap.find id m.maps.id_2_pos_map
 
