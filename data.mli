@@ -52,10 +52,13 @@ val create_map_content : ?mil_unit:MilUnit.t option
 val create_diff_record : ('a -> map_content) -> 'a list -> diff_record
 
 (**
- * [empty_diff_logs] is an empty diff logs that should be produced at the start
- * of the game.
+ * [create_empty_diff_logs i] creates an empty diff logs that starts at index
+ * [i].
+ *
+ * Requires: [i] is a natural number.
+ * @return an empty diff logs that starts at index [i].
 *)
-val empty_diff_logs : diff_logs
+val empty_diff_logs : int -> diff_logs
 
 (** [append_new_diff_record r l] appends [r] to the end of [l].
  *
