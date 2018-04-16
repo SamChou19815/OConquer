@@ -1,3 +1,5 @@
+open Data
+
 (** [LocalServerKernel] is the kernal of local server. *)
 module LocalServerKernel : LocalServer.Kernel = struct
   (* TODO fix all dummy implementation! *)

@@ -19,3 +19,7 @@ module DiffSet = Set.Make (struct
 type diff_record = DiffSet.t
 
 type diff_logs = diff_record list
+
+let create_map_content ?(mil_unit: MilUnit.t option = None)
+    ~(pos: Position.t) ~(tile: Tile.t) : map_content =
+  { position = pos; tile; mil_unit; }

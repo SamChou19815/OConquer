@@ -4,6 +4,8 @@
  * part of the system is connected to each other.
 *)
 
+open Common
+
 (**
  * [map_content] is the abstract type for all the information that belongs to
  * a position in the world map. It contains tile information and optionally
@@ -22,3 +24,17 @@ type diff_record
  * difference records.
 *)
 type diff_logs
+
+(**
+ * [create_map_content mil_unit pos tile] creates a map content with
+ * an optional military unit [mil_unit], position [pos], and tile [tile].
+ *
+ * Requires:
+ * - [mil_unit] must be a legal military unit that is at [pos]. If it's not
+ *   supplied, it defaults to [None].
+ * - [pos] must be a legal, in-bound position.
+ * - [tile] can be any tile, but it must corresponds to the [pos].
+ * @return a [map_content] object that contains all the aforementioned info.
+*)
+val create_map_content : ?mil_unit:MilUnit.t option
+  -> pos:Position.t -> tile:Tile.t -> map_content
