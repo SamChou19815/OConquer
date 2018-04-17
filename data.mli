@@ -68,3 +68,11 @@ val empty_diff_logs : int -> diff_logs
  * @return the updated diff logs with the new [r] appended to the end.
 *)
 val append_new_diff_record : diff_record -> diff_logs -> diff_logs
+
+(**
+ * [diff_logs_to_json l] converts a diff log into json format.
+ *
+ * Requires: [l] is a legal [diff_logs].
+ * @return the json format of the given [l].
+*)
+val diff_logs_to_json : diff_logs -> Yojson.Basic.json

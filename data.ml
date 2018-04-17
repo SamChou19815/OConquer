@@ -1,5 +1,6 @@
 open Common
 open Definitions
+open Yojson.Basic
 
 type map_content = {
   position: Position.t;
@@ -37,3 +38,11 @@ let empty_diff_logs (i: int) : diff_logs =
 
 let append_new_diff_record (r: diff_record) (l: diff_logs) : diff_logs =
   { last_id = l.last_id + 1; logs = r::l.logs }
+
+let mil_unit_to_json (mil_unit: MilUnit.t) : json = `Null
+
+let map_content_to_json (map_content: map_content) : json = `Null
+
+let diff_record_to_json (r: diff_record) : json = `Null
+
+let diff_logs_to_json (l: diff_logs) : json = `Null
