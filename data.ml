@@ -43,6 +43,6 @@ let mil_unit_to_json (mil_unit: MilUnit.t) : json = `Null
 
 let map_content_to_json (map_content: map_content) : json = `Null
 
-let diff_record_to_json (r: diff_record) : json = `Null
+let diff_record_to_json (r: diff_record) : json = `String "dd"
 
 let diff_logs_to_json (l: diff_logs) : json = `Null

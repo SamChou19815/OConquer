@@ -24,6 +24,18 @@ interface MilUnit {
   leadership: number;
 }
 
+/*
+Example:
+{
+    "playerIdentity": "BLACK",
+    "id": 10,
+    "direction": "EAST",
+    "numberOfSoldiers": 100,
+    "morale": 10,
+    "leadership": 30
+}
+*/
+
 interface MapContent {
   position: Position;
   tileType: TileType;
