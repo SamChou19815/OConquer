@@ -34,3 +34,15 @@ val retreat_leadership_penalty : int
  * with city level.
 *)
 val increase_soldier_factor : int
+
+(**
+ * [base_attack_damage] defines the number of soldiers died due to an single
+ * attack.
+*)
+val base_attack_damage : int
+
+(**
+ * [fort_bonus_factor] defines defense factor a fort tile provides for
+ * the military unit while engaging.
+*)
+val fort_bonus_factor: int

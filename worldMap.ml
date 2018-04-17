@@ -98,7 +98,6 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
 
 let randomize_map (m: t) : t =
   let max_num_mountains_to_add = map_width * map_height / 20 in
-  let changed_pos_for_randomization = HashSet.create () in
   let () = Random.self_init () in
   let rec add_mountain n m' =
     if n = 0 then m'
@@ -106,8 +105,7 @@ let randomize_map (m: t) : t =
       let pos = (Random.int map_width, Random.int map_height) in
       if PosMap.mem pos m'.maps.pos_2_id_map then add_mountain n m'
       else
-        (* Record changes in local HashSet. *)
-        let () = HashSet.add pos changed_pos_for_randomization in
+        let () = HashSet.add pos m'.changed_pos in
         let pos_2_tile_map' =
           PosMap.add pos Tile.Mountain m.maps.pos_2_tile_map
         in
@@ -330,7 +328,7 @@ let divide (id: int) (m: t) : t =
     match get_passable_pos_ahead direction my_pos m with
     | None -> m (* No place to divide *)
     | Some ahead_pos ->
-      match MilUnit.divide mil_unit with
+      match (MilUnit.divide mil_unit m.next_id) with
       | None -> m (* Impossible to divide *)
       | Some (m1, m2) ->
         let () = Queue.add (MilUnit.id m2) m.execution_queue in

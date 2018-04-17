@@ -60,9 +60,11 @@ let exec (id: int) (action: command) (m: WorldMap.t) : WorldMap.t =
   in
   (* Move forward *)
   let forward : WorldMap.t -> WorldMap.t = WorldMap.move_mil_unit_forward id in
+  let attack: WorldMap.t ->WorldMap.t = WorldMap.attack id in
+  let divide: WorldMap.t ->WorldMap.t = WorldMap.divide id in
   match action with
   | DoNothing -> m
-  | Attack -> failwith "Bad!"
+  | Attack -> attack m
   | Train -> update MilUnit.train m
   | TurnLeft -> update MilUnit.turn_left m
   | TurnRight -> update MilUnit.turn_right m
@@ -71,7 +73,7 @@ let exec (id: int) (action: command) (m: WorldMap.t) : WorldMap.t =
     m |> update MilUnit.turn_right |> update MilUnit.turn_right (* turn back *)
     |> forward (* move forward is moving back since we turned back *)
     |> update MilUnit.apply_retreat_penalty (* retreat morale penalty *)
-  | Divide -> failwith "Bad!"
+  | Divide -> divide m
   | Upgrade -> WorldMap.(upgrade_tile (get_position_by_id id m) m)
 
 (**

@@ -11,3 +11,7 @@ let retreat_morale_penalty = 1
 let retreat_leadership_penalty = 1
 
 let increase_soldier_factor = 1
+
+let base_attack_damage = 10
+
+let fort_bonus_factor = 2
