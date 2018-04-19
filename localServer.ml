@@ -17,15 +17,19 @@ module Make (K: Kernel) = struct
   let current_state = K.init ()
 
   let handle_start_simulation_request _ (body: string) : string =
-    (* TODO better parsing body method *)
-    match String.split_on_char ';' body with
-    | [p1; p2] -> begin
-        match K.start_simulation p1 p2 current_state with
-        | `OK -> "OK"
-        | `DoesNotCompile -> "DOES_NOT_COMPILE"
-        | `AlreadyRunning -> "ALREADY_RUNNING"
-      end
-    | _ -> report_bad_input "Bad start simulation request!"
+    let open Yojson.Basic in
+    let open Util in
+    let (black_program, white_program) =
+      try
+        let assoc = body |> from_string |> to_assoc in
+        let to_string key = assoc |> List.assoc key |> to_string in
+        (to_string "black_program", to_string "white_program")
+      with _ -> report_bad_input "Bad start simulation request!"
+    in
+    match K.start_simulation black_program white_program current_state with
+    | `OK -> "OK"
+    | `DoesNotCompile -> "DOES_NOT_COMPILE"
+    | `AlreadyRunning -> "ALREADY_RUNNING"
 
   let handle_query_request (param: params) _ : string =
     let id =
