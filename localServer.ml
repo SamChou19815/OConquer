@@ -40,6 +40,5 @@ module Make (K: Kernel) = struct
     create_handler GET "/apis/local/query" handle_query_request;
   ]
 
-  (* TODO fix dummy implementation *)
   let start_local_server () = start_server handlers
 end
