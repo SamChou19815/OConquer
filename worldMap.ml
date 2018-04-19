@@ -328,7 +328,7 @@ let divide (id: int) (m: t) : t =
     match get_passable_pos_ahead direction my_pos m with
     | None -> m (* No place to divide *)
     | Some ahead_pos ->
-      match (MilUnit.divide mil_unit m.next_id) with
+      match MilUnit.divide m.next_id mil_unit with
       | None -> m (* Impossible to divide *)
       | Some (m1, m2) ->
         let () = Queue.add (MilUnit.id m2) m.execution_queue in

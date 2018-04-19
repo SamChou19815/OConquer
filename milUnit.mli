@@ -158,18 +158,20 @@ val apply_retreat_penalty : t -> t
 val attack : (Tile.t * Tile.t) -> (t * t) -> (t option * t option)
 
 (**
- * [divide mil_unit next_id] divides a military unit into two units, each with
+ * [divide next_id mil_unit] divides a military unit into two units, each with
  * half of number of original soldiers (+- 1), equal morale and equal leadership.
  * If the military unit has only 1 solider, division will fail and return
  * [None].
  *
- * Requires: [mil_unit] is a legal military unit.
+ * Requires:
+ * - [next_id] is the next id for the potentially new military unit.
+ * - [mil_unit] is a legal military unit.
  * @return: [Some (m1, m2)] where [m1] [m2] are the divided units, [m1] with
  * [id] of [mil_unit.id] and [m2] with [id] of [next_id]. if the
  * division is successful and [None] if the division fails due to insufficient
  * number of soldiers.
 *)
-val divide : t -> int -> (t * t) option
+val divide : int -> t -> (t * t) option
 
 (**
  * [to_string mil_unit] outputs the standard string representation of the

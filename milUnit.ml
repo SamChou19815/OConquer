@@ -61,7 +61,7 @@ let train (m: t) : t =
 
 (**
  * [reduce_morale_by a m] reduces the morale of the military unit [m] by [a].
- * If the resultant morale is negative, it will be reset to 0.
+ * If the resultant morale is not positive, it will be reset to 1.
  * If [a] is not-positive, it has no effect.
  *
  * Requires: [m] is a legal military unit.
@@ -70,14 +70,14 @@ let train (m: t) : t =
 let reduce_morale_by (amount: int) (m: t) : t =
   if amount > 0 then
     let morale = m.morale - amount in
-    let morale_normalized = if morale < 0 then 0 else morale in
+    let morale_normalized = if morale < 1 then 1 else morale in
     { m with morale = morale_normalized }
   else m
 
 (**
  * [reduce_leadership_by a m] reduces the leadership of the military unit [m]
  * by [a].
- * If the resultant leadership is negative, it will be reset to 0.
+ * If the resultant leadership is not positive, it will be reset to 1.
  * If [a] is not-positive, it has no effect.
  *
  * Requires: [m] is a legal military unit.
@@ -86,7 +86,7 @@ let reduce_morale_by (amount: int) (m: t) : t =
 let reduce_leadership_by (amount: int) (m: t) : t =
   if amount > 0 then
     let leadership = m.leadership - amount in
-    let leadership_normalized = if leadership < 0 then 0 else leadership in
+    let leadership_normalized = if leadership < 1 then 1 else leadership in
     { m with leadership = leadership_normalized }
   else m
 
@@ -94,33 +94,32 @@ let apply_retreat_penalty (m: t) : t =
   m |> reduce_morale_by retreat_morale_penalty
   |> reduce_leadership_by retreat_leadership_penalty
 
-
 let attack_damage (leadership: int) (morale: int) : int =
-  let base_damage = base_attack_damage in
-  if leadership >0 && morale >0
-  then leadership * morale * base_damage
-  else base_damage
-
-
+  if leadership > 0 && morale > 0 then leadership * morale * base_attack_damage
+  else failwith "Corrupted values of leadership and morale."
 
 let attack (t1, t2: Tile.t * Tile.t) (m1, m2: t * t) : (t option * t option) =
-  if same_mil_unit m1 m2 then (Some m1, Some m2)
+  (* Prevent programmer error to attack same side *)
+  if m1.identity = m2.identity then (Some m1, Some m2)
   else
     (* Initializing attack actively grants more winning possibility in addition
-       to other attributes*)
+       to other attributes *)
     let attacker_bonus = 1 + Random.int 1 in
     let m1_damage = (attack_damage m1.leadership m1.morale) * attacker_bonus in
     let m2_damage = attack_damage m2.leadership m2.morale in
     let m1_num_soliders =
-    if t1 = Fort then m1.num_soliders - m2_damage/fort_bonus_factor
-    else m1.num_soliders - m2_damage in
+      if t1 = Fort then m1.num_soliders - m2_damage/fort_bonus_factor
+      else m1.num_soliders - m2_damage in
     let m1_num_soliders_normalized =
-      if m1_num_soliders < 0 then 0 else m1_num_soliders in
-      let m2_num_soliders =
-      if t2 = Fort then m2.num_soliders - m1_damage/fort_bonus_factor
-      else m2.num_soliders - m1_damage in
-      let m2_num_soliders_normalized =
-      if m2_num_soliders < 0 then 0 else m2_num_soliders  in
+      if m1_num_soliders < 0 then 0 else m1_num_soliders
+    in
+    let m2_num_soliders =
+      if t2 = Fort then m2.num_soliders - m1_damage / fort_bonus_factor
+      else m2.num_soliders - m1_damage
+    in
+    let m2_num_soliders_normalized =
+      if m2_num_soliders < 0 then 0 else m2_num_soliders
+    in
     match m1_num_soliders_normalized, m2_num_soliders_normalized with
     | 0, 0 -> (None, None)
     | 0, _ -> (None, Some {m2 with num_soliders = m2_num_soliders_normalized})
@@ -128,17 +127,15 @@ let attack (t1, t2: Tile.t * Tile.t) (m1, m2: t * t) : (t option * t option) =
     | _, _ -> (Some {m1 with num_soliders = m1_num_soliders_normalized },
                Some {m2 with num_soliders = m2_num_soliders_normalized})
 
-
-let divide (m: t) (next_id: int): (t * t) option =
+let divide (next_id: int) (m: t) : (t * t) option =
   if m.num_soliders <= 1 then None
   else
-    let even_split = m.num_soliders mod 2 in
-    let m1 = { m with num_soliders = m.num_soliders/2 } in
-    let m2 = { m with id = next_id;
-               num_soliders = if even_split = 0
-               then m.num_soliders/2 else 1+ m.num_soliders/2; } in
+    (* Divide number of soldiers. *)
+    let num_soliders_1 = m.num_soliders / 2 in
+    let num_soliders_2 = m.num_soliders - num_soliders_1 in
+    let m1 = { m with num_soliders = num_soliders_1 } in
+    let m2 = { m with id = next_id; num_soliders = num_soliders_2 } in
     Some (m1, m2)
-
 
 let to_string (m: t) : string =
   let identity = match m.identity with
