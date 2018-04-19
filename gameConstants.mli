@@ -33,7 +33,7 @@ val retreat_leadership_penalty : int
  * [increase_soldier_factor] defines how the number of soldiers increase scales
  * with city level.
 *)
-val increase_soldier_factor : int
+val increase_soldier_factor : float
 
 (**
  * [base_attack_damage] defines the number of soldiers died due to an single
@@ -42,7 +42,15 @@ val increase_soldier_factor : int
 val base_attack_damage : int
 
 (**
- * [fort_bonus_factor] defines defense factor a fort tile provides for
- * the military unit while engaging.
+ * [fort_city_bonus_factor] defines defense factor a fort/city tile provides for
+ * the military unit while engaging. The unit at fort/city will receive damage
+ * lowered by a factor of this constant.
 *)
-val fort_bonus_factor: int
+val fort_city_bonus_factor : float
+
+(**
+ * [attack_morale_change] specifies the amount of change in morale for attacker
+ * and defender. Attacker's morale increases by this amount and defender's
+ * morale decreases by this amount.
+*)
+val attack_morale_change : int

@@ -94,38 +94,53 @@ let apply_retreat_penalty (m: t) : t =
   m |> reduce_morale_by retreat_morale_penalty
   |> reduce_leadership_by retreat_leadership_penalty
 
-let attack_damage (leadership: int) (morale: int) : int =
-  if leadership > 0 && morale > 0 then leadership * morale * base_attack_damage
-  else failwith "Corrupted values of leadership and morale."
+(**
+ * [logistic x] is the function `1/(1+e^(-x))`.
+ *
+ * Requires: None.
+ * @return `1/(1+e^(-x))`.
+*)
+let logistic (x: float) : float = 1. /. (1. +. exp (0. -. x))
+
+(**
+ * [single_round_attack_power attacker defender_tile] computes the attacking
+ * power of [attacker] when the defender is on [defender_tile].
+ *
+ * Requires:
+ * - [attacker] is the military unit representing attacker.
+ * - [defender_tile] is the defender's current tile.
+ * @return pure attacking power of the [attacker] to defender on the
+ * [defender_tile].
+*)
+let single_round_attack_power (attacker: t) (defender_tile: Tile.t) : int =
+  let attacking_output_raw =
+    attacker.num_soliders * attacker.leadership * attacker.morale
+    |> float_of_int
+    |> logistic
+    |> ( *. ) (float_of_int base_attack_damage)
+  in
+  int_of_float (attacking_output_raw /. (Tile.defender_bonus defender_tile))
 
 let attack (t1, t2: Tile.t * Tile.t) (m1, m2: t * t) : (t option * t option) =
   (* Prevent programmer error to attack same side *)
   if m1.identity = m2.identity then (Some m1, Some m2)
   else
-    (* Initializing attack actively grants more winning possibility in addition
-       to other attributes *)
-    let attacker_bonus = 1 + Random.int 1 in
-    let m1_damage = (attack_damage m1.leadership m1.morale) * attacker_bonus in
-    let m2_damage = attack_damage m2.leadership m2.morale in
-    let m1_num_soliders =
-      if t1 = Fort then m1.num_soliders - m2_damage/fort_bonus_factor
-      else m1.num_soliders - m2_damage in
-    let m1_num_soliders_normalized =
-      if m1_num_soliders < 0 then 0 else m1_num_soliders
-    in
-    let m2_num_soliders =
-      if t2 = Fort then m2.num_soliders - m1_damage / fort_bonus_factor
-      else m2.num_soliders - m1_damage
-    in
-    let m2_num_soliders_normalized =
-      if m2_num_soliders < 0 then 0 else m2_num_soliders
-    in
-    match m1_num_soliders_normalized, m2_num_soliders_normalized with
-    | 0, 0 -> (None, None)
-    | 0, _ -> (None, Some {m2 with num_soliders = m2_num_soliders_normalized})
-    | _, 0 -> (Some {m1 with num_soliders = m1_num_soliders_normalized }, None)
-    | _, _ -> (Some {m1 with num_soliders = m1_num_soliders_normalized },
-               Some {m2 with num_soliders = m2_num_soliders_normalized})
+    (* Let attacker attack first, then let defender retaliate. *)
+    let m1 = { m1 with morale = m1.morale + attack_morale_change } in
+    let m1_attack_power = single_round_attack_power m1 t2 in
+    let m2_soldiers_left = m2.num_soliders - m1_attack_power in
+    if m2_soldiers_left <= 0 then (Some m1, None) (* m2 is gone *)
+    else
+      (* Apply attack result *)
+      let m2 = { m2 with
+                 num_soliders = m2_soldiers_left;
+                 morale = m2.morale - attack_morale_change
+               } in
+      (* Retaliate! *)
+      let m2_attack_power = single_round_attack_power m2 t1 in
+      let m1_soliders_left = m1.num_soliders - m2_attack_power in
+      if m1_soliders_left <= 0 then (None, Some m2) (* m1 is gone *)
+      else (Some { m1 with num_soliders = m1_soliders_left }, Some m2)
 
 let divide (next_id: int) (m: t) : (t * t) option =
   if m.num_soliders <= 1 then None
