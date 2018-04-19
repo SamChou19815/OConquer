@@ -4,9 +4,12 @@ open Cohttp_lwt_unix
 
 type accepted_method = GET | POST
 
-type params = (string * string list) list
+type params = (string * string) list
 
 type convenient_handler = params -> string -> string
+
+(** [BadInput reason] indicates a reason for bad inputs. *)
+exception BadInput of string
 
 type handler = Server.conn -> Request.t -> (string -> string) option
 
@@ -18,6 +21,28 @@ type response = (Response.t * Cohttp_lwt__Body.t) Lwt.t
 
 (** [callback] is a low level function used by cohttp to handle requests. *)
 type callback = Server.conn -> Request.t -> Cohttp_lwt__Body.t -> response
+
+let report_bad_input (reason: string) : 'a = raise (BadInput reason)
+
+(**
+ * [query_simplifier raw_params] collapses the list of values into one, dropping
+ * additional values if needed.
+ *
+ * Requires: [raw_params] is the raw params directly from Cohttp.
+ * @return an association list of simplified params.
+*)
+let query_simplifier : (string * string list) list -> params =
+  let rec h acc = function
+    | [] -> acc
+    | (key, values)::others ->
+      match values with
+      | [] -> h acc others
+      | first_value::_ ->
+        let pair = (key, first_value) in
+        let acc' = pair::acc in
+        h acc' others
+  in
+  h []
 
 let create_handler (m: accepted_method) (path: string)
     (h: convenient_handler) : handler =
@@ -34,10 +59,13 @@ let create_handler (m: accepted_method) (path: string)
     | Some m' ->
       (* Refuse to handle wrong methods *)
       if m <> m' then None
-      else
+      else (
         let uri = Request.uri req in
         (* Refuse to handle wrong paths. *)
-        if Uri.path uri = path then Some (h (Uri.query uri)) else None
+        if Uri.path uri = path then
+          Some (uri |> Uri.query |> query_simplifier |> h)
+        else None
+      )
 
 let test_handler : handler = create_handler GET "/test" (fun _ b -> "It works!")
 
@@ -46,7 +74,7 @@ let test_handler : handler = create_handler GET "/test" (fun _ b -> "It works!")
  * by the server that can handle requests.
  *
  * Requires: None.
- * Returns: a callback that handle requests according to given [handlers].
+ * @return a callback that handle requests according to given [handlers].
 *)
 let create_callback (handlers: handler list) : callback =
   let rec handle (lst: handler list) (conn: Server.conn)
@@ -66,10 +94,15 @@ let create_callback (handlers: handler list) : callback =
               let resp_body = body_handler b in
               Server.respond_string
                 ~status:`OK ~body:resp_body ()
-            with _ ->
+            with
+            | BadInput reason ->
               Server.respond_error
+                ~status:`Bad_request (* 400 error. *)
+                ~body:("Bad Input. Reason: \n" ^ reason) ()
+            | _ ->
+              Server.respond_error (* 500 error. *)
                 ~status:`Internal_server_error
-                ~body:"Internal Error" ()
+                ~body:"Internal Error." ()
           )
   in
   handle handlers

@@ -39,7 +39,7 @@ module type Kernel = sig
    * - [s] is a legal server state.
    * @return: TODO the data structure for changed is SUBJECT TO CHANGE!
   *)
-  val query : int -> state -> unit
+  val query : int -> state -> string
 end
 
 module Make : functor (K: Kernel) -> sig

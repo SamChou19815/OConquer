@@ -9,7 +9,7 @@ open Cohttp
 type accepted_method = GET | POST
 
 (** [params] is the type of all the parameter map. *)
-type params = (string * string list) list
+type params = (string * string) list
 
 (**
  * [convenient_handler] handlers a request according to parameters with type
@@ -33,6 +33,15 @@ type convenient_handler = params -> string -> string
 type handler
 
 (**
+ * [report_bad_input reason] reports a bad input exception and halts.
+ *
+ * Requires: [reason] describes why the input is bad.
+ * @return None.
+ * @raise BadInput with message [reason] that describes why the input is bad.
+*)
+val report_bad_input : string -> 'a
+
+(**
  * [create_handler m path h] produces a low level handler from the prescribed
  * accepted method [m] and accepted path [path] to accept or reject a request.
  * Then it transforms a convenient handler [h] to a fully fledged handler.
@@ -41,7 +50,7 @@ type handler
  * - [m] is [GET] or [POST].
  * - [path] is a legal path that starts with "/" but does not end with "/".
  * - [h] is a high level convenient handler. It is allowed to throw exception
- *   to indicate a very bad client request.
+ *   to indicate a very bad client request by using [report_bad_input].
  * @return: a constructed corresponding low level handler.
 *)
 val create_handler : accepted_method -> string -> convenient_handler -> handler
