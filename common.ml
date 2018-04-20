@@ -1,3 +1,23 @@
+let compute_and_print_running_time (f: unit -> 'a) : 'a =
+  let t1 = Unix.gettimeofday() in
+  let result = f () in
+  let t2 = Unix.gettimeofday() in
+  let diff = t2 -. t1 in
+  let () = print_endline ("Running Time: " ^ string_of_float diff) in
+  result
+
+let run_and_print_running_time (f: unit -> unit) : unit =
+  let t1 = Unix.gettimeofday() in
+  let () = f () in
+  let t2 = Unix.gettimeofday() in
+  let diff = t2 -. t1 in
+  print_endline ("Running Time: " ^ string_of_float diff)
+
+let rec repeats (n: int) (f: 'a -> 'a) (input: 'a) : 'a =
+  if n < 0 then raise (Invalid_argument "n should be positive!")
+  else if n = 0 then input
+  else repeats (n - 1) f (f input)
+
 module Position = struct
   type t = int * int
 

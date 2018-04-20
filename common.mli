@@ -1,4 +1,40 @@
-(** [Common] defines some common data structures that are frequently used. *)
+(**
+ * [Common] defines some common data structures and helper functions that
+ * are frequently used.
+*)
+
+(**
+ * [compute_and_print_running_time f] runs the function [f] to get result and
+ * prints the running time of the function [f].
+ * It is useful for profiling.
+ *
+ * Requires: [f] is a function that computes something.
+ * @return the computation result.
+ * Effect: Running time has been printed to console.
+*)
+val compute_and_print_running_time : (unit -> 'a) -> 'a
+
+(**
+ * [run_and_print_running_time f] runs the function [f] and
+ * prints the running time of the function [f].
+ * It is useful for profiling.
+ *
+ * Requires: [f] is a function that runs something.
+ * @return None.
+ * Effect: Running time has been printed to console.
+*)
+val run_and_print_running_time : (unit -> unit) -> unit
+
+(**
+ * [repeats n f input] is mathematically equivalent to `f^n(input)`.
+ *
+ * Requires:
+ * - [n] is a natural number.
+ * - [f] has no visible side effects.
+ * - [input] is a valid input to [f].
+ * @return `f^n(input)`.
+*)
+val repeats : int -> ('a -> 'a) -> 'a -> 'a
 
 (**
  * [Position] is an adapter for the [Map] module. It defines how tuple
