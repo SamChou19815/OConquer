@@ -1,7 +1,7 @@
 open Definitions
 open Common
 
-type program = string
+type program = player_identity
 
 module type Context = sig
   val get_my_pos : Position.t
@@ -14,7 +14,7 @@ let from_string (i: player_identity) (p_str: string) : program option =
     | Black -> "BlackProgram"
     | White -> "WhiteProgram"
   in
-  if Runner.compile_program class_name p_str then Some class_name else None
+  if Runner.compile_program class_name p_str then Some i else None
 
 module type Runner = sig
   val run_program : program -> command

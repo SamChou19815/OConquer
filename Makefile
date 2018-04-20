@@ -4,6 +4,10 @@ main:
 test:
 	ocamlbuild -use-ocamlfind main.byte
 
+testprogramrunner:
+	ocamlbuild -use-ocamlfind program_runner_test.byte && \
+	./program_runner_test.byte
+
 docs:
 	mkdir -p docs
 	ocamldoc -html -d docs/ -colorize-code -short-functors -stars -keep-code \

@@ -1,17 +1,29 @@
-let compile_program (class_name: string) (p_str: string) : bool =
-  let fd = Unix.openfile class_name [O_CREAT; O_WRONLY; O_TRUNC] 0o640 in
-  let l = Unix.single_write_substring fd p_str 0 (String.length p_str) in
-  Unix.close fd;
-  if l <= 0 then false else
-    let compile_cmd = "javac ./programs/" ^ class_name ^ ".java" in
-    match Unix.system compile_cmd with
-    | Unix.WEXITED id -> id = 0
-    | _ -> false
+open Definitions
+
+let compile_program (black_program: string) (white_program: string) : bool =
+  let h class_name program =
+    let f =
+      let name = "./programs/src/" ^ class_name ^ ".java" in
+      Unix.openfile name [O_CREAT; O_WRONLY; O_TRUNC] 0o640
+    in
+    let _ = Unix.single_write_substring f program 0 (String.length program) in
+    Unix.close f;
+  in
+  h "BlackProgram" black_program; h "WhiteProgram" white_program;
+  let compile_cmd = "javac -d ./programs/out ./programs/src/*.java" in
+  match Unix.system compile_cmd with
+  | Unix.WEXITED id -> id = 0
+  | _ -> false
 
 let get_value (r: in_channel -> 'a option) (w: 'a -> out_channel -> unit)
-    (to_final_value: 'a -> 'b option) (class_name: string) : 'b option =
+    (to_final_value: 'a -> 'b option) (identity: player_identity) : 'b option =
   let (cin, cout, cerr) as p =
-    Unix.open_process_full ("java -cp ./programs " ^ class_name) [||]
+    let args = match identity with
+      | Black -> "black"
+      | White -> "white"
+    in
+    Unix.open_process_full ("java -cp ./programs/src ProgramRunner "
+                            ^ args) [||]
   in
   let rec h () : 'b option =
     let input = r cin in

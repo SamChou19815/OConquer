@@ -22,6 +22,12 @@ setup.log
 # docs
 docs/
 
+## Java SDK
+
+/programs/.idea/*
+/programs/*.iml
+*.class
+
 ## START for web app
 
 # compiled output
