@@ -22,7 +22,7 @@ let get_value (r: in_channel -> 'a option) (w: 'a -> out_channel -> unit)
       | Black -> "black"
       | White -> "white"
     in
-    Unix.open_process_full ("java -cp ./programs/src ProgramRunner "
+    Unix.open_process_full ("java -cp ./programs/out ProgramRunner "
                             ^ args) [||]
   in
   let rec h () : 'b option =

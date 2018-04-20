@@ -118,5 +118,7 @@ let process_mil_unit (get_program: MilUnit.t -> Command.program)
   exec mil_unit_id cmd map
 
 let next (s: state) : state =
-  let world_map' = WorldMap.next (process_mil_unit (get_program s)) s.world_map in
+  let world_map' =
+    WorldMap.next (process_mil_unit (get_program s)) s.world_map
+  in
   { s with turns = s.turns + 1; world_map = world_map' }

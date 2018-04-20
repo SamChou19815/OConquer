@@ -9,12 +9,8 @@ module type Context = sig
   val get_tile : Position.t -> Tile.t
 end
 
-let from_string (i: player_identity) (p_str: string) : program option =
-  let class_name = match i with
-    | Black -> "BlackProgram"
-    | White -> "WhiteProgram"
-  in
-  if Runner.compile_program class_name p_str then Some i else None
+let from_string (b: string) (w: string) : (program * program) option =
+  if Runner.compile_program b w then Some (Black, White) else None
 
 module type Runner = sig
   val run_program : program -> command
@@ -33,7 +29,11 @@ module ProgramRunner (Cxt: Context) = struct
     | _ -> Cxt.get_my_pos
 
   let reader (i: in_channel) : input option =
-    match String.split_on_char ' ' (input_line i) with
+    let line =
+      (* Return bad result if things fail on Unix pipe line level. *)
+      try input_line i with End_of_file -> "BAD INPUT LINE"
+    in
+    match String.split_on_char ' ' line with
     | ["REQUEST"; "MY_POS"] -> Some (Req MyPosition)
     | ["REQUEST"; "MIL_UNIT"; p1; p2] ->
       Some (Req (MilitaryUnit (strings_to_pos_coerce (p1, p2))))
