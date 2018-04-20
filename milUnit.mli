@@ -60,6 +60,15 @@ val same_mil_unit : t -> t -> bool
 val identity : t -> player_identity
 
 (**
+ * [string_of_identity identity] returns a string representation
+ * of the player identiy.
+
+ * Requires: [identity] is a legal player identity.
+ * @return: the string representation identity of [identity].
+ *)
+val string_of_identity : player_identity -> string
+
+(**
  * [id mil_unit] reports the id of the military unit.
  *
  * Requires: [mil_unit] is a legal military unit.

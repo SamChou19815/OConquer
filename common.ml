@@ -6,6 +6,7 @@ module Position = struct
     if c = 0 then compare p1y p2y else c
 
   let to_string (x, y: t) : string = string_of_int x ^ " " ^ string_of_int y
+
 end
 
 module PosMap = struct

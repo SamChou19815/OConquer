@@ -22,6 +22,11 @@ let same_mil_unit (m1: t) (m2: t) : bool =
 
 let identity (m: t) : player_identity = m.identity
 
+let string_of_identity (pi:player_identity) :string =
+  match pi with
+  | Black -> "Black"
+  | White -> "white"
+
 let id (m: t) : int = m.id
 
 let direction (m: t) : int = m.direction

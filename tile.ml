@@ -24,3 +24,9 @@ let to_string : t -> string = function
   | Mountain -> "TILE MOUNTAIN"
   | Fort -> "TILE FORT"
   | City level -> "TILE CITY " ^ string_of_int level
+
+  let to_string_json : t -> string = function
+    | Empty -> "empty"
+    | Mountain -> "mountain"
+    | Fort -> "fort"
+    | City _ -> "city"
