@@ -1,3 +1,5 @@
+open OUnit
+
 let black_program_initial = "/**
  * User defined program for black side.
  */
@@ -52,7 +54,20 @@ public class WhiteProgram implements Program {
 
 }
 "
-let they_do_compile =
-  Runner.compile_program black_program_initial white_program_initial
+let (compiled_black_program, compiled_white_program) =
+  match Command.from_string black_program_initial white_program_initial with
+  | None -> failwith "DOES NOT COMPILE!" | Some v -> v
 
-let () = print_endline (string_of_bool they_do_compile)
+let simple_program_tests = [
+  "simple_programs_compile" >:: (fun _ ->
+      ignore compiled_black_program; ignore compiled_white_program);
+  "do_get_result" >:: (fun _ ->
+      let state = Engine.init compiled_black_program compiled_white_program in
+      ignore(Engine.(state |> next |> next |> next |> next |> next))
+    )
+]
+
+let tests =
+  List.flatten [
+    simple_program_tests
+  ]

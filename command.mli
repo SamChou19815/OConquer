@@ -41,17 +41,19 @@ module type Context = sig
 end
 
 (**
- * [from_string i program_str] parses a string [program_str] into a program.
- * If the [program_str] is not a legal program, [None] will be returned;
- * otherwise, [Some p] is returned, where [p] represents a legal program.
+ * [from_string black_program white_program] turns [black_program] and
+ * [white_program] into two compiled programs.
+ * If the [black_program] or [black_program] is not a legal program,
+ * [None] will be returned;
+ * otherwise, [Some (p1, p2)] is returned, where [p1, p2] represents two legal
+ * compiled program.
  *
- * Requires:
- * - [i] is the player identity.
- * - [string] can be any string.
- * @return: [Some p] where  where [p] represents a legal program.
- * [None] if the program is illegal.
+ * Requires: [black_program] [white_program] are black program and white
+ * program.
+ * @return [Some (p1, p2)] is returned, where [p1, p2] represents two legal
+ * compiled program. [None] if the program is illegal.
 *)
-val from_string : player_identity -> string -> program option
+val from_string : string -> string -> (program * program) option
 
 (** [Runner] is the module type for a runner of program. *)
 module type Runner = sig

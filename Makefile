@@ -2,11 +2,7 @@ main:
 	ocamlbuild -use-ocamlfind main.byte
 
 test:
-	ocamlbuild -use-ocamlfind main.byte
-
-testprogramrunner:
-	ocamlbuild -use-ocamlfind program_runner_test.byte && \
-	./program_runner_test.byte
+	ocamlbuild -use-ocamlfind test.byte && ./test.byte
 
 docs:
 	mkdir -p docs
