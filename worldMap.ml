@@ -1,5 +1,6 @@
-open Common
 open GameConstants
+open Common
+open Data
 
 (* Some type alias to improve readability of code. *)
 type pos_2_id_map = int PosMap.t
@@ -96,26 +97,6 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
       next_id; changed_pos; execution_queue;
     }
 
-let randomize_map (m: t) : t =
-  let max_num_mountains_to_add = map_width * map_height / 20 in
-  let () = Random.self_init () in
-  let rec add_mountain n m' =
-    if n = 0 then m'
-    else
-      let pos = (Random.int map_width, Random.int map_height) in
-      if PosMap.mem pos m'.maps.pos_2_id_map then add_mountain n m'
-      else
-        let () = HashSet.add pos m'.changed_pos in
-        let pos_2_tile_map' =
-          PosMap.add pos Tile.Mountain m.maps.pos_2_tile_map
-        in
-        let m'' =
-          { m' with maps = { m'.maps with pos_2_tile_map = pos_2_tile_map' } }
-        in
-        add_mountain (n - 1) m''
-  in
-  add_mountain max_num_mountains_to_add m
-
 let get_position_by_id (id: int) (m: t) : Position.t =
   IntMap.find id m.maps.id_2_pos_map
 
@@ -172,6 +153,17 @@ let get_pos_ahead (dir: int) (x, y: Position.t) : Position.t =
   | 3 -> (x, y - 1)
   | _ -> failwith "Bad Direction! Data Corrupted!"
 
+(**
+ * [get_passable_pos_ahead direction pos m] outputs a passable position
+ * directly ahead of the given [pos] pointing to direction [direction].
+ * If there is no such position that is passable, it will give [None].
+ *
+ * Requires:
+ * - [direction] is 0, 1, 2, 3, representing east, north, west, south.
+ * - [pos] can be any position.
+ * @return: [Some p] if [p] is ahead of [pos] according to [direction]; [None]
+ * if the position ahead is not passable.
+*)
 let get_passable_pos_ahead (d: int) (p: Position.t) (m: t) : Position.t option =
   let new_pos = get_pos_ahead d p in
   match get_tile_by_pos new_pos m with
@@ -180,6 +172,47 @@ let get_passable_pos_ahead (d: int) (p: Position.t) (m: t) : Position.t option =
     match PosMap.find_opt new_pos m.maps.pos_2_id_map with
     | Some _ -> None (* Cannot move onto another military unit! *)
     | None -> Some new_pos (* OK to move! *)
+
+(**
+ * [diff_record_from_positions m pos_lst] creates a diff record from a set of
+ * changed position [ps] in a given map [m].
+ *
+ * Requires:
+ * - [pos_lst] is a list of changed positions without duplicates.
+ * - [m] is a legal map.
+ * @return a diff record constructed from changed locations and map.
+*)
+let diff_record_from_positions (m: t) (pos_lst: Position.t list) : diff_record =
+  pos_lst
+  |> List.map (fun pos -> create_map_content
+                  ~mil_unit:(get_mil_unit_opt_by_pos pos m)
+                  ~pos:pos
+                  ~tile:(get_tile_by_pos pos m))
+  |> create_diff_record
+
+let randomize_map (m: t) : t * diff_record =
+  let max_num_mountains_to_add = map_width * map_height / 20 in
+  let changed_pos_for_randomization = HashSet.create () in
+  let () = Random.self_init () in
+  let rec add_mountain n m' =
+    if n = 0 then m'
+    else
+      let pos = (Random.int map_width, Random.int map_height) in
+      if PosMap.mem pos m'.maps.pos_2_id_map then add_mountain n m'
+      else
+        let () = HashSet.add pos changed_pos_for_randomization in
+        let pos_2_tile_map' =
+          PosMap.add pos Tile.Mountain m.maps.pos_2_tile_map
+        in
+        let m'' =
+          { m' with maps = { m'.maps with pos_2_tile_map = pos_2_tile_map' } }
+        in
+        add_mountain (n - 1) m''
+  in
+  let new_map = add_mountain max_num_mountains_to_add m in
+  let diff_record = changed_pos_for_randomization
+                    |> HashSet.elem |> diff_record_from_positions new_map in
+  (new_map, diff_record)
 
 let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
   match IntMap.find_opt id m.maps.id_2_mil_unit_map with
@@ -335,7 +368,7 @@ let divide (id: int) (m: t) : t =
         let m' = { m with next_id = m.next_id + 1 } in
         m' |> put_mil_unit my_pos m1 |> put_mil_unit ahead_pos m2
 
-let next (process_mil_unit: int -> t -> t) (m: t) : t =
+let next (process_mil_unit: int -> t -> t) (m: t) : t * diff_record =
   (* To store all the military units' id that can possibly exist. *)
   let temp_queue : int Queue.t = Queue.create () in
   (* Iterate through the execution list to execute according to
@@ -352,15 +385,17 @@ let next (process_mil_unit: int -> t -> t) (m: t) : t =
         next_process map'
       else next_process map
   in
-  (* Add back alive military units. *)
-  let end_of_turn_process (map: t) : t =
+  (* Add back alive military units, produce new map and diff record. *)
+  let end_of_turn_processing (map: t) : t * diff_record =
     while temp_queue |> Queue.is_empty |> not do
       let id = Queue.pop temp_queue in
       if IntMap.mem id m.maps.id_2_mil_unit_map then
         (* Only add back if it still exists *)
         Queue.push id map.execution_queue
     done;
+    let diff_record = map.changed_pos
+                      |> HashSet.elem |> diff_record_from_positions map in
     HashSet.clear map.changed_pos;
-    map
+    (map, diff_record)
   in
-  m |> next_process |> end_of_turn_process
+  m |> next_process |> end_of_turn_processing

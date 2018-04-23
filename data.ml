@@ -8,16 +8,7 @@ type map_content = {
   mil_unit: MilUnit.t option;
 }
 
-(**
- * [DiffSet] is the set that is responsible for managing a set of map content
- * change in one round.
-*)
-module DiffSet = Set.Make (struct
-    type t = map_content
-    let compare m1 m2 = Position.compare m1.position m2.position
-  end)
-
-type diff_record = DiffSet.t
+type diff_record = map_content list
 
 (* Stored in the reserve order. *)
 type diff_logs = diff_record list
@@ -26,8 +17,7 @@ let create_map_content ?(mil_unit: MilUnit.t option = None)
     ~(pos: Position.t) ~(tile: Tile.t) : map_content =
   { position = pos; tile; mil_unit; }
 
-let create_diff_record (f: 'a -> map_content) (lst: 'a list) : diff_record =
-  lst |> List.map f |> DiffSet.of_list
+let create_diff_record (lst: map_content list) : diff_record = lst
 
 let empty_diff_logs : diff_logs = []
 
@@ -76,7 +66,7 @@ let map_content_to_json (map_content: map_content) : json =
   ]
 
 let diff_record_to_json (r: diff_record) : json =
-  `List (r |> DiffSet.elements |> List.map map_content_to_json)
+  `List (List.map map_content_to_json r)
 
 let diff_logs_to_json (l: diff_logs) : json =
   `List (List.rev_map diff_record_to_json l)

@@ -43,13 +43,12 @@ val create_map_content : ?mil_unit:MilUnit.t option
  * [create_diff_record f lst] creates a [diff_record] from a list of items [lst]
  * and a function [f] that maps each item to a [map_content].
  *
- * Requires:
- * - [f] should correctly converts an object to a map_record.
- * - [lst] should contain a list of things that fits the meaning of map content.
+ * Requires: [lst] should contain a list of map content that has changed. It
+ * should not contain duplicate elements.
  * @return a diff record of the list that represents all the changes in one
  * round.
 *)
-val create_diff_record : ('a -> map_content) -> 'a list -> diff_record
+val create_diff_record : map_content list -> diff_record
 
 (**
  * [empty_diff_logs i] creates an empty diff logs.

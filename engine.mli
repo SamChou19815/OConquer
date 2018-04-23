@@ -44,8 +44,9 @@ val get_map : state -> WorldMap.t
  * a new legal state regardless whether the game has ended.
  *
  * Requires: [s] must be a legal state.
- * @return: a new legal state created from the given state [s] where the game
- * has been advanced for one more round by executing programs of each military
- * unit.
+ * @return: [s', diff_record] where [s'] is a new legal state created from the
+ * given state [s] where the game has been advanced for one more round by
+ * executing programs of each military unit, and [diff_record] represents all
+ * changed map content in that round.
 *)
-val next : state -> state
+val next : state -> state * Data.diff_record

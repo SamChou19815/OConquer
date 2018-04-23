@@ -1,6 +1,7 @@
 (** [WorldMap] encapsulates many operations on the world map. *)
 
 open Common
+open Data
 
 (**
  * [t] is the type of the world map, which is a collection of military unit map
@@ -24,15 +25,6 @@ exception IllegalWorldMapOperation of string
  * and two military units [m1] [m2] on opposite corners.
 *)
 val init : MilUnit.t -> MilUnit.t -> t
-
-(**
- * [randomize_map m] randomizes the map by randomly adding some mountains.
- *
- * Requires: [m] is a legal world map.
- * @return: a new world map with randomly created mountain. We ensure that the
- * newly created mountain will not collide with existing units.
-*)
-val randomize_map : t -> t
 
 (**
  * [get_position_by_id id m] tries to find the position of the military
@@ -118,17 +110,15 @@ val get_tile_by_mil_id : int -> t -> Tile.t
 val get_tile_opt_by_mil_id : int -> t -> Tile.t option
 
 (**
- * [get_passable_pos_ahead direction pos m] outputs a passable position
- * directly ahead of the given [pos] pointing to direction [direction].
- * If there is no such position that is passable, it will give [None].
+ * [randomize_map m] randomizes the map by randomly adding some mountains.
  *
- * Requires:
- * - [direction] is 0, 1, 2, 3, representing east, north, west, south.
- * - [pos] can be any position.
- * @return: [Some p] if [p] is ahead of [pos] according to [direction]; [None]
- * if the position ahead is not passable.
+ * Requires: [m] is a legal world map.
+ * @return: [(map, diff_record)], where [map] is a new world map with randomly
+ * created mountain and [diff_record] is a set of changed map content.
+ * We ensure that the newly created mountain will not collide with existing
+ * units.
 *)
-val get_passable_pos_ahead : int -> Position.t -> t -> Position.t option
+val randomize_map : t -> t * diff_record
 
 (**
  * [update_mil_unit id f m] updates a military unit with [id] on the map [m] by
@@ -196,7 +186,7 @@ val divide : int -> t -> t
 
 (**
  * [next process_mil_unit m] steps through the entire round for the world map
- * to produce a new world map.
+ * to produce a new world map and a diff record.
  * [process_mil_unit] does some operation on the military unit to change some
  * state in the world map [m] for processing each military unit.
  * This function is reserved for the [Engine] module only.
@@ -206,6 +196,6 @@ val divide : int -> t -> t
  *   new world map.
  * - [m] is a legal world map.
  * @return: a new world map that stepped a whole round from the old given world
- * map [m].
+ * map [m] and a diff record that contains everything changed in this round.
 *)
-val next : (int -> t -> t) -> t -> t
+val next : (int -> t -> t) -> t -> t * diff_record

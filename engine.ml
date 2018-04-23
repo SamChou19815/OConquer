@@ -117,8 +117,9 @@ let process_mil_unit (get_program: MilUnit.t -> Command.program)
   let cmd = R.run_program program in
   exec mil_unit_id cmd map
 
-let next (s: state) : state =
-  let world_map' =
+let next (s: state) : state * Data.diff_record =
+  let (new_world_map, diff_record) =
     WorldMap.next (process_mil_unit (get_program s)) s.world_map
   in
-  { s with turns = s.turns + 1; world_map = world_map' }
+  let new_state = { s with turns = s.turns + 1; world_map = new_world_map } in
+  (new_state, diff_record)
