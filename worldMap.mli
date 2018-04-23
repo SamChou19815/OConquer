@@ -27,6 +27,16 @@ exception IllegalWorldMapOperation of string
 val init : MilUnit.t -> MilUnit.t -> t
 
 (**
+ * [number_of_units m] computes the number of military units for black and white
+ * side.
+ *
+ * Requires: [m] is a legal world map.
+ * @return [black_num, white_num] where they are number of military units for
+ * black and white respectively.
+*)
+val number_of_units : t -> int * int
+
+(**
  * [get_position_by_id id m] tries to find the position of the military
  * unit with id [id].
  *

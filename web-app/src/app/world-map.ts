@@ -1,5 +1,12 @@
 enum PlayerIdentity { BLACK = "BLACK", WHITE = "WHITE" }
 
+enum GameStatus {
+    BLACK_WINS = "BLACK_WINS";
+    WHITE_WINS = "WHITE_WINS";
+    DRAW = "DRAW";
+    IN_PROGRESS = "IN_PROGRESS";
+}
+
 enum TileType {
   EMPTY = "EMPTY", MOUNTAIN = "MOUNTAIN", FORT = "FORT", CITY = "CITY"
 }
@@ -39,4 +46,9 @@ interface MapContent {
   tileType: TileType;
   cityLevel?: number | null;
   milUnit?: MilUnit | null;
+}
+
+interface GameReport {
+  logs: MapContent[][];
+  status: GameStatus;
 }

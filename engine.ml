@@ -8,17 +8,23 @@ type state = {
   white_program: Command.program;
 }
 
-let init (p1: Command.program) (p2: Command.program) : state =
+let init (p1: Command.program) (p2: Command.program) =
   let m1 = MilUnit.default_init Black 0 0 in
   let m2 = MilUnit.default_init White 1 3 in
-  {
-    turns = 0;
-    world_map = WorldMap.init m1 m2;
-    black_program = p1;
-    white_program = p2;
-  }
+  let turns = 0 in
+  let world_map = WorldMap.init m1 m2 in
+  let (world_map, diff_record) = WorldMap.randomize_map world_map in
+  let s = { turns; world_map; black_program = p1; white_program = p2; } in
+  (s, diff_record)
 
-let get_game_status (s: state) : game_status = InProgress
+let get_game_status (s: state) : game_status =
+  let (b, w) = WorldMap.number_of_units s.world_map in
+  if b = 0 then WhiteWins
+  else if w = 0 then BlackWins
+  else if s.turns < GameConstants.max_turns then InProgress
+  else if b > w then BlackWins
+  else if b < w then WhiteWins
+  else Draw
 
 let get_map (s: state) : WorldMap.t = s.world_map
 

@@ -25,6 +25,9 @@ type diff_record
 *)
 type diff_logs
 
+(** [game_report] is the abstract type for the progress report of game. *)
+type game_report
+
 (**
  * [create_map_content mil_unit pos tile] creates a map content with
  * an optional military unit [mil_unit], position [pos], and tile [tile].
@@ -61,9 +64,20 @@ val create_diff_record : map_content list -> diff_record
 val create_diff_logs : diff_record list -> diff_logs
 
 (**
- * [diff_logs_to_json l] converts a diff log into json format.
+ * [create_game_report logs status] creates a game report from [logs] and
+ * [status].
  *
- * Requires: [l] is a legal [diff_logs].
- * @return the json format of the given [l].
+ * Requires:
+ * - [logs] is valid logs.
+ * - [status] is in sync with logs.
+ * @return a constructed game report.
 *)
-val diff_logs_to_json : diff_logs -> Yojson.Basic.json
+val create_game_report : diff_logs -> Definitions.game_status -> game_report
+
+(**
+ * [game_report_to_json r] converts a game report into json format.
+ *
+ * Requires: [r] is a legal [game_report].
+ * @return the json format of the given [r].
+*)
+val game_report_to_json : game_report -> Yojson.Basic.json

@@ -100,6 +100,17 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
       next_id; changed_pos; execution_queue;
     }
 
+let number_of_units (m: t) : int * int =
+  let b = ref 0 in let w = ref 0 in
+  let incrementer (id: int) : unit =
+    let mil_unit = IntMap.find id m.maps.id_2_mil_unit_map in
+    match MilUnit.identity mil_unit with
+    | Black -> incr b
+    | White -> incr w
+  in
+  Queue.iter incrementer m.execution_queue;
+  (!b, !w)
+
 let get_position_by_id (id: int) (m: t) : Position.t =
   IntMap.find id m.maps.id_2_pos_map
 

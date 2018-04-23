@@ -8,6 +8,10 @@ val map_width : int
 (** [map_height] is the height of the map. *)
 val map_height : int
 
+(** Game Progress Constants *)
+(** [max_turns] is the maximum number of turns of the game. *)
+val max_turns : int
+
 (** Game Interaction Constants *)
 
 (** [training_morale_boost] is the value added to morale after training. *)

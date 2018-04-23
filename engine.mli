@@ -15,11 +15,13 @@ type state
 (**
  * [init p1 p2] creates a new game state with two given parsed programs [p1]
  * [p2]. The created new state represents the initial legal state of the game.
+ * A new diff record representing the randomized map is also returned.
  *
  * Requires: [p1] [p2] must be legal programs.
- * @return: the returned state is the initial state of the game. If [p1] [p2]
- * are legal, the returned state is also legal. *)
-val init : Command.program -> Command.program -> state
+ * @return: [s, d] where [s] is the returned state is the initial state of the
+ * game and [d] is the initial diff logs.
+*)
+val init : Command.program -> Command.program -> state * Data.diff_record
 
 (**
  * [get_game_status s] reports the winning status of the game.
