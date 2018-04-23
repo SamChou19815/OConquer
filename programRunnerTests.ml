@@ -20,6 +20,9 @@ public class BlackProgram implements Program {
 
     @Override
     public Action getAction() {
+        Position myPosition = GameSDK.getMyPosition();
+        GameSDK.getMilitaryUnit(myPosition);
+        GameSDK.getTile(myPosition);
         return Action.DO_NOTHING;
     }
 
@@ -52,6 +55,9 @@ public class WhiteProgram implements Program {
 
     @Override
     public Action getAction() {
+        Position myPosition = GameSDK.getMyPosition();
+        GameSDK.getMilitaryUnit(myPosition);
+        GameSDK.getTile(myPosition);
         return Action.DO_NOTHING;
     }
 
@@ -86,7 +92,8 @@ let (compiled_black, compiled_white) = get_compiled_programs ()
 let simple_program_tests = [
   "simple_programs_do_get_result" >:: (fun _ ->
       let state_init = Engine.init compiled_black compiled_white in
-      ignore(repeats 5 Engine.next state_init)
+      let next (s, _) = Engine.next s in
+      ignore(repeats 5 next state_init)
     )
 ]
 

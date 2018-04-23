@@ -14,6 +14,9 @@ public class WhiteProgram implements Program {
 
     @Override
     public Action getAction() {
+        Position myPosition = GameSDK.getMyPosition();
+        GameSDK.getMilitaryUnit(myPosition);
+        GameSDK.getTile(myPosition);
         return Action.DO_NOTHING;
     }
 
