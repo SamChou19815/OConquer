@@ -159,7 +159,7 @@ module ArrayList : sig
    *
    * Requires:
    * - [s] can be any integer greater than or equal to 0.
-   * - [t] can be any integer.
+   * - [t] can be any integer less than [size l].
    * - [l] is a legal array list.
    * @return a sub list of the original array list [l] from [s] to [t].
    * @raise Invalid_argument ["index out of bounds"] if [s] is less than 0.

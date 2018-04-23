@@ -1,2 +1,2 @@
-(** [program_tests] contains a list of program runner tests. *)
+(** [tests] contains a list of tests for program runner functionality. *)
 val tests : OUnit.test list

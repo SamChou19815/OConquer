@@ -3,7 +3,8 @@ open OUnit
 (** [all_tests] is the collection of all tests. *)
 let all_tests =
   List.flatten [
-    ProgramRunnerTests.tests
+    CommonTests.tests;
+    ProgramRunnerTests.tests;
   ]
 
 let suite = "Final Project Test Suite" >::: all_tests

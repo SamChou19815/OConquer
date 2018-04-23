@@ -89,7 +89,7 @@ module ArrayList = struct
     else
       let rec builder i acc =
         if i < s then acc
-        else builder (i - 1) (l.content.(i)::acc)
+        else builder (i - 1) (get i l::acc)
       in
       builder (t - 1) []
 

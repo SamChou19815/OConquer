@@ -88,7 +88,7 @@ let diff_record_to_json (r: diff_record) : json =
  * @return the json format of the given [r].
 *)
 let diff_logs_to_json (l: diff_logs) : json =
-  `List (List.rev_map diff_record_to_json l)
+  `List (List.map diff_record_to_json l)
 
 let game_report_to_json (r: game_report) : json =
   let status = match r.game_status with

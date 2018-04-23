@@ -40,10 +40,11 @@ module LocalServerKernel : LocalServer.Kernel = struct
         s.game_status <- game_status;
         let ended = match game_status with
           | BlackWins | WhiteWins | Draw ->
+            print_endline "Game Over!";
             s.game_state <- None;
             true
           | InProgress ->
-            Mutex.lock s.mutex;
+            print_endline "Running: One Step!";
             let (next_state, diff_record) = Engine.next game_state in
             s.game_state <- Some next_state;
             ArrayList.add diff_record s.diff_logs;
@@ -54,6 +55,7 @@ module LocalServerKernel : LocalServer.Kernel = struct
       end
 
   let start_simulation (p1: string) (p2: string) (s: state) =
+    print_endline "Trying to start new simulation!";
     if s.game_state <> None then `AlreadyRunning
     else match Command.from_string p1 p2 with
       | None -> `DoesNotCompile
@@ -71,6 +73,7 @@ module LocalServerKernel : LocalServer.Kernel = struct
         end
 
   let query (last_seen_round_id: int) (s: state) : string =
+    print_endline "Handling Query!";
     Mutex.lock s.mutex;
     let start_i = if last_seen_round_id >= 0 then last_seen_round_id else 0 in
     let end_i = ArrayList.size s.diff_logs in
