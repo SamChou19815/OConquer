@@ -22,14 +22,22 @@ let same_mil_unit (m1: t) (m2: t) : bool =
 
 let identity (m: t) : player_identity = m.identity
 
-let string_of_identity (pi:player_identity) :string =
-  match pi with
-  | Black -> "Black"
-  | White -> "white"
+let identity_string (m: t) :string =
+  match m.identity with
+  | Black -> "BLACK"
+  | White -> "WHITE"
 
 let id (m: t) : int = m.id
 
 let direction (m: t) : int = m.direction
+
+let direction_string (m: t) : string =
+  match m.direction with
+  | 0 -> "EAST"
+  | 1 -> "NORTH"
+  | 2 -> "WEST"
+  | 3 -> "SOUTH"
+  | _ -> failwith "Corrupted Direction Data!"
 
 let num_soliders (m: t) : int = m.num_soliders
 
@@ -158,9 +166,6 @@ let divide (next_id: int) (m: t) : (t * t) option =
     Some (m1, m2)
 
 let to_string (m: t) : string =
-  let identity = match m.identity with
-    | Black -> "Black"
-    | White -> "White"
-  in
+  let identity = identity_string m in
   Printf.sprintf "MIL_UNIT %s %d %d %d %d %d"
     identity m.id m.direction m.num_soliders m.morale m.leadership

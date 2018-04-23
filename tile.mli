@@ -53,10 +53,10 @@ val upgrade_tile : t -> t
 val to_string : t -> string
 
 (**
- * [to_string_json tile] outputs the standard string representation of the [tile].
+ * [type_string tile] outputs the standard string representation of the [tile].
  * The representation is used for json output.
  *
  * Requires: None.
  * @return the standard string representation of the [tile].
 *)
-val to_string_json : t -> string
+val type_string : t -> string

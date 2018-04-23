@@ -1,13 +1,11 @@
-enum PlayerIdentity { BLACK, WHITE }
+enum PlayerIdentity { BLACK = "BLACK", WHITE = "WHITE" }
 
 enum TileType {
-
-  EMPTY, MOUNTAIN, FORT, CITY
-
+  EMPTY = "EMPTY", MOUNTAIN = "MOUNTAIN", FORT = "FORT", CITY = "CITY"
 }
 
 enum Direction {
-  EAST, NORTH, WEST, SOUTH
+  EAST = "EAST", NORTH = "NORTH", WEST = "WEST", SOUTH = "SOUTH"
 }
 
 interface Position {
@@ -39,6 +37,6 @@ Example:
 interface MapContent {
   position: Position;
   tileType: TileType;
-  cityLevel?: number;
-  milUnit?: MilUnit;
+  cityLevel?: number | null;
+  milUnit?: MilUnit | null;
 }

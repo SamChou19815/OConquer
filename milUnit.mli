@@ -46,7 +46,7 @@ val default_init : player_identity -> int -> int -> t
  * on a military unit.
  *
  * Requires: [m1] [m2] are legal military units.
- * @return: whether [m1] [m2] refers to the same military unit, just in
+ * @return whether [m1] [m2] refers to the same military unit, just in
  * different states.
 *)
 val same_mil_unit : t -> t -> bool
@@ -55,24 +55,24 @@ val same_mil_unit : t -> t -> bool
  * [identity mil_unit] reports the identity of the military unit.
  *
  * Requires: [mil_unit] is a legal military unit.
- * @return: the identity of the military unit [mil_unit].
+ * @return the identity of the military unit [mil_unit].
 *)
 val identity : t -> player_identity
 
 (**
- * [string_of_identity identity] returns a string representation
- * of the player identiy.
-
- * Requires: [identity] is a legal player identity.
- * @return: the string representation identity of [identity].
- *)
-val string_of_identity : player_identity -> string
+ * [identity_string mil_unit] returns a string representation
+ * of the player identiy of the given [mil_unit].
+ *
+ * Requires: [mil_unit] is a legal military unit.
+ * @return the string representation identity of [mil_unit].
+*)
+val identity_string : t -> string
 
 (**
  * [id mil_unit] reports the id of the military unit.
  *
  * Requires: [mil_unit] is a legal military unit.
- * @return: the id of the military unit [mil_unit].
+ * @return the id of the military unit [mil_unit].
 *)
 val id : t -> int
 
@@ -80,16 +80,25 @@ val id : t -> int
  * [direction mil_unit] reports the direction of the military unit.
  *
  * Requires: [mil_unit] is a legal military unit.
- * @return: the direction of the military unit [mil_unit].
+ * @return the direction of the military unit [mil_unit].
 *)
 val direction : t -> int
+
+(**
+ * [direction_string mil_unit] reports the string representation of the
+ * direction of the military unit.
+ *
+ * Requires: [mil_unit] is a legal military unit.
+ * @return the direction string of the military unit [mil_unit].
+*)
+val direction_string : t -> string
 
 (**
  * [num_soliders mil_unit] reports the number of soldiers for the given
  * military unit [mil_unit].
  *
  * Requires: [mil_unit] is a legal military unit.
- * @return: the number of soldiers for the given military unit [mil_unit].
+ * @return the number of soldiers for the given military unit [mil_unit].
 *)
 val num_soliders : t -> int
 
@@ -97,7 +106,7 @@ val num_soliders : t -> int
  * [morale mil_unit] reports the morale for the given military unit [mil_unit].
  *
  * Requires: [mil_unit] is a legal military unit.
- * @return: the morale for the given military unit [mil_unit].
+ * @return the morale for the given military unit [mil_unit].
 *)
 val morale : t -> int
 
@@ -106,7 +115,7 @@ val morale : t -> int
  * [mil_unit].
  *
  * Requires: [mil_unit] is a legal military unit.
- * @return: the leadership for the given military unit [mil_unit].
+ * @return the leadership for the given military unit [mil_unit].
 *)
 val leadership : t -> int
 
@@ -117,7 +126,7 @@ val leadership : t -> int
  * Requires:
  * - [n] is non-negative.
  * - [m] is a legal military unit.
- * @return: the result of increasing soliders for that military unit.
+ * @return the result of increasing soliders for that military unit.
 *)
 val increase_soldier_by : int -> t -> t
 
@@ -125,7 +134,7 @@ val increase_soldier_by : int -> t -> t
  * [turn_left m] lets the military unit [m] turn left.
  *
  * Requires: [m] is a legal military unit.
- * @return: the result of turning left for that military unit.
+ * @return the result of turning left for that military unit.
 *)
 val turn_left : t -> t
 
@@ -133,7 +142,7 @@ val turn_left : t -> t
  * [turn_right m] lets the military unit [m] turn right.
  *
  * Requires: [m] is a legal military unit.
- * @return: the result of turning right for that military unit.
+ * @return the result of turning right for that military unit.
 *)
 val turn_right : t -> t
 
@@ -141,7 +150,7 @@ val turn_right : t -> t
  * [train m] increases the fighting ability of a military unit after training.
  *
  * Requires: [m] is a legal military unit.
- * @return: the result of training the military unit.
+ * @return the result of training the military unit.
 *)
 val train : t -> t
 
@@ -150,7 +159,7 @@ val train : t -> t
  * after retreating.
  *
  * Requires: [m] is a legal military unit.
- * @return: the result of retreating for the military unit.
+ * @return the result of retreating for the military unit.
 *)
 val apply_retreat_penalty : t -> t
 
@@ -162,7 +171,7 @@ val apply_retreat_penalty : t -> t
  * eliminated as a result of attack.
  *
  * Requires: [m1] and [m2] are legal military units.
- * @return: the result of attack stored in a tuple.
+ * @return the result of attack stored in a tuple.
 *)
 val attack : (Tile.t * Tile.t) -> (t * t) -> (t option * t option)
 
@@ -175,7 +184,7 @@ val attack : (Tile.t * Tile.t) -> (t * t) -> (t option * t option)
  * Requires:
  * - [next_id] is the next id for the potentially new military unit.
  * - [mil_unit] is a legal military unit.
- * @return: [Some (m1, m2)] where [m1] [m2] are the divided units, [m1] with
+ * @return [Some (m1, m2)] where [m1] [m2] are the divided units, [m1] with
  * [id] of [mil_unit.id] and [m2] with [id] of [next_id]. if the
  * division is successful and [None] if the division fails due to insufficient
  * number of soldiers.
@@ -187,6 +196,6 @@ val divide : int -> t -> (t * t) option
  * military unit [mil_unit]. The representation is used as a contract in IO.
  *
  * Requires: [mil_unit] is a legal military unit.
- * @return: the standard string representation of the military unit [mil_unit].
+ * @return the standard string representation of the military unit [mil_unit].
 *)
 val to_string : t -> string
