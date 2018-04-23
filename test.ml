@@ -4,6 +4,11 @@ open OUnit
 let all_tests =
   List.flatten [
     CommonTests.tests;
+    MilUnitTests.tests;
+    TileTests.tests;
+    WorldMapTests.tests;
+    EngineTests.tests;
+    ServerKernelsTests.tests;
     ProgramRunnerTests.tests;
   ]
 
