@@ -1,11 +1,11 @@
 open Data
 
-(** [LocalServerKernel] is the kernal of local server. *)
 module LocalServerKernel : LocalServer.Kernel = struct
 
   (* TODO do something to ensure thread safety! *)
 
   type state = {
+    mutex: Mutex.t;
     (* Currnet game state.
      * Option type is used to indicate whether a game is running. *)
     mutable game_state: Engine.state option;
@@ -14,7 +14,11 @@ module LocalServerKernel : LocalServer.Kernel = struct
     mutable diff_logs: diff_logs option;
   }
 
-  let init () = { game_state = None; diff_logs = None; }
+  let init () = {
+    mutex = Mutex.create ();
+    game_state = None;
+    diff_logs = None;
+  }
 
   (**
    * [run_simulation s] runs a simulation on the given state [s], updating
@@ -32,12 +36,13 @@ module LocalServerKernel : LocalServer.Kernel = struct
       | None -> `DoesNotCompile
       | Some (black_program, white_program) -> begin
           let init_state = Engine.init black_program white_program in
+          Mutex.lock s.mutex;
           s.game_state <- Some init_state;
+          Mutex.unlock s.mutex;
           (* Should dispatch a new thread here! TODO *)
           run_simulation s;
           `OK
         end
-
   let query (last_seen_round_id: int) (s: state) : string = "TODO"
 
 end

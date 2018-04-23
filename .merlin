@@ -1,9 +1,11 @@
 B _build
+B +threads
 PKG oUnit
 PKG yojson
 PKG str
 PKG unix
 PKG qcheck
 PKG lwt lwt.unix
+PKG threads
 PKG cohttp
 PKG cohttp cohttp.lwt
