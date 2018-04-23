@@ -31,11 +31,11 @@ module type Kernel = sig
     [`OK | `DoesNotCompile | `AlreadyRunning]
 
   (**
-   * [query round_id s] outputs all changes that has occured since the given
-   * round id [round_id] in a given server state [s].
+   * [query last_seen_round_id s] outputs all changes that has occured since
+   * the given round id [last_seen_round_id] in a given server state [s].
    *
    * Requires:
-   * - [round_id] is between 0 and the current round id on the server.
+   * - [last_seen_round_id] is between 0 and the current round id on the server.
    * - [s] is a legal server state.
    * @return: TODO the data structure for changed is SUBJECT TO CHANGE!
   *)
