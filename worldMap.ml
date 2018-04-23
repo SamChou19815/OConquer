@@ -21,10 +21,13 @@ type maps = {
   pos_2_tile_map: pos_2_tile_map;
 }
 
+(** [ChangedPosSet] is a set of all changed positions. *)
+module ChangedPosSet = Set.Make (Position)
+
 type t = {
   maps: maps;
   next_id: int; (* Next ID that can be used by a military unit. *)
-  changed_pos: Position.t HashSet.t; (* A set of changed position in a round. *)
+  changed_pos: ChangedPosSet.t; (* A set of changed position in a round. *)
   execution_queue: int Queue.t; (* A queue of military unit id. *)
 }
 
@@ -88,7 +91,7 @@ let init (m1: MilUnit.t) (m2: MilUnit.t) : t =
     in
     (* Init states *)
     let next_id = 2 in
-    let changed_pos = HashSet.create () in
+    let changed_pos = ChangedPosSet.empty in
     let execution_queue = Queue.create () in
     let () = Queue.(add 0 execution_queue; add 1 execution_queue) in
     (* Assemble! *)
@@ -220,9 +223,9 @@ let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
   | Some mil_unit ->
     let mil_unit' = f mil_unit in
     if MilUnit.same_mil_unit mil_unit mil_unit' then
-      (** Report change in position of the military unit. *)
-      let () = HashSet.add (get_position_by_id id m) m.changed_pos in
       { m with
+        (** Report change in position of the military unit. *)
+        changed_pos = ChangedPosSet.add (get_position_by_id id m) m.changed_pos;
         maps = {
           m.maps with
           id_2_mil_unit_map = IntMap.add id mil_unit' m.maps.id_2_mil_unit_map
@@ -235,9 +238,9 @@ let update_mil_unit (id: int) (f: MilUnit.t -> MilUnit.t) (m: t) : t =
 let upgrade_tile (pos: Position.t) (m: t) : t =
   let tile = get_tile_by_pos pos m in
   let tile' = Tile.upgrade_tile tile in
-  (** Report change in position of the military unit. *)
-  let () = HashSet.add pos m.changed_pos in
   { m with
+    (** Report change in position of the military unit. *)
+    changed_pos = ChangedPosSet.add pos m.changed_pos;
     maps =
       { m.maps with
         pos_2_tile_map = PosMap.add pos tile' m.maps.pos_2_tile_map
@@ -271,9 +274,9 @@ let put_mil_unit (pos: Position.t) (mil_unit: MilUnit.t) (m: t) : t =
     | Mountain -> illegal_ops "Put on mountain"
     | _ ->
       let id = MilUnit.id mil_unit in
-      (** Report change in position of the military unit. *)
-      let () = HashSet.add pos m.changed_pos in
       { m with
+        (** Report change in position of the military unit. *)
+        changed_pos = ChangedPosSet.add pos m.changed_pos;
         maps = {
           m.maps with
           (* Add to map if it does not exist previously *)
@@ -297,9 +300,9 @@ let remove_mil_unit (pos: Position.t) (m: t) : t =
   match PosMap.find_opt pos m.maps.pos_2_id_map with
   | None -> m
   | Some id ->
-    (** Report change in position of the military unit. *)
-    let () = HashSet.add pos m.changed_pos in
     { m with
+      (** Report change in position of the military unit. *)
+      changed_pos = ChangedPosSet.add pos m.changed_pos;
       maps = {
         m.maps with
         (* Remove from id -> mil unit binding *)
@@ -394,8 +397,9 @@ let next (process_mil_unit: int -> t -> t) (m: t) : t * diff_record =
         Queue.push id map.execution_queue
     done;
     let diff_record = map.changed_pos
-                      |> HashSet.elem |> diff_record_from_positions map in
-    HashSet.clear map.changed_pos;
+                      |> ChangedPosSet.elements
+                      |> diff_record_from_positions map in
+    let map = { map with changed_pos = ChangedPosSet.empty } in
     (map, diff_record)
   in
   m |> next_process |> end_of_turn_processing
