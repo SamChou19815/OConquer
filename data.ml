@@ -19,9 +19,7 @@ let create_map_content ?(mil_unit: MilUnit.t option = None)
 
 let create_diff_record (lst: map_content list) : diff_record = lst
 
-let empty_diff_logs : diff_logs = []
-
-let append_new_diff_record (r: diff_record) (l: diff_logs) : diff_logs = r::l
+let create_diff_logs (lst: diff_record list) : diff_logs = lst
 
 (**
  * [mil_unit_to_json mil_unit] converts a [mil_unit] to json format.

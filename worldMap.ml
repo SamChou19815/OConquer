@@ -195,7 +195,7 @@ let diff_record_from_positions (m: t) (pos_lst: Position.t list) : diff_record =
 
 let randomize_map (m: t) : t * diff_record =
   let max_num_mountains_to_add = map_width * map_height / 20 in
-  let changed_pos_for_randomization = HashSet.create () in
+  let changed_pos_for_randomization = HashSet.make () in
   let () = Random.self_init () in
   let rec add_mountain n m' =
     if n = 0 then m'

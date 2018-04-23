@@ -40,8 +40,8 @@ val create_map_content : ?mil_unit:MilUnit.t option
   -> pos:Position.t -> tile:Tile.t -> map_content
 
 (**
- * [create_diff_record f lst] creates a [diff_record] from a list of items [lst]
- * and a function [f] that maps each item to a [map_content].
+ * [create_diff_record lst] creates a [diff_record] from a list of diff records
+ * [lst].
  *
  * Requires: [lst] should contain a list of map content that has changed. It
  * should not contain duplicate elements.
@@ -51,21 +51,14 @@ val create_map_content : ?mil_unit:MilUnit.t option
 val create_diff_record : map_content list -> diff_record
 
 (**
- * [empty_diff_logs i] creates an empty diff logs.
+ * [create_diff_logs lst] creates a [diff_logs] from a list of diff records
+ * [lst].
  *
- * Requires: None.
- * @return an empty diff logs.
+ * Requires: [lst] should contain an ordered list of diff records according to
+ * their appearing sequence.
+ * @return a constructed diff logs of those diff records.
 *)
-val empty_diff_logs : diff_logs
-
-(** [append_new_diff_record r l] appends [r] to the end of [l].
- *
- * Requires:
- * - [r] is a legal [diff_record].
- * - [l] is a legal [diff_logs].
- * @return the updated diff logs with the new [r] appended to the end.
-*)
-val append_new_diff_record : diff_record -> diff_logs -> diff_logs
+val create_diff_logs : diff_record list -> diff_logs
 
 (**
  * [diff_logs_to_json l] converts a diff log into json format.

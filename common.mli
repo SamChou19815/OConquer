@@ -26,13 +26,13 @@ val compute_and_print_running_time : (unit -> 'a) -> 'a
 val run_and_print_running_time : (unit -> unit) -> unit
 
 (**
- * [repeats n f input] is mathematically equivalent to `f^n(input)`.
+ * [repeats n f input] is mathematically equivalent to f^n(input).
  *
  * Requires:
  * - [n] is a natural number.
  * - [f] has no visible side effects.
  * - [input] is a valid input to [f].
- * @return `f^n(input)`.
+ * @return f^n(input).
 *)
 val repeats : int -> ('a -> 'a) -> 'a -> 'a
 
@@ -55,15 +55,10 @@ module Position : sig
 end
 
 (** [PosMap] is a map where the key is always a tuple position. *)
-module PosMap : sig
-  include Map.S with type key = Position.t
-
-end
+module PosMap : (Map.S with type key = Position.t)
 
 (** [IntMap] is a map where the key is always an int. *)
-module IntMap : sig
-  include Map.S with type key = int
-end
+module IntMap : (Map.S with type key = int)
 
 (** [HashSet] is a mutable HashSet. *)
 module HashSet : sig
@@ -72,13 +67,13 @@ module HashSet : sig
   type 'a t
 
   (**
-   * [create ()] creates a new set with empty content.
+   * [make ()] makes a new set with empty content.
    *
    * Requires: None.
    * @return: an empty set.
    * Effect: None.
   *)
-  val create : unit -> 'a t
+  val make : unit -> 'a t
 
   (**
    * [clear set] empties the set.
@@ -109,4 +104,66 @@ module HashSet : sig
    * Effect: None.
   *)
   val elem : 'a t -> 'a list
+end
+
+(** [ArrayList] is a mutable List structure, similar to Java's ArrayList. *)
+module ArrayList : sig
+
+  (** ['a t] is the type of the array list with elements with type ['a] *)
+  type 'a t
+
+  (**
+   * [make template] creates an array list with content type same as that of
+   * [template].
+   *
+   * Requires: [template] can be anything.
+   * @return an constructed legal empty array list.
+  *)
+  val make : 'a -> 'a t
+
+  (**
+   * [size l] reports the size of the array list.
+   *
+   * Requires: [l] is a legal array list.
+   * @return size of the array list.
+  *)
+  val size : 'a t -> int
+
+  (**
+   * [get i l] gets the content at index [index] of the given [l].
+   *
+   * Requires:
+   * - [0 <= i < length l].
+   * - [l] is a legal array list.
+   * @return content at index [i] of [l].
+   * @raise Invalid_argument ["index out of bounds"] if [i] fails the
+   * requirement.
+  *)
+  val get : int -> 'a t -> 'a
+
+  (**
+   * [add v l] adds [v] to the end of [l].
+   *
+   * Requires:
+   * - [v] can be any value.
+   * - [l] is a legal array list.
+   * @return None.
+   * Effect: [v] is added to [l], where [l] is modified in-place.
+  *)
+  val add : 'a -> 'a t -> unit
+
+  (**
+   * [sub s t l] creates a list of elements in the array list [l] from [s]
+   * (inclusive) to [t] (exclusive).
+   * If [t >= l], the result will be an empty list.
+   *
+   * Requires:
+   * - [s] can be any integer greater than or equal to 0.
+   * - [t] can be any integer.
+   * - [l] is a legal array list.
+   * @return a sub list of the original array list [l] from [s] to [t].
+   * @raise Invalid_argument ["index out of bounds"] if [s] is less than 0.
+  *)
+  val sub : int -> int -> 'a t -> 'a list
+
 end

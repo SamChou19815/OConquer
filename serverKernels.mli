@@ -1,2 +1,6 @@
-(** [LocalServerKernel] is the kernal of local server. *)
+(**
+ * [ServerKernels] contains a collection of server kernels to be used in Main.
+*)
+
+(** [LocalServerKernel] is the kernel of local server. *)
 module LocalServerKernel : LocalServer.Kernel

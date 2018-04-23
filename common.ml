@@ -29,25 +29,68 @@ module Position = struct
 
 end
 
-module PosMap = struct
-  include Map.Make (Position)
-
-  (* prepare for future extension *)
+(** [Int] is the integer adapter module for [Map]. *)
+module Int = struct
+  type t = int
+  let compare = Pervasives.compare
 end
 
-module IntMap = Map.Make (struct
-    type t = int
-    let compare i1 i2 = Pervasives.compare i1 i2
-  end)
+module PosMap = Map.Make (Position)
+
+module IntMap = Map.Make (Int)
 
 module HashSet = struct
   type 'a t = ('a, unit) Hashtbl.t
 
-  let create () : 'a t = Hashtbl.create ~random:true 16
+  let make () : 'a t = Hashtbl.create ~random:true 16
 
   let clear : 'a t -> unit = Hashtbl.reset
 
   let add (i: 'a) (set: 'a t) : unit = Hashtbl.replace set i ()
 
   let elem (set: 'a t) : 'a list = Hashtbl.fold (fun i () lst -> i::lst) set []
+end
+
+module ArrayList = struct
+
+  (** ['a t] remembers both the content and actual size. *)
+  type 'a t = {
+    mutable actual_size: int;
+    mutable content: 'a array;
+  }
+
+  let make (template: 'a) : 'a t =
+    { actual_size = 0; content = Array.make 16 template }
+
+  let size (l: 'a t) : int = l.actual_size
+
+  let get (i: int) (l: 'a t) : 'a =
+    if i >= 0 && i < l.actual_size then l.content.(i)
+    else invalid_arg "index out of bounds"
+
+  let add (v: 'a) (l: 'a t) : unit =
+    let () =
+      if l.actual_size == Array.length l.content then begin
+        let old_len = Array.length l.content in
+        let new_content = Array.make (old_len * 2) l.content.(0) in
+        for i = 0 to (old_len - 1) do
+          (* copy over to the new one *)
+          new_content.(i) <- l.content.(i)
+        done;
+        l.content <- new_content
+      end
+      else ()
+    in
+    let () = l.content.(l.actual_size) <- v in
+    l.actual_size <- l.actual_size + 1
+
+  let sub (s: int) (t: int) (l: 'a t) : 'a list =
+    if s < 0 then invalid_arg "index out of bounds"
+    else
+      let rec builder i acc =
+        if i < s then acc
+        else builder (i - 1) (l.content.(i)::acc)
+      in
+      builder (t - 1) []
+
 end
