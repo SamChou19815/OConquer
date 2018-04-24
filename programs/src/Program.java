@@ -1,6 +1,7 @@
 /**
  * Program is the interface that the user's program must obey.
  */
+@FunctionalInterface
 public interface Program {
     
     /**

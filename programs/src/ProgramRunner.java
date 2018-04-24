@@ -1,3 +1,5 @@
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * The Program runner. The user should not worry about this.
  */
@@ -10,21 +12,17 @@ public final class ProgramRunner {
     /**
      * Test code that is used to test user's code.
      */
-    private Action action = null;
+    private AtomicReference<Action> actionAtomic = new AtomicReference<>(Action.DO_NOTHING);
     
     private ProgramRunner() {}
     
     @SuppressWarnings("deprecation")
     private void computeAction(Program p) {
         Thread tester = new Thread(() -> {
-            Action action;
             try {
-                action = p.getAction();
+                actionAtomic.set(p.getAction());
             } catch (TooManySDKCallsException e) {
-                action = Action.DO_NOTHING;
-            }
-            synchronized (ProgramRunner.this) {
-                this.action = action;
+                actionAtomic.set(Action.DO_NOTHING);
             }
         });
         tester.start();
@@ -32,11 +30,10 @@ public final class ProgramRunner {
             // Force an end!
             tester.join(TIMEOUT);
         } catch (InterruptedException e) {
-            action = Action.DO_NOTHING;
+            throw new RuntimeException("Unexpected Behavior!");
         }
         if (tester.isAlive()) {
             tester.stop();
-            action = Action.DO_NOTHING;
         }
     }
     
@@ -52,7 +49,7 @@ public final class ProgramRunner {
         }
         ProgramRunner r = new ProgramRunner();
         r.computeAction(p);
-        System.out.println("COMMAND " + r.action);
+        System.out.println("COMMAND " + r.actionAtomic.get());
     }
     
 }
