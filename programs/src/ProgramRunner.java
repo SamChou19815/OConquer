@@ -17,13 +17,19 @@ public final class ProgramRunner {
     @SuppressWarnings("deprecation")
     private void computeAction(Program p) {
         Thread tester = new Thread(() -> {
-            Action action = p.getAction();
+            Action action;
+            try {
+                action = p.getAction();
+            } catch (TooManySDKCallsException e) {
+                action = Action.DO_NOTHING;
+            }
             synchronized (ProgramRunner.this) {
                 this.action = action;
             }
         });
         tester.start();
         try {
+            // Force an end!
             tester.join(TIMEOUT);
         } catch (InterruptedException e) {
             action = Action.DO_NOTHING;
