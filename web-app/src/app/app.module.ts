@@ -1,10 +1,9 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-
 import { AppComponent } from './app.component';
 import { MapContentComponent } from './map-content/map-content.component';
-
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -12,7 +11,8 @@ import { MapContentComponent } from './map-content/map-content.component';
     MapContentComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    SharedModule
   ],
   providers: [],
   bootstrap: [AppComponent]
