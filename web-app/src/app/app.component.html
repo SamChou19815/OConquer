@@ -1,9 +1,19 @@
 <mat-toolbar color="primary" class="mat-elevation-z2">
-  <span class="title">Final Project</span>
+  <mat-toolbar-row>Final Project</mat-toolbar-row>
+  <mat-toolbar-row class="tab-row">
+    <nav mat-tab-nav-bar #navBar>
+      <a mat-tab-link class="tab-item"
+         *ngFor="let link of navLinks"
+         [routerLink]="link.path"
+         routerLinkActive #rla="routerLinkActive"
+         [routerLinkActiveOptions]="{exact: true}"
+         [active]="rla.isActive"
+         [class.active-tab-item]="rla.isActive">
+        {{link.label}}
+      </a>
+    </nav>
+  </mat-toolbar-row>
 </mat-toolbar>
 <div class="content">
-  <mat-card>
-    <mat-card-title>Test</mat-card-title>
-    <mat-card-content>Test</mat-card-content>
-  </mat-card>
+  <router-outlet></router-outlet>
 </div>
