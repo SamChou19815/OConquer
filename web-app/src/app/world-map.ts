@@ -1,18 +1,18 @@
-enum PlayerIdentity { BLACK = "BLACK", WHITE = "WHITE" }
+enum PlayerIdentity { BLACK = 'BLACK', WHITE = 'WHITE' }
 
 enum GameStatus {
-    BLACK_WINS = "BLACK_WINS";
-    WHITE_WINS = "WHITE_WINS";
-    DRAW = "DRAW";
-    IN_PROGRESS = "IN_PROGRESS";
+  BLACK_WINS = 'BLACK_WINS',
+  WHITE_WINS = 'WHITE_WINS',
+  DRAW = 'DRAW',
+  IN_PROGRESS = 'IN_PROGRESS'
 }
 
 enum TileType {
-  EMPTY = "EMPTY", MOUNTAIN = "MOUNTAIN", FORT = "FORT", CITY = "CITY"
+  EMPTY = 'EMPTY', MOUNTAIN = 'MOUNTAIN', FORT = 'FORT', CITY = 'CITY'
 }
 
 enum Direction {
-  EAST = "EAST", NORTH = "NORTH", WEST = "WEST", SOUTH = "SOUTH"
+  EAST = 'EAST', NORTH = 'NORTH', WEST = 'WEST', SOUTH = 'SOUTH'
 }
 
 interface Position {
