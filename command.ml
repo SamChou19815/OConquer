@@ -1,7 +1,10 @@
 open Definitions
 open Common
 
-type program = player_identity
+type program = {
+  handle: Runner.running_program;
+  player: player_identity;
+}
 
 module type Context = sig
   val get_my_pos : Position.t
@@ -10,7 +13,14 @@ module type Context = sig
 end
 
 let from_string (b: string) (w: string) : (program * program) option =
-  if Runner.compile_program b w then Some (Black, White) else None
+  match Runner.start_program b w with
+  | None -> None
+  | Some handle -> Some (
+      { handle; player = Black },
+      { handle; player = White }
+    )
+
+let stop_program (p, _: program * program) : unit = Runner.stop_program p.handle
 
 module type Runner = sig
   val run_program : program -> command
@@ -28,59 +38,47 @@ module ProgramRunner (Cxt: Context) = struct
     | Some i1, Some i2 -> (i1, i2)
     | _ -> Cxt.get_my_pos
 
-  let reader (i: in_channel) : input option =
-    let line =
-      (* Return bad result if things fail on Unix pipe line level. *)
-      try input_line i with End_of_file -> "BAD INPUT LINE"
-    in
+  let reader (line: string) : input =
     match String.split_on_char ' ' line with
-    | ["REQUEST"; "MY_POS"] -> Some (Req MyPosition)
+    | ["REQUEST"; "MY_POS"] -> Req MyPosition
     | ["REQUEST"; "MIL_UNIT"; p1; p2] ->
-      Some (Req (MilitaryUnit (strings_to_pos_coerce (p1, p2))))
+      Req (MilitaryUnit (strings_to_pos_coerce (p1, p2)))
     | ["REQUEST"; "TILE"; p1; p2] ->
-      Some (Req (Tile (strings_to_pos_coerce (p1, p2))))
+      Req (Tile (strings_to_pos_coerce (p1, p2)))
     | ["COMMAND"; c] ->
-      let cmd_opt = match c with
-        | "DO_NOTHING" -> Some DoNothing
-        | "ATTACK" -> Some Attack
-        | "TRAIN" -> Some Train
-        | "TURN_LEFT" -> Some TurnLeft
-        | "TURN_RIGHT" -> Some TurnRight
-        | "MOVE_FORWARD" -> Some MoveForward
-        | "RETREAT_BACKWARD" -> Some RetreatBackward
-        | "DIVIDE" -> Some Divide
-        | "UPGRADE" -> Some Upgrade
-        | _ -> None
+      let cmd = match c with
+        | "DO_NOTHING" -> DoNothing
+        | "ATTACK" -> Attack
+        | "TRAIN" -> Train
+        | "TURN_LEFT" -> TurnLeft
+        | "TURN_RIGHT" -> TurnRight
+        | "MOVE_FORWARD" -> MoveForward
+        | "RETREAT_BACKWARD" -> RetreatBackward
+        | "DIVIDE" -> Divide
+        | "UPGRADE" -> Upgrade
+        | _ -> failwith ("Wrong Action! Your action is: " ^ c)
       in
-      begin
-        match cmd_opt with
-        | Some cmd -> Some (Cmd cmd)
-        | None -> None
-      end
-    | _ -> None
+      Cmd cmd
+    | _ -> failwith ("Wrong Command! Your command is: " ^ line)
 
-  let writer (i: input) (o: out_channel) : unit =
-    let s = match i with
-      | Req MyPosition -> Position.to_string Cxt.get_my_pos
-      | Req (MilitaryUnit p) ->
-        p |> Cxt.get_mil_unit |>
-        (function
-          | Some m -> MilUnit.to_string m
-          | None -> "NONE"
-        )
-      | Req (Tile p) -> p |> Cxt.get_tile |> Tile.to_string
-      | Cmd _ -> failwith "Impossible Situation"
-    in
-    output_string o s;
-    output_char o '\n';
-    flush o
+  let writer (i: input) : string =
+    match i with
+    | Req MyPosition -> Position.to_string Cxt.get_my_pos
+    | Req (MilitaryUnit p) ->
+      p |> Cxt.get_mil_unit |>
+      (function
+        | Some m -> MilUnit.to_string m
+        | None -> "NONE"
+      )
+    | Req (Tile p) -> p |> Cxt.get_tile |> Tile.to_string
+    | Cmd _ -> failwith "Impossible Situation"
 
   let to_final_value : input -> command option = function
     | Cmd c -> Some c
     | Req _ -> None
 
-  let rec run_program (program: program) : command =
-    match Runner.get_value reader writer to_final_value program with
+  let rec run_program (p: program) : command =
+    match Runner.get_value reader writer to_final_value p.player p.handle with
     | Some c -> c
     | None -> DoNothing
 end

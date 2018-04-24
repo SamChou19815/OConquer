@@ -1,41 +1,67 @@
 open Definitions
 
-let compile_program (black_program: string) (white_program: string) : bool =
-  let h class_name program =
+type running_program = in_channel * out_channel
+
+let start_program (bp: string) (wp: string) : running_program option =
+  let open Unix in
+  let program_writer class_name code =
     let f =
       let name = "./programs/src/" ^ class_name ^ ".java" in
-      Unix.openfile name [O_CREAT; O_WRONLY; O_TRUNC] 0o640
+      openfile name [O_CREAT; O_WRONLY; O_TRUNC] 0o640
     in
-    let _ = Unix.single_write_substring f program 0 (String.length program) in
-    Unix.close f;
+    let _ = single_write_substring f code 0 (String.length code) in
+    close f;
   in
-  h "BlackProgram" black_program; h "WhiteProgram" white_program;
-  let compile_cmd = "javac -d ./programs/out ./programs/src/*.java" in
-  match Unix.system compile_cmd with
-  | Unix.WEXITED id -> id = 0
-  | _ -> false
+  (* Write code to filesystem. *)
+  program_writer "BlackProgram" bp;
+  program_writer "WhiteProgram" wp;
+  (* Compile Code *)
+  match system "javac -d ./programs/out ./programs/src/*.java" with
+  | WSIGNALED _ | WSTOPPED _ -> None
+  | WEXITED id ->
+    if id = 0 then
+      Some (open_process "java -cp ./programs/out ProgramRunner")
+    else None
 
-let get_value (r: in_channel -> 'a option) (w: 'a -> out_channel -> unit)
-    (to_final_value: 'a -> 'b option) (identity: player_identity) : 'b option =
-  let (cin, cout, cerr) as p =
-    let args = match identity with
-      | Black -> "black"
-      | White -> "white"
-    in
-    Unix.open_process_full ("java -cp ./programs/out ProgramRunner "
-                            ^ args) [||]
+let get_value
+    (reader: string -> 'a)
+    (writer: 'a -> string)
+    (to_final_value: 'a -> 'b option)
+    (identity: player_identity)
+    (cin, cout: running_program): 'b option =
+  (* Print request for running program in Java. *)
+  let () =
+    output_string cout (
+      match identity with
+      | Black -> "BLACK\n"
+      | White -> "WHITE\n"
+    );
+    flush cout;
+    let confirmation_line = input_line cin in
+    if confirmation_line = "CONFIRMED!" then ()
+    else failwith ("Bad confirmation line: " ^ confirmation_line)
   in
-  let rec h () : 'b option =
-    let input = r cin in
-    match input with
-    | None -> None
-    | Some v ->
-      match to_final_value v with
-      | Some v -> Some v
-      | None ->
-        let () = w v cout in
-        h ()
+  (* Run interactive io until the end. *)
+  let rec interactive_io () : 'b option =
+    let line = input_line cin in
+    let input = reader line in
+    match to_final_value input with
+    | Some v -> Some v
+    | None ->
+      let () =
+        let s = writer input in
+        output_string cout s;
+        output_char cout '\n';
+        flush cout
+      in
+      interactive_io ()
   in
-  let r = h () in
-  let _ = Unix.close_process_full p in
-  r
+  interactive_io ()
+
+let stop_program (p: running_program)  =
+  let (_, cout) = p in
+  let () =
+    output_string cout "END\n";
+    flush cout
+  in
+  ignore(Unix.close_process p)

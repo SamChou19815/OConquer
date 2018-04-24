@@ -3,7 +3,11 @@
  */
 public class BlackProgram implements Program {
 
-    BlackProgram() {}
+    private final GameSDK SDK;
+
+    BlackProgram(GameSDK SDK) {
+        this.SDK = SDK;
+    }
 
     /*
      * ******************************************
@@ -13,9 +17,9 @@ public class BlackProgram implements Program {
 
     @Override
     public Action getAction() {
-        Position myPosition = GameSDK.getMyPosition();
-        GameSDK.getMilitaryUnit(myPosition);
-        GameSDK.getTile(myPosition);
+        Position myPosition = SDK.getMyPosition();
+        SDK.getMilitaryUnit(myPosition);
+        SDK.getTile(myPosition);
         return Action.DO_NOTHING;
     }
 

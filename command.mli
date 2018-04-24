@@ -55,6 +55,15 @@ end
 *)
 val from_string : string -> string -> (program * program) option
 
+(**
+ * [stop_program pair] stops a [pair] of programs.
+ *
+ * Requires: [pair] is a pair of not-stopped programs.
+ * @return None.
+ * Effect: given [pair] of programs is stopped.
+*)
+val stop_program : program * program -> unit
+
 (** [Runner] is the module type for a runner of program. *)
 module type Runner = sig
   (**

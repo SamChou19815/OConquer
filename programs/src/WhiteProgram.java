@@ -4,7 +4,11 @@
  */
 public class WhiteProgram implements Program {
 
-    WhiteProgram() {}
+    private final GameSDK SDK;
+
+    WhiteProgram(GameSDK SDK) {
+        this.SDK = SDK;
+    }
 
     /*
      * ******************************************
@@ -14,9 +18,9 @@ public class WhiteProgram implements Program {
 
     @Override
     public Action getAction() {
-        Position myPosition = GameSDK.getMyPosition();
-        GameSDK.getMilitaryUnit(myPosition);
-        GameSDK.getTile(myPosition);
+        Position myPosition = SDK.getMyPosition();
+        SDK.getMilitaryUnit(myPosition);
+        SDK.getTile(myPosition);
         return Action.DO_NOTHING;
     }
 

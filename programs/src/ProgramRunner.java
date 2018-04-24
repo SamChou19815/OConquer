@@ -1,3 +1,4 @@
+import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -14,6 +15,9 @@ public final class ProgramRunner {
      */
     private AtomicReference<Action> actionAtomic = new AtomicReference<>(Action.DO_NOTHING);
     
+    /**
+     * Forbidden instantiation.
+     */
     private ProgramRunner() {}
     
     @SuppressWarnings("deprecation")
@@ -38,18 +42,25 @@ public final class ProgramRunner {
     }
     
     public static void main(String... args) {
-        String which = args[0];
-        Program p;
-        if ("black".equals(which)) {
-            p = new BlackProgram();
-        } else if ("white".equals(which)) {
-            p = new WhiteProgram();
-        } else {
-            throw new Error();
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            String request = scanner.nextLine();
+            Program p;
+            if ("BLACK".equals(request)) {
+                System.out.println("CONFIRMED!");
+                p = new BlackProgram(new GameSDK(scanner));
+            } else if ("WHITE".equals(request)) {
+                System.out.println("CONFIRMED!");
+                p = new WhiteProgram(new GameSDK(scanner));
+            } else if ("END".equals(request)) {
+                return;
+            } else {
+                throw new Error("WRONG CMD!");
+            }
+            ProgramRunner r = new ProgramRunner();
+            r.computeAction(p);
+            System.out.println("COMMAND " + r.actionAtomic.get().name());
         }
-        ProgramRunner r = new ProgramRunner();
-        r.computeAction(p);
-        System.out.println("COMMAND " + r.actionAtomic.get());
     }
     
 }

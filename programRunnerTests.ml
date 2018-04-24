@@ -10,7 +10,11 @@ let black_program_initial = "/**
  */
 public class BlackProgram implements Program {
 
-    BlackProgram() {}
+    private final GameSDK SDK;
+
+    BlackProgram(GameSDK SDK) {
+        this.SDK = SDK;
+    }
 
     /*
      * ******************************************
@@ -20,9 +24,9 @@ public class BlackProgram implements Program {
 
     @Override
     public Action getAction() {
-        Position myPosition = GameSDK.getMyPosition();
-        GameSDK.getMilitaryUnit(myPosition);
-        GameSDK.getTile(myPosition);
+        Position myPosition = SDK.getMyPosition();
+        SDK.getMilitaryUnit(myPosition);
+        SDK.getTile(myPosition);
         return Action.DO_NOTHING;
     }
 
@@ -45,7 +49,11 @@ let white_program_initial = "/**
  */
 public class WhiteProgram implements Program {
 
-    WhiteProgram() {}
+    private final GameSDK SDK;
+
+    WhiteProgram(GameSDK SDK) {
+        this.SDK = SDK;
+    }
 
     /*
      * ******************************************
@@ -55,9 +63,9 @@ public class WhiteProgram implements Program {
 
     @Override
     public Action getAction() {
-        Position myPosition = GameSDK.getMyPosition();
-        GameSDK.getMilitaryUnit(myPosition);
-        GameSDK.getTile(myPosition);
+        Position myPosition = SDK.getMyPosition();
+        SDK.getMilitaryUnit(myPosition);
+        SDK.getTile(myPosition);
         return Action.DO_NOTHING;
     }
 
@@ -84,7 +92,7 @@ let get_compiled_programs () : Command.program * Command.program =
   | Some v -> v
 
 (** A pair of compiled black and white programs. *)
-let (compiled_black, compiled_white) = get_compiled_programs ()
+let (compiled_black, compiled_white) as p = get_compiled_programs ()
 
 (**
  * [simple_program_tests] is a set of simple programs that always do nothing.
@@ -93,8 +101,9 @@ let simple_program_tests = [
   "simple_programs_do_get_result" >:: (fun _ ->
       let state_init = Engine.init compiled_black compiled_white in
       let next (s, _) = Engine.next s in
-      ignore(repeats 5 next state_init)
-    )
+      ignore(repeats 500 next state_init)
+    );
+  "program_does_end" >:: (fun _ -> Command.stop_program p)
 ]
 
 let tests =

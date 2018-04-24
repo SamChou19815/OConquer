@@ -23,14 +23,16 @@ module LocalServerKernel : LocalServer.Kernel = struct
   }
 
   (**
-   * [run_simulation s] runs a simulation on the given state [s], updating
+   * [run_simulation p s] runs a simulation on the given state [s], updating
    * state in-place when necessary.
    *
-   * Requires: [s] is a legal server state.
+   * Requires:
+   * - [p] is a pair of programs.
+   * - [s] is a legal server state.
    * @return None.
    * Effect: [s] got updated as running.
   *)
-  let rec run_simulation (s: state) : unit =
+  let rec run_simulation (p: Command.program * Command.program) (s: state) =
     match s.game_state with
     | None -> failwith "Unexpected state!"
     | Some game_state ->
@@ -51,7 +53,7 @@ module LocalServerKernel : LocalServer.Kernel = struct
             false
         in
         Mutex.unlock s.mutex;
-        if ended then () else run_simulation s
+        if ended then Command.stop_program p else run_simulation p s
       end
 
   let start_simulation (p1: string) (p2: string) (s: state) =
@@ -59,7 +61,8 @@ module LocalServerKernel : LocalServer.Kernel = struct
     if s.game_state <> None then `AlreadyRunning
     else match Command.from_string p1 p2 with
       | None -> `DoesNotCompile
-      | Some (b, w) -> begin
+      | Some p -> begin
+          let (b, w) = p in
           Mutex.lock s.mutex;
           (* Clear old diff logs *)
           s.diff_logs <- ArrayList.make (create_diff_record []);
@@ -68,7 +71,7 @@ module LocalServerKernel : LocalServer.Kernel = struct
           s.game_status <- InProgress;
           ArrayList.add diff_record s.diff_logs;
           Mutex.unlock s.mutex;
-          let _ = Thread.create run_simulation s in
+          let _ = Thread.create (run_simulation p) s in
           `OK
         end
 

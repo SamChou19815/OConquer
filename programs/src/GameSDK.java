@@ -8,28 +8,13 @@ public final class GameSDK {
     /**
      * Scanner of the SDK.
      */
-    private static final Scanner scanner = new Scanner(System.in);
-    /**
-     * Maximum number of calls.
-     */
-    private static final int MAX_CALLS = 5;
-    /**
-     * Record the number of calls.
-     */
-    private static int numberOfCalls = 0;
+    private final Scanner scanner;
     
     /**
      * Forbidden instantiation of GameSDK.
      */
-    private GameSDK() {}
-    
-    /**
-     * A method call check called before providing SDK functionality.
-     */
-    private static void methodCallLimitCheck() {
-        if (numberOfCalls++ > MAX_CALLS) {
-            throw new TooManySDKCallsException();
-        }
+    GameSDK(Scanner scanner) {
+        this.scanner = scanner;
     }
     
     /**
@@ -37,10 +22,11 @@ public final class GameSDK {
      *
      * @return the position of myself.
      */
-    public static Position getMyPosition() {
-        methodCallLimitCheck();
+    public Position getMyPosition() {
         System.out.println("REQUEST MY_POS");
-        return new Position(scanner.nextInt(), scanner.nextInt());
+        String[] words = scanner.nextLine().split(" ");
+        int x = Integer.parseInt(words[0]), y = Integer.parseInt(words[1]);
+        return new Position(x, y);
     }
     
     /**
@@ -50,10 +36,13 @@ public final class GameSDK {
      * @return the military unit at the given position {@code p},
      * {@code null} if there is no military unit there.
      */
-    public static MilitaryUnit getMilitaryUnit(Position p) {
-        methodCallLimitCheck();
-        System.out.println("REQUEST MIL_UNIT");
-        return new MilitaryUnit(scanner.nextLine());
+    public MilitaryUnit getMilitaryUnit(Position p) {
+        System.out.println("REQUEST MIL_UNIT " + p.getX() + " " + p.getY());
+        String line = scanner.nextLine();
+        if ("NONE".equals(line)) {
+            return null;
+        }
+        return new MilitaryUnit(line);
     }
     
     /**
@@ -62,10 +51,10 @@ public final class GameSDK {
      * @param p given position of the tile.
      * @return the tile at the given position {@code p}.
      */
-    public static Tile getTile(Position p) {
-        methodCallLimitCheck();
-        System.out.println("REQUEST TILE");
-        return new Tile(scanner.nextLine());
+    public Tile getTile(Position p) {
+        System.out.println("REQUEST TILE " + p.getX() + " " + p.getY());
+        String line = scanner.nextLine();
+        return new Tile(line);
     }
 
 }
