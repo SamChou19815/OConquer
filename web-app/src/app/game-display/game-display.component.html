@@ -1,0 +1,6 @@
+<div>
+  Game Status: {{gameState.status}}
+</div>
+<div *ngFor="let mapContent of gameState.getRoundRecord(roundIDForDisplay)">
+  <app-map-content [mapContent]="mapContent"></app-map-content>
+</div>

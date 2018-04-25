@@ -5,11 +5,13 @@ import { AppComponent } from './app.component';
 import { MapContentComponent } from './map-content/map-content.component';
 import { SharedModule } from './shared/shared.module';
 import { AppRoutingModule } from './app-routing.module';
+import { GameDisplayComponent } from './game-display/game-display.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    MapContentComponent
+    MapContentComponent,
+    GameDisplayComponent
   ],
   imports: [
     BrowserModule,
@@ -19,4 +21,5 @@ import { AppRoutingModule } from './app-routing.module';
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
