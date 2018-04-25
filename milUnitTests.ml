@@ -1,3 +1,5 @@
 open OUnit
 
-let tests = []
+let tests = [
+  "mil_unit_trivial_test" >:: (fun () -> ())
+]
