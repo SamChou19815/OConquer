@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
+import { TileType } from '../definitions';
 
 @Component({
   selector: 'app-map-content',
