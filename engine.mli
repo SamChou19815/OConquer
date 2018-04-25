@@ -32,14 +32,6 @@ val init : Command.program -> Command.program -> state * Data.diff_record
 val get_game_status : state -> game_status
 
 (**
- * [get_map s] reports the current world map of the game.
- *
- * Requires: [s] is a legal state.
- * @return: the current world map of the game state [s].
-*)
-val get_map : state -> WorldMap.t
-
-(**
  * [next s] produces a new state from the old given state [s]. This function is
  * used to advance the game into a new round. It is not responsible for checking
  * whether the game has ended. For any legal state, it is guaranteed to produce

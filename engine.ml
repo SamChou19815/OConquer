@@ -26,8 +26,6 @@ let get_game_status (s: state) : game_status =
   else if b < w then WhiteWins
   else Draw
 
-let get_map (s: state) : WorldMap.t = s.world_map
-
 (**
  * [get_context id m] creates a specialized Context module that reports various
  * aspects of the map for a given map [m] and military unit id [id], which are
