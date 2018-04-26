@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {MapContent, TileType} from '../definitions';
+import {MapContent, PlayerIdentity, Direction, TileType} from '../definitions';
 
 @Component({
   selector: 'app-map-content',
@@ -14,6 +14,28 @@ export class MapContentComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  get playerIdentityString(): string {
+    switch (this.mapContent.milUnit.playerIdentity) {
+      case (PlayerIdentity.BLACK):
+        return 'Black Player';
+      case (PlayerIdentity.WHITE):
+        return 'White Player';
+    }
+  }
+
+  get directionString(): string {
+    switch (this.mapContent.milUnit.direction) {
+      case Direction.NORTH:
+        return 'Direction North';
+      case Direction.SOUTH:
+        return 'Direction South';
+      case Direction.EAST:
+        return 'Direction East';
+      case Direction.WEST:
+        return 'Direction West';
+    }
   }
 
   get tileString(): string {
