@@ -1,6 +1,5 @@
 /**
  * User defined program for white side.
- * Do not use {@code System.in} here.
  */
 public class WhiteProgram implements Program {
 

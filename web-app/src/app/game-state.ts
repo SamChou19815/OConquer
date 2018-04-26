@@ -78,6 +78,21 @@ export class GameBoard {
   }
 
   /**
+   * Apply changes from the given report from server.
+   *
+   * @param {GameReport} report the report that is the basis for change.
+   */
+  applyChanges(report: GameReport) {
+    for (const record of report.logs) {
+      const roundRecord = {
+        status: report.status,
+        record: [...record]
+      };
+      this.applyRoundRecord(roundRecord);
+    }
+  }
+
+  /**
    * Reset the board.
    */
   reset(): void {

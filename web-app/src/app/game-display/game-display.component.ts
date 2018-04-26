@@ -8,6 +8,9 @@ import { GameBoard } from '../game-state';
 })
 export class GameDisplayComponent implements OnInit {
 
+  /**
+   * The current game board to be displayed.
+   */
   @Input() gameBoard: GameBoard;
 
   constructor() {

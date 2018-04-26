@@ -45,7 +45,6 @@ public class BlackProgram implements Program {
 *)
 let white_program_initial = "/**
  * User defined program for white side.
- * Do not use {@code System.in} here.
  */
 public class WhiteProgram implements Program {
 

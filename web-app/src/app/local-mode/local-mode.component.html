@@ -1,3 +1,5 @@
-<app-local-mode-programs-input (submitted)="programSubmitted($event)">
+<app-local-mode-programs-input *ngIf="!isRunning"
+                               (submitted)="programSubmitted($event)">
 
 </app-local-mode-programs-input>
+<app-game-display *ngIf="isRunning" [gameBoard]="gameBoard"></app-game-display>

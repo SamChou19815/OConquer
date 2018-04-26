@@ -50,7 +50,7 @@ export class LocalModeNetworkService {
    * @param {(report: GameReport) => void} callback callback processor.
    */
   query(roundID: number, callback: (report: GameReport) => void): void {
-    this.http.get<GameReport>(PREFIX + 'query?round_id' + roundID)
+    this.http.get<GameReport>(PREFIX + 'query?round_id=' + roundID)
       .subscribe(callback);
   }
 

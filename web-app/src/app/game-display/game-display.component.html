@@ -1,8 +1,12 @@
-<div>
-  Game Status: {{gameBoard.status}}
-</div>
-<div *ngFor="let row of gameBoard.board; let i = index" [attr.data-index]="i">
-  <div *ngFor="let mapContent of row">
-    <app-map-content [mapContent]="mapContent"></app-map-content>
-  </div>
-</div>
+<mat-card>
+  <mat-card-title>Game Status: {{gameBoard.status}}</mat-card-title>
+  <mat-card-content>
+    <div *ngFor="let row of gameBoard.board; let i = index"
+         [attr.data-index]="i">
+      <div *ngFor="let mapContent of row">
+        <app-map-content [mapContent]="mapContent"></app-map-content>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
