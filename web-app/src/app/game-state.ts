@@ -15,7 +15,7 @@ export class GameBoard {
   /**
    * The backing board field.
    */
-  private _board: MapContent[][];
+  private readonly _board: MapContent[][];
 
   /**
    * Construct an initial board.
@@ -26,7 +26,7 @@ export class GameBoard {
       const row = new Array(MAX_WIDTH);
       for (let i = 0; i < MAX_WIDTH; i++) {
         row[i] = {
-          position: {x: i, y: j},
+          position: { x: i, y: j },
           tileType: TileType.EMPTY,
           cityLevel: null,
           militaryUnit: null,
@@ -57,17 +57,6 @@ export class GameBoard {
     for (const change of diffRecord) {
       this._board[change.position.x][change.position.y] = change;
     }
-    /*
-    for (let i = 0; i < diffRecordBoard.length; i++) {
-      const row = diffRecordBoard[i];
-      for (let j = 0; j < row.length; j++) {
-        const c: MapContent | null = row[j];
-        if (c != null) {
-          // Only apply changes that is not null (no change).
-          this._board[i][j] = c;
-        }
-      }
-    }*/
   }
 
 }
@@ -95,23 +84,6 @@ export class GameState {
    */
   constructor() {
     this._status = GameStatus.IN_PROGRESS;
-    /*
-    // Initial Record Init
-    const initialRecord = new Array(MAX_HEIGHT);
-    for (let i = 0; i < MAX_WIDTH; i++) {
-      const row = new Array(MAX_WIDTH);
-      for (let j = 0; j < MAX_HEIGHT; j++) {
-        row[j] = {
-          position: {x: i, y: j},
-          tileType: TileType.EMPTY,
-          cityLevel: null,
-          militaryUnit: null,
-        };
-      }
-      initialRecord[i] = row;
-    }
-    this._roundRecords = [initialRecord];
-    */
     this._roundRecords = [];
   }
 
@@ -149,22 +121,6 @@ export class GameState {
    * @param {MapContent[]} roundRecord the record to be appended.
    */
   private appendRoundRecord(roundRecord: (MapContent | null)[]) {
-    /*
-    const transformed: MapContent[][] = roundRecord
-      .sort((a, b) => {
-        if (a.position.x !== b.position.x) {
-          return a.position.x - b.position.x;
-        } else {
-          return a.position.y - b.position.y;
-        }
-        // TODO implement with correct sort.
-      })
-      .map(value => {
-        return [];
-        // TODO turn flattened to 2-D array representation of game map.
-      });
-    this._roundRecords.push(transformed);
-    */
     this._roundRecords.push([...roundRecord]);
   }
 
@@ -181,17 +137,3 @@ export class GameState {
   }
 
 }
-
-/*
-A useful example:
-const gameState = new GameState();
-const newMapContent: MapContent = {
-  position: { x: 0, y: 0 },
-  tileType: TileType.EMPTY,
-  cityLevel: null,
-  milUnit: null,
-};
-const roundRecord = [newMapContent];
-gameState.appendRoundRecord(roundRecord);
-console.log(gameState.getRoundRecord(0));
- */
