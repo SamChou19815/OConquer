@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-local-mode',
@@ -7,9 +7,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LocalModeComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
+  }
+
+  programSubmitted(): void {
+    alert('Submitted!');
   }
 
 }
