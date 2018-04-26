@@ -17,6 +17,13 @@ exception BadTileInput
  * [num_of_soldier_increase t] reports the number of soldier increase for the
  * tile if a military unit is on it.
  *
+ * Rules of Soldier Increase:
+ * 1. On [Empty] and [Fort] tiles the number of soldier increase is always 0.
+ * 2. On [City i] tiles, the number of soldier increase is the product of city
+ * level [i] and a constant [GameConstants.increase_soldier_factor].
+ * 3. On [Mountain] tiles no soldiers can be on the tile, so the function is
+ * undefined.
+ *
  * Requires: [t] is not [Mountain].
  * @return number of soldier increase for the tile if a military unit is on it.
  * @raise BadTileInput if [t = Mountain].
