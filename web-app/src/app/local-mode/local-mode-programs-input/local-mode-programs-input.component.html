@@ -1,3 +1,23 @@
-<p>
-  local-mode-programs-input works!
-</p>
+<mat-card>
+  <mat-card-header>Submit your programs</mat-card-header>
+  <mat-card-content>
+    <mat-form-field>
+      <textarea matInput
+                [(ngModel)]="blackProgram"
+                placeholder="Program for Black"
+                type="text"></textarea>
+    </mat-form-field>
+    <mat-form-field>
+      <textarea matInput
+                [(ngModel)]="whiteProgram"
+                placeholder="Program for White"
+                type="text"></textarea>
+    </mat-form-field>
+  </mat-card-content>
+  <mat-card-actions>
+    <button color="primary" mat-button (click)="submit()"
+            [disabled]="submitDisabled">
+      Submit
+    </button>
+  </mat-card-actions>
+</mat-card>
