@@ -11,6 +11,7 @@ import {
  * The definition of a game board.
  */
 export class GameBoard {
+
   /**
    * The backing board field.
    */
@@ -92,17 +93,17 @@ export class GameState {
     this._status = GameStatus.IN_PROGRESS;
     // Initial Record Init
     const initialRecord = new Array(MAX_HEIGHT);
-    for (let j = 0; j < MAX_HEIGHT; j++) {
+    for (let i = 0; i < MAX_WIDTH; i++) {
       const row = new Array(MAX_WIDTH);
-      for (let i = 0; i < MAX_WIDTH; i++) {
-        row[i] = {
+      for (let j = 0; j < MAX_HEIGHT; j++) {
+        row[j] = {
           position: { x: i, y: j },
           tileType: TileType.EMPTY,
           cityLevel: null,
           militaryUnit: null,
         };
       }
-      initialRecord[j] = row;
+      initialRecord[i] = row;
     }
     this._roundRecords = [initialRecord];
   }
