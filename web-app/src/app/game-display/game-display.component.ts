@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { GameState } from '../definitions';
+import { GameState } from '../game-state';
 
 @Component({
   selector: 'app-game-display',

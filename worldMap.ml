@@ -162,9 +162,9 @@ let get_tile_by_mil_id (id: int) (m: t) : Tile.t =
 let get_pos_ahead (dir: int) (x, y: Position.t) : Position.t =
   match dir with
   | 0 -> (x + 1, y)
-  | 1 -> (x, y + 1)
+  | 1 -> (x, y - 1)
   | 2 -> (x - 1, y)
-  | 3 -> (x, y - 1)
+  | 3 -> (x, y + 1)
   | _ -> failwith "Bad Direction! Data Corrupted!"
 
 (**
@@ -206,7 +206,12 @@ let diff_record_from_positions (m: t) (pos_lst: Position.t list) : diff_record =
 
 let randomize_map (m: t) : t * diff_record =
   let max_num_mountains_to_add = map_width * map_height / 20 in
-  let changed_pos_for_randomization = HashSet.make () in
+  let changed_pos_for_randomization =
+    let s = HashSet.make () in
+    HashSet.add (0, 0) s;
+    HashSet.add (map_width - 1, map_height - 1) s;
+    s
+  in
   let () = Random.self_init () in
   let rec add_mountain n m' =
     if n = 0 then m'
