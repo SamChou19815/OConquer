@@ -46,7 +46,7 @@ export class LocalModeComponent implements OnInit {
    *
    * @returns {GameBoard} the current game board.
    */
-  get gameBoard(): GameBoard {
+  get game(): GameBoard {
     return this._gameBoard;
   }
 
@@ -61,7 +61,7 @@ export class LocalModeComponent implements OnInit {
    * Start to make query to the server.
    */
   private makeQuery(): void {
-    this.networkService.query(this._gameBoard.board.length - 1,
+    this.networkService.query(this._gameBoard.numberOfTurns,
       report => {
         this._gameBoard.applyChanges(report);
         if (report.status === GameStatus.IN_PROGRESS) {
@@ -69,7 +69,8 @@ export class LocalModeComponent implements OnInit {
           this.sleep();
           this.makeQuery();
         } else {
-          this._running = false;
+          alert('Game Over!');
+          // this._running = false;
         }
       });
   }

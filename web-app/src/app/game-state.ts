@@ -28,6 +28,10 @@ export class GameBoard {
    * The backing board field.
    */
   private _board: MapContent[][];
+  /**
+   * Number of turns passed.
+   */
+  private _numberOfTurns: number;
 
   /**
    * Construct an initial board.
@@ -55,6 +59,18 @@ export class GameBoard {
   }
 
   /**
+   * Obtain the number of turns passed.
+   *
+   * @returns {number} Obtain the number of turns passed.
+   */
+  get numberOfTurns(): number {
+    if (this._numberOfTurns === 0) {
+      return 0;
+    }
+    return this._numberOfTurns - 1;
+  }
+
+  /**
    * Obtain the content at the specified position.
    *
    * @param {number} x x coordinate.
@@ -71,6 +87,7 @@ export class GameBoard {
    * @param {RoundRecord} roundRecord the board change.
    */
   applyRoundRecord(roundRecord: RoundRecord) {
+    this._numberOfTurns++;
     this._status = roundRecord.status;
     for (const change of roundRecord.record) {
       this._board[change.position.x][change.position.y] = change;
@@ -111,6 +128,7 @@ export class GameBoard {
       initialRecord[j] = row;
     }
     this._board = initialRecord;
+    this._numberOfTurns = 0;
   }
 
 }

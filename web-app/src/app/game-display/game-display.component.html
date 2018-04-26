@@ -1,5 +1,6 @@
 <mat-card>
   <mat-card-title>Game Status: {{gameBoard.status}}</mat-card-title>
+  <mat-card-title>Number of turns: {{gameBoard.numberOfTurns}}</mat-card-title>
   <mat-card-content>
     <div *ngFor="let row of gameBoard.board; let i = index"
          [attr.data-index]="i">
