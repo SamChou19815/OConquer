@@ -69,6 +69,6 @@ export interface MapContent {
 }
 
 export interface GameReport {
-  logs: (MapContent | null)[][];
+  logs: MapContent[][];
   status: GameStatus;
 }
