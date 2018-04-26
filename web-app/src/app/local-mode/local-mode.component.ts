@@ -13,8 +13,10 @@ export class LocalModeComponent implements OnInit {
   ngOnInit() {
   }
 
-  programSubmitted(): void {
-    alert('Submitted!');
+  programSubmitted(programs: [string, string]): void {
+    alert(`Submitted!
+    Black: ${programs[0]}
+    White: ${programs[1]}`);
   }
 
 }
