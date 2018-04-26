@@ -22,30 +22,9 @@ body {
   white-space: pre-line;
 }
 
-/* Styling cards on different device widths. */
-
-/*  Mobile */
-@media (max-width: 600px) {
-  mat-card {
-    width: 90%;
-    margin: 0.5em auto;
-  }
-}
-
-/*  Tablet */
-@media (max-width: 900px) and (min-width: 600px) {
-  mat-card {
-    width: 80%;
-    margin: 1em auto;
-  }
-}
-
-/*  Desktop */
-@media (min-width: 900px) {
-  mat-card {
-    margin: 1em auto;
-    width: 800px;
-  }
+mat-card {
+  margin: 1em auto;
+  width: 1100px;
 }
 
 .mat-fab {

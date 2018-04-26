@@ -101,10 +101,10 @@ export class LocalModeComponent implements OnInit {
     this.networkService.startSimulation(blackProgram, whiteProgram,
       isSuccessful => {
         if (isSuccessful) {
-          this._running = true;
+          this._inGame = true;
           this.makeQuery();
         } else {
-          this._running = false;
+          this._inGame = false;
           alert('Your code does not compile!');
         }
       });

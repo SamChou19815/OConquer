@@ -1,15 +1,15 @@
-<div>
-  <div>Tile: {{tileString}}</div>
+<div [class]="cellStyle">
   <div>Position: ({{mapContent.position.x}}, {{mapContent.position.y}})</div>
   <div *ngIf="mapContent.cityLevel">
-    <div>City Level: {{mapContent.cityLevel}} </div>
+    <div>City Level: {{mapContent.cityLevel}}</div>
   </div>
   <div *ngIf="mapContent.milUnit">
-    <div>Player Identity: {{playerIdentityString}}</div>
-    <div>Id: {{mapContent.milUnit?.id}}</div>
-    <div>Direction: {{directionString}}</div>
-    <div>Number of Soldiers: {{mapContent.milUnit?.numberOfSoldiers}}</div>
-    <div>Morale: {{mapContent.milUnit?.morale}}</div>
-    <div>Leadership: {{mapContent.milUnit?.leadership}}</div>
+    <div>Military Unit:</div>
+    <div> Player Identity: {{playerIdentityString}}</div>
+    <div> Id: {{mapContent.milUnit?.id}}</div>
+    <div> Direction: {{directionString}}</div>
+    <div> Soldiers: {{mapContent.milUnit?.numberOfSoldiers}}</div>
+    <div> Morale: {{mapContent.milUnit?.morale}}</div>
+    <div> Leadership: {{mapContent.milUnit?.leadership}}</div>
   </div>
 </div>

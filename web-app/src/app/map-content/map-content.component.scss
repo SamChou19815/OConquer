@@ -1,0 +1,40 @@
+@import '~@angular/material/theming';
+
+$orange-palette: mat-palette($mat-orange, 400);
+$green-palette: mat-palette($mat-blue-grey, 400);
+$brown-palette: mat-palette($mat-brown, 400);
+
+:host {
+  display: flex;
+  break-inside: avoid;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  min-width: 100px;
+  min-height: 100px;
+  margin: 5px;
+}
+
+.cell.empty {
+  background-color: #DDDDDD;
+  color: #333333;
+}
+
+.cell.mountain {
+  background-color: mat-color($brown-palette);
+  color: #DDDDDD;
+}
+
+.cell.fort {
+  background-color: mat-color($orange-palette);
+  color: #DDDDDD;
+}
+
+.cell.city {
+  background-color: mat-color($brown-palette);
+  color: #DDDDDD;
+}

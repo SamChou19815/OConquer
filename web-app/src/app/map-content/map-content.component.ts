@@ -1,10 +1,15 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {MapContent, PlayerIdentity, Direction, TileType} from '../definitions';
+import { Component, Input, OnInit } from '@angular/core';
+import {
+  MapContent,
+  PlayerIdentity,
+  Direction,
+  TileType
+} from '../definitions';
 
 @Component({
   selector: 'app-map-content',
   templateUrl: './map-content.component.html',
-  styleUrls: ['./map-content.component.css']
+  styleUrls: ['./map-content.component.scss']
 })
 export class MapContentComponent implements OnInit {
 
@@ -14,6 +19,19 @@ export class MapContentComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  get cellStyle(): string {
+    switch (this.mapContent.tileType) {
+      case TileType.EMPTY:
+        return 'cell empty';
+      case TileType.MOUNTAIN:
+        return 'cell mountain';
+      case TileType.FORT:
+        return 'cell fort';
+      case TileType.CITY:
+        return 'cell city';
+    }
   }
 
   get playerIdentityString(): string {
