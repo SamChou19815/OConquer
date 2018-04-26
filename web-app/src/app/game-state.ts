@@ -132,7 +132,7 @@ export class GameState {
    * @param {number} roundID the ID of the round.
    * @returns {MapContent[]} the content of the record.
    */
-  getRoundRecord(roundID: number): MapContent[] {
+  getRoundRecord(roundID: number): MapContent[][] {
     return [...this._roundRecords[roundID]];
   }
 
