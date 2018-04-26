@@ -6,6 +6,8 @@ import { MapContentComponent } from './map-content/map-content.component';
 import { SharedModule } from './shared/shared.module';
 import { AppRoutingModule } from './app-routing.module';
 import { GameDisplayComponent } from './game-display/game-display.component';
+import { HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -15,7 +17,9 @@ import { GameDisplayComponent } from './game-display/game-display.component';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     SharedModule,
+    HttpClientModule,
     AppRoutingModule
   ],
   providers: [],

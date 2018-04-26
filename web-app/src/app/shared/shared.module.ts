@@ -10,4 +10,5 @@ import { MaterialModule } from './material.module';
   exports: [CommonModule, FormsModule, MaterialModule],
   declarations: []
 })
-export class SharedModule {}
+export class SharedModule {
+}
