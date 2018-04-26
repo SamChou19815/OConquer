@@ -8,33 +8,50 @@ import {
 } from './definitions';
 
 /**
+ * Definition for the grouped round record.
+ */
+interface RoundRecord {
+  status: GameStatus;
+  record: MapContent[];
+}
+
+/**
  * The definition of a game board.
  */
 export class GameBoard {
 
   /**
+   * The backing field of status.
+   */
+  private _status: GameStatus;
+  /**
    * The backing board field.
    */
-  private readonly _board: MapContent[][];
+  private _board: MapContent[][];
 
   /**
    * Construct an initial board.
    */
   constructor() {
-    const initialRecord = new Array(MAX_HEIGHT);
-    for (let j = 0; j < MAX_HEIGHT; j++) {
-      const row = new Array(MAX_WIDTH);
-      for (let i = 0; i < MAX_WIDTH; i++) {
-        row[i] = {
-          position: { x: i, y: j },
-          tileType: TileType.EMPTY,
-          cityLevel: null,
-          militaryUnit: null,
-        };
-      }
-      initialRecord[j] = row;
-    }
-    this._board = initialRecord;
+    this.reset();
+  }
+
+  /**
+   * Obtain the current status.
+   *
+   * @returns {GameStatus} the current status.
+   */
+  get status() {
+    return this._status;
+  }
+
+  /**
+   * Obtain the current board.
+   *
+   * @returns {MapContent[][]} the current board.
+   */
+  get board(): MapContent[][] {
+    return this._board;
   }
 
   /**
@@ -51,12 +68,34 @@ export class GameBoard {
   /**
    * Apply a diff record to update itself.
    *
-   * @param {MapContent[][]} diffRecord the board change.
+   * @param {RoundRecord} roundRecord the board change.
    */
-  applyDiffRecord(diffRecord: MapContent[]) {
-    for (const change of diffRecord) {
+  applyRoundRecord(roundRecord: RoundRecord) {
+    this._status = roundRecord.status;
+    for (const change of roundRecord.record) {
       this._board[change.position.x][change.position.y] = change;
     }
+  }
+
+  /**
+   * Reset the board.
+   */
+  reset(): void {
+    this._status = GameStatus.IN_PROGRESS;
+    const initialRecord = new Array(MAX_HEIGHT);
+    for (let j = 0; j < MAX_HEIGHT; j++) {
+      const row = new Array(MAX_WIDTH);
+      for (let i = 0; i < MAX_WIDTH; i++) {
+        row[i] = {
+          position: { x: i, y: j },
+          tileType: TileType.EMPTY,
+          cityLevel: null,
+          militaryUnit: null,
+        };
+      }
+      initialRecord[j] = row;
+    }
+    this._board = initialRecord;
   }
 
 }
@@ -66,34 +105,17 @@ export class GameBoard {
  */
 export class GameState {
   /**
-   * The current status of the game. (end or in progress)
-   */
-  private _status: GameStatus;
-  /**
    * A collection of all the recorded round records.
-   * The first level is the collection of all known round records.
-   * The second and third level is a 2D array description of the
-   * game.
    * e.g. this._roundRecords[i] means the map of the world at round i.
    */
-  private readonly _roundRecords: MapContent[][];
+  private readonly _roundRecords: RoundRecord[];
 
   /**
    * Construct an game state from an empty template, which represents the start
    * of the game.
    */
   constructor() {
-    this._status = GameStatus.IN_PROGRESS;
     this._roundRecords = [];
-  }
-
-  /**
-   * Obtain the current status of the game.
-   *
-   * @returns {GameStatus} the current status of the game.
-   */
-  get status(): GameStatus {
-    return this._status;
   }
 
   /**
@@ -111,17 +133,8 @@ export class GameState {
    * @param {number} roundID the ID of the round.
    * @returns {MapContent[]} the content of the record.
    */
-  getRoundRecord(roundID: number): MapContent[] {
-    return [...this._roundRecords[roundID]];
-  }
-
-  /**
-   * Append a round record to the end of the records.
-   *
-   * @param {MapContent[]} roundRecord the record to be appended.
-   */
-  private appendRoundRecord(roundRecord: (MapContent | null)[]) {
-    this._roundRecords.push([...roundRecord]);
+  getRoundRecord(roundID: number): RoundRecord {
+    return this._roundRecords[roundID];
   }
 
   /**
@@ -130,9 +143,12 @@ export class GameState {
    * @param {GameReport} report the report that is the basis for change.
    */
   applyChanges(report: GameReport) {
-    this._status = report.status;
-    for (const roundRecord of report.logs) {
-      this.appendRoundRecord(roundRecord);
+    for (const record of report.logs) {
+      const roundRecord = {
+        status: report.status,
+        record: [...record]
+      };
+      this._roundRecords.push(roundRecord);
     }
   }
 

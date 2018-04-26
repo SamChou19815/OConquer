@@ -1,6 +1,8 @@
 <div>
-  Game Status: {{gameState.status}}
+  Game Status: {{gameBoard.status}}
 </div>
-<div *ngFor="let mapContent of gameState.getRoundRecord(roundIDForDisplay)">
-  <app-map-content [mapContent]="mapContent"></app-map-content>
+<div *ngFor="let row of gameBoard.board; let i = index" [attr.data-index]="i">
+  <div *ngFor="let mapContent of row">
+    <app-map-content [mapContent]="mapContent"></app-map-content>
+  </div>
 </div>

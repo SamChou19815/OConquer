@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { GameState } from '../game-state';
+import { GameBoard } from '../game-state';
 
 @Component({
   selector: 'app-game-display',
@@ -8,8 +8,7 @@ import { GameState } from '../game-state';
 })
 export class GameDisplayComponent implements OnInit {
 
-  @Input() gameState: GameState;
-  @Input() roundIDForDisplay: number;
+  @Input() gameBoard: GameBoard;
 
   constructor() {
   }
