@@ -64,10 +64,7 @@ export class GameBoard {
    * @returns {number} Obtain the number of turns passed.
    */
   get numberOfTurns(): number {
-    if (this._numberOfTurns === 0) {
-      return 0;
-    }
-    return this._numberOfTurns - 1;
+    return this._numberOfTurns;
   }
 
   /**
@@ -128,7 +125,7 @@ export class GameBoard {
       initialRecord[j] = row;
     }
     this._board = initialRecord;
-    this._numberOfTurns = 0;
+    this._numberOfTurns = -1;
   }
 
 }

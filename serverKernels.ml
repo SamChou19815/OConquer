@@ -78,7 +78,8 @@ module LocalServerKernel : LocalServer.Kernel = struct
   let query (last_seen_round_id: int) (s: state) : string =
     print_endline "Handling Query!";
     Mutex.lock s.mutex;
-    let start_i = if last_seen_round_id >= 0 then last_seen_round_id else 0 in
+    let id = last_seen_round_id + 1 in
+    let start_i = if id >= 0 then id else 0 in
     let end_i = ArrayList.size s.diff_logs in
     let diff_logs_lst = ArrayList.sub start_i end_i s.diff_logs in
     let status = s.game_status in

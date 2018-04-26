@@ -11,9 +11,13 @@ import { GameStatus } from '../definitions';
 export class LocalModeComponent implements OnInit {
 
   /**
-   * Report whether the server is running the program.
+   * Report whether the player is in a game.
    */
-  private _running: boolean;
+  private _inGame: boolean;
+  /**
+   * Report whether the player is in game but game has now stopped.
+   */
+  private _inGameAndStopped: boolean;
   /**
    * The current game board.
    */
@@ -25,7 +29,8 @@ export class LocalModeComponent implements OnInit {
    * @param {LocalModeNetworkService} networkService the network service.
    */
   constructor(private networkService: LocalModeNetworkService) {
-    this._running = false;
+    this._inGame = false;
+    this._inGameAndStopped = false;
     this._gameBoard = new GameBoard();
   }
 
@@ -33,12 +38,21 @@ export class LocalModeComponent implements OnInit {
   }
 
   /**
-   * Report whether the game is running.
+   * Report whether the player is in game.
    *
-   * @returns {boolean} whether the game is running.
+   * @returns {boolean} whether the player is in game.
    */
-  get isRunning(): boolean {
-    return this._running;
+  get isInGame(): boolean {
+    return this._inGame;
+  }
+
+  /**
+   * Report whether the player is in game but game stopped.
+   *
+   * @returns {boolean} whether the player is in game but game stopped.
+   */
+  get isInGameButStopped(): boolean {
+    return this._inGameAndStopped;
   }
 
   /**
@@ -53,7 +67,7 @@ export class LocalModeComponent implements OnInit {
   /**
    * Sleep for a while.
    */
-  private async sleep(): void {
+  private async sleep() {
     await new Promise(resolve => setTimeout(resolve, 200));
   }
 
@@ -65,12 +79,14 @@ export class LocalModeComponent implements OnInit {
       report => {
         this._gameBoard.applyChanges(report);
         if (report.status === GameStatus.IN_PROGRESS) {
-          this._running = true;
+          this._inGame = true;
+          this._inGameAndStopped = false;
+          // noinspection JSIgnoredPromiseFromCall
           this.sleep();
           this.makeQuery();
         } else {
-          alert('Game Over!');
-          // this._running = false;
+          this._inGame = true;
+          this._inGameAndStopped = true;
         }
       });
   }
@@ -92,6 +108,15 @@ export class LocalModeComponent implements OnInit {
           alert('Your code does not compile!');
         }
       });
+  }
+
+  /**
+   * Reset the status to a new game.
+   */
+  reset(): void {
+    this._inGame = false;
+    this._inGameAndStopped = false;
+    this._gameBoard.reset();
   }
 
 }

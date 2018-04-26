@@ -44,7 +44,7 @@ body {
 @media (min-width: 900px) {
   mat-card {
     margin: 1em auto;
-    width: 600px;
+    width: 800px;
   }
 }
 

@@ -1,5 +1,10 @@
-<app-local-mode-programs-input *ngIf="!isRunning"
+<app-local-mode-programs-input *ngIf="!isInGame"
                                (submitted)="programSubmitted($event)">
 
 </app-local-mode-programs-input>
-<app-game-display *ngIf="isRunning" [gameBoard]="game"></app-game-display>
+<app-game-display *ngIf="isInGame" [game]="game"></app-game-display>
+<mat-card *ngIf="isInGameButStopped">
+  <mat-card-actions>
+    <button color="primary" mat-button (click)="reset()">Reset</button>
+  </mat-card-actions>
+</mat-card>

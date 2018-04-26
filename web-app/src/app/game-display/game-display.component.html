@@ -1,13 +1,13 @@
 <mat-card>
-  <mat-card-title>Game Status: {{gameBoard.status}}</mat-card-title>
-  <mat-card-title>Number of turns: {{gameBoard.numberOfTurns}}</mat-card-title>
-  <mat-card-content>
-    <div *ngFor="let row of gameBoard.board; let i = index"
+  <mat-card-title>Game Status: {{game.status}}</mat-card-title>
+  <mat-card-title *ngIf="game.numberOfTurns !== 1">
+    Number of turns: {{game.numberOfTurns}}
+  </mat-card-title>
+  <mat-card-content class="tile-container">
+    <div *ngFor="let row of game.board; let i = index"
          [attr.data-index]="i">
-      <div *ngFor="let mapContent of row">
-        <app-map-content [mapContent]="mapContent"></app-map-content>
-      </div>
+      <app-map-content *ngFor="let mapContent of row"
+                       [mapContent]="mapContent"></app-map-content>
     </div>
   </mat-card-content>
 </mat-card>
-

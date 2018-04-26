@@ -11,7 +11,7 @@ export class GameDisplayComponent implements OnInit {
   /**
    * The current game board to be displayed.
    */
-  @Input() gameBoard: GameBoard;
+  @Input() game: GameBoard;
 
   constructor() {
   }

@@ -1,0 +1,7 @@
+.tile-container {
+  display: block;
+  column-count: 10;
+  column-gap: 2px;
+  column-fill: initial;
+}
+
