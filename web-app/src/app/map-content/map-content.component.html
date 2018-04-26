@@ -1,9 +1,15 @@
 <div>
   <div>Tile: {{tileString}}</div>
   <div>Position: ({{mapContent.position.x}}, {{mapContent.position.y}})</div>
-  <div *ngIf="this.mapContent.milUnit">
-    <div>Number of Soldiers: {{this.mapContent.milUnit?.numberOfSoldiers}}</div>
-    <div>Morale: {{this.mapContent.milUnit?.morale}}</div>
-    <div>Leadership: {{this.mapContent.milUnit?.leadership}}</div>
+  <div *ngIf="mapContent.cityLevel">
+    <div>City Level: {{mapContent.cityLevel}} </div>
+  </div>
+  <div *ngIf="mapContent.milUnit">
+    <div>Player Identity: {{mapContent.milUnit?.playerIdentity}}</div>
+    <div>Id: {{mapContent.milUnit?.id}}</div>
+    <div>Direction: {{mapContent.milUnit?.direction}}</div>
+    <div>Number of Soldiers: {{mapContent.milUnit?.numberOfSoldiers}}</div>
+    <div>Morale: {{mapContent.milUnit?.morale}}</div>
+    <div>Leadership: {{mapContent.milUnit?.leadership}}</div>
   </div>
 </div>
