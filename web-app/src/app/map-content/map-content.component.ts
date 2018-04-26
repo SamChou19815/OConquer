@@ -37,35 +37,22 @@ export class MapContentComponent implements OnInit {
   get playerIdentityString(): string {
     switch (this.mapContent.milUnit.playerIdentity) {
       case (PlayerIdentity.BLACK):
-        return 'Black Player';
+        return 'Black';
       case (PlayerIdentity.WHITE):
-        return 'White Player';
+        return 'White';
     }
   }
 
   get directionString(): string {
     switch (this.mapContent.milUnit.direction) {
       case Direction.NORTH:
-        return 'Direction North';
+        return 'North';
       case Direction.SOUTH:
-        return 'Direction South';
+        return 'South';
       case Direction.EAST:
-        return 'Direction East';
+        return 'East';
       case Direction.WEST:
-        return 'Direction West';
-    }
-  }
-
-  get tileString(): string {
-    switch (this.mapContent.tileType) {
-      case TileType.EMPTY:
-        return 'Empty Tile';
-      case TileType.MOUNTAIN:
-        return 'Mountain Tile';
-      case TileType.FORT:
-        return 'Fort Tile';
-      case TileType.CITY:
-        return 'City Tile of level ' + this.mapContent.cityLevel;
+        return 'West';
     }
   }
 
