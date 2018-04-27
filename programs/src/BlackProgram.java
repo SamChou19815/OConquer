@@ -1,3 +1,9 @@
+import java.util.Random;
+
+/*
+ * YOU CAN IMPORT IF YOU WANT.
+ */
+
 /**
  * User defined program for black side.
  */
@@ -17,10 +23,14 @@ public class BlackProgram implements Program {
 
     @Override
     public Action getAction() {
-        Position myPosition = SDK.getMyPosition();
-        SDK.getMilitaryUnit(myPosition);
-        SDK.getTile(myPosition);
-        return Action.DO_NOTHING;
+        int random = (int) (Math.random() * 10);
+        for (int i = 0; i < random; i++) {
+            Position myPosition = SDK.getMyPosition();
+            SDK.getMilitaryUnit(myPosition);
+            SDK.getTile(myPosition);
+        }
+        Action[] values = Action.values();
+        return values[new Random().nextInt(values.length)];
     }
 
     /*

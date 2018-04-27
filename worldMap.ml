@@ -282,7 +282,7 @@ let upgrade_tile (pos: Position.t) (m: t) : t =
 let put_mil_unit (pos: Position.t) (mil_unit: MilUnit.t) (m: t) : t =
   (* Check whether it's occupied. *)
   match get_mil_unit_opt_by_pos pos m with
-  | Some _ -> illegal_ops "Occupied"
+  | Some _ -> illegal_ops ("Occupied at: " ^ Position.to_string pos)
   | None ->
     match get_tile_by_pos pos m with
     (* It can guard out-of-bound position
@@ -385,7 +385,8 @@ let divide (id: int) (m: t) : t =
       | Some (m1, m2) ->
         let () = Queue.add (MilUnit.id m2) m.execution_queue in
         let m' = { m with next_id = m.next_id + 1 } in
-        m' |> put_mil_unit my_pos m1 |> put_mil_unit ahead_pos m2
+        m' |> remove_mil_unit my_pos
+        |> put_mil_unit my_pos m1 |> put_mil_unit ahead_pos m2
 
 let next (process_mil_unit: int -> t -> t) (m: t) : t * diff_record =
   (* To store all the military units' id that can possibly exist. *)

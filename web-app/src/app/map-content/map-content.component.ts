@@ -35,7 +35,7 @@ export class MapContentComponent implements OnInit {
   }
 
   get playerIdentityString(): string {
-    switch (this.mapContent.milUnit.playerIdentity) {
+    switch (this.mapContent.milUnit.identity) {
       case (PlayerIdentity.BLACK):
         return 'Black';
       case (PlayerIdentity.WHITE):

@@ -50,7 +50,7 @@ export interface Position {
  * Definition for military unit.
  */
 export interface MilUnit {
-  playerIdentity: PlayerIdentity;
+  identity: PlayerIdentity;
   id: number;
   direction: Direction;
   numberOfSoldiers: number;

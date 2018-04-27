@@ -1,7 +1,7 @@
 @import '~@angular/material/theming';
 
 $orange-palette: mat-palette($mat-orange, 400);
-$green-palette: mat-palette($mat-blue-grey, 400);
+$green-palette: mat-palette($mat-green, 400);
 $brown-palette: mat-palette($mat-brown, 400);
 
 :host {
@@ -26,15 +26,15 @@ $brown-palette: mat-palette($mat-brown, 400);
 
 .cell.mountain {
   background-color: mat-color($brown-palette);
-  color: #DDDDDD;
+  color: #EEEEEE;
 }
 
 .cell.fort {
   background-color: mat-color($orange-palette);
-  color: #DDDDDD;
+  color: #EEEEEE;
 }
 
 .cell.city {
-  background-color: mat-color($brown-palette);
-  color: #DDDDDD;
+  background-color: mat-color($green-palette);
+  color: #EEEEEE;
 }
