@@ -1,12 +1,8 @@
 <div [class]="cellStyle">
-  <div>Position: ({{mapContent.position.x}}, {{mapContent.position.y}})</div>
-  <div *ngIf="mapContent.cityLevel">
-    <div>City Level: {{mapContent.cityLevel}}</div>
+  <div class="city-level" *ngIf="mapContent.cityLevel">
+    {{mapContent.cityLevel}}
   </div>
   <div *ngIf="mapContent.milUnit">
-    <div>Military Unit:</div>
-    <div> Player {{playerIdentityString}}</div>
-    <div> ID: {{mapContent.milUnit?.id}}</div>
     <div> Direction: {{directionString}}</div>
     <div> Soldiers: {{mapContent.milUnit?.numberOfSoldiers}}</div>
     <div> Morale: {{mapContent.milUnit?.morale}}</div>

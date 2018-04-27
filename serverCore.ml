@@ -112,4 +112,7 @@ let start_server ?(port: int = 8080) (handlers: handler list) : unit =
   let mode = `TCP (`Port port) in
   let callback = create_callback handlers in
   let server = Server.create ~mode (Server.make ~callback ()) in
+  let () =
+    print_endline ("Server started at http://localhost:" ^ string_of_int port)
+  in
   ignore (Lwt_main.run server)

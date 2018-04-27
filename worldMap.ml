@@ -383,9 +383,9 @@ let divide (id: int) (m: t) : t =
       match MilUnit.divide m.next_id mil_unit with
       | None -> m (* Impossible to divide *)
       | Some (m1, m2) ->
-        let () = Queue.add (MilUnit.id m2) m.execution_queue in
-        let m' = { m with next_id = m.next_id + 1 } in
-        m' |> remove_mil_unit my_pos
+        let m2_id = MilUnit.id m2 in
+        let () = Queue.push m2_id m.execution_queue in
+        { m with next_id = m.next_id + 1 } |> remove_mil_unit my_pos
         |> put_mil_unit my_pos m1 |> put_mil_unit ahead_pos m2
 
 let next (process_mil_unit: int -> t -> t) (m: t) : t * diff_record =
@@ -398,7 +398,7 @@ let next (process_mil_unit: int -> t -> t) (m: t) : t * diff_record =
     else
       let id = Queue.pop map.execution_queue in
       (* First check whether the id still exist. *)
-      if IntMap.mem id m.maps.id_2_mil_unit_map then
+      if IntMap.mem id map.maps.id_2_mil_unit_map then
         (* Only executed military unit may exist at a later time. *)
         let () = Queue.push id temp_queue in
         let map' = process_mil_unit id map in
@@ -409,7 +409,7 @@ let next (process_mil_unit: int -> t -> t) (m: t) : t * diff_record =
   let end_of_turn_processing (map: t) : t * diff_record =
     while temp_queue |> Queue.is_empty |> not do
       let id = Queue.pop temp_queue in
-      if IntMap.mem id m.maps.id_2_mil_unit_map then
+      if IntMap.mem id map.maps.id_2_mil_unit_map then
         (* Only add back if it still exists *)
         Queue.push id map.execution_queue
     done;

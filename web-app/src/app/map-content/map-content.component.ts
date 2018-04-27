@@ -22,16 +22,34 @@ export class MapContentComponent implements OnInit {
   }
 
   get cellStyle(): string {
+    let classes = 'cell';
     switch (this.mapContent.tileType) {
       case TileType.EMPTY:
-        return 'cell empty';
+        classes += ' empty';
+        break;
       case TileType.MOUNTAIN:
-        return 'cell mountain';
+        classes += ' mountain';
+        break;
       case TileType.FORT:
-        return 'cell fort';
+        classes += ' fort';
+        break;
       case TileType.CITY:
-        return 'cell city';
+        classes += ' city';
+        break;
     }
+    if (this.mapContent.milUnit === null
+      || this.mapContent.milUnit === undefined) {
+      return classes + ' no-player';
+    }
+    switch (this.mapContent.milUnit.identity) {
+      case PlayerIdentity.BLACK:
+        classes += ' black-player';
+        break;
+      case PlayerIdentity.WHITE:
+        classes += ' white-player';
+        break;
+    }
+    return classes;
   }
 
   get playerIdentityString(): string {
@@ -46,13 +64,13 @@ export class MapContentComponent implements OnInit {
   get directionString(): string {
     switch (this.mapContent.milUnit.direction) {
       case Direction.NORTH:
-        return 'North';
+        return 'N';
       case Direction.SOUTH:
-        return 'South';
+        return 'S';
       case Direction.EAST:
-        return 'East';
+        return 'E';
       case Direction.WEST:
-        return 'West';
+        return 'W';
     }
   }
 

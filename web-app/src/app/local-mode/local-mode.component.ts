@@ -67,8 +67,8 @@ export class LocalModeComponent implements OnInit {
   /**
    * Sleep for a while.
    */
-  private async sleep() {
-    await new Promise(resolve => setTimeout(resolve, 200));
+  private async sleep(): Promise<void> {
+    await new Promise<void>(resolve => setTimeout(resolve, 300));
   }
 
   /**
@@ -82,8 +82,7 @@ export class LocalModeComponent implements OnInit {
           this._inGame = true;
           this._inGameAndStopped = false;
           // noinspection JSIgnoredPromiseFromCall
-          this.sleep();
-          this.makeQuery();
+          this.sleep().then(() => this.makeQuery());
         } else {
           this._inGame = true;
           this._inGameAndStopped = true;

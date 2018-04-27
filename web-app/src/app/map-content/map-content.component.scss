@@ -17,24 +17,42 @@ $brown-palette: mat-palette($mat-brown, 400);
   min-width: 100px;
   min-height: 100px;
   margin: 5px;
+  position: relative;
+  border: 2px solid;
+}
+
+.city-level {
+  position: absolute;
+  right: 2px;
+  top: 2px;
 }
 
 .cell.empty {
-  background-color: #DDDDDD;
-  color: #333333;
+  border-color: black;
 }
 
 .cell.mountain {
-  background-color: mat-color($brown-palette);
-  color: #EEEEEE;
+  border-color: mat-color($brown-palette);
 }
 
 .cell.fort {
-  background-color: mat-color($orange-palette);
-  color: #EEEEEE;
+  border-color: mat-color($orange-palette);
 }
 
 .cell.city {
-  background-color: mat-color($green-palette);
+  border-color: mat-color($green-palette);
+}
+
+.cell.no-player {
+  background-color: transparent;
+}
+
+.cell.black-player {
+  background-color: #666666;
   color: #EEEEEE;
+}
+
+.cell.white-player {
+  background-color: #DDDDDD;
+  color: #666666;
 }
