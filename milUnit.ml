@@ -57,14 +57,14 @@ let increase_soldier_by (n: int) (m: t) : t =
  * Requires: [m] is a legal military unit.
  * Returns: the result of turning for that military unit.
 *)
-let turn (right: bool) (m: t) : t =
-  let offset = if right then 1 else -1 in
+let turn (left: bool) (m: t) : t =
+  let offset = if left then 1 else -1 in
   let direction' = (m.direction + offset + 4) mod 4 in
   { m with direction = direction' }
 
-let turn_left : t -> t = turn false
+let turn_left : t -> t = turn true
 
-let turn_right : t -> t = turn true
+let turn_right : t -> t = turn false
 
 let train (m: t) : t =
   { m with
