@@ -102,8 +102,7 @@ let tests = [
 
   (* Test cases for [move_mil_unit_forward] *)
   "worldMap_test_21" >:: (fun _ ->
-    let map1' =
-                WorldMap.move_mil_unit_forward 1 map1 in
+    let map1' = WorldMap.move_mil_unit_forward 1 map1 in
     let pos1 = get_position_by_id 1 map1' in
     assert_equal pos1 (8,9));
   "worldMap_test_22" >:: (fun _ ->
@@ -111,9 +110,48 @@ let tests = [
     let pos1 = get_position_by_id 0 map1' in
     assert_equal pos1 (1,0));
   "worldMap_test_23" >:: (fun _ ->
+    let map1' = WorldMap.move_mil_unit_forward 3 map1 in
+    assert_equal map1 map1');
+  "worldMap_test_24" >:: (fun _ ->
       let m1 = (update_mil_unit 0 MilUnit.turn_right map1) in
       let map1' = WorldMap.move_mil_unit_forward 0 m1 in
       let pos1 = get_position_by_id 0 map1' in
       assert_equal pos1 (0,1));
-  
+
+  (* Test cases for [attack] and [divide] *)
+  "worldMap_test_25" >:: (fun _ ->
+    let map1' = WorldMap.attack 3 map1 in
+    assert_equal map1 map1');
+  "worldMap_test_26" >:: (fun _ ->
+    let map1' = WorldMap.divide 4 map1 in
+    assert_equal map1 map1');
+  "worldMap_test_27" >:: (fun _ ->
+    let map1' = WorldMap.attack 0 map1 in
+    assert_equal map1 map1');
+  "worldMap_test_28" >:: (fun _ ->
+    let map1' = WorldMap.attack 1 map1 in
+    assert_equal map1 map1');
+
+  "worldMap_test_29" >:: (fun _ ->
+    let map1' = WorldMap.divide 0 map1 in
+    let child_pos = WorldMap.get_position_by_id 2 map1' in
+    assert_equal child_pos (1,0));
+  "worldMap_test_29" >:: (fun _ ->
+    let map1' = WorldMap.divide 0 map1 in
+    let child = WorldMap.get_mil_unit_by_id 2 map1' in
+    assert_equal (child |> identity) (b_mil|> identity));
+  "worldMap_test_30" >:: (fun _ ->
+    let map1' = WorldMap.divide 1 map1 in
+    let child_pos = WorldMap.get_position_by_id 2 map1' in
+    assert_equal child_pos (8,9));
+  "worldMap_test_31" >:: (fun _ ->
+    let map1' = update_mil_unit 1 MilUnit.turn_left map1 in
+    let map2' = WorldMap.divide 1 map1' in
+    let child = WorldMap.get_mil_unit_opt_by_id 2 map2' in
+    assert_equal child None);
+
+  "worldMap_test_32" >:: (fun _ ->
+    let action = WorldMap.attack in
+    let (nextMap, diffre) = WorldMap.next action map1 in
+    assert_equal nextMap map1);
 ]
