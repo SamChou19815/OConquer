@@ -1,18 +1,28 @@
 # CS 3110 Final Project - OConquer GAME MANUAL
 
 # System Requirement
+- java JDK
+- OCaml
+- npm
+- node.js
 
 # Background
 
+Inspired by the Heart of Iron series and Red Alert Series, OConquer is a sandbox military strategy simulation game developed in OCaml, where players control military units by writing their own driving programs in Java and feeding the code to the game. The military units will execute their programs sequentially; driving program with better strategy embedded would lead the military units to conquer the world and claim victory.
+
 # Goal
+
+The essential strategy to win the game is to carefully plan on military unit's actions under different situations.
 
 # How to Play
 
-
 ## Actions
+- Attack
+- Divide
+- Turn Left
+- Turn Right
 
-<!-- ------------------------- -->
-## Write your program
+## Write Your Program
 
 ### Introduction
 

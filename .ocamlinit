@@ -1,0 +1,12 @@
+#directory "_build";;
+#load "gameConstants.cmo";;
+#load "tile.cmo";;
+#load "milUnit.cmo";;
+#load "data.cmo";;
+
+#load "common.cmo";;
+#load "definitions.cmo";;
+#load "worldMap.cmo";;
+
+
+open WorldMap
