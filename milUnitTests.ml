@@ -2,7 +2,6 @@ open OUnit
 open Definitions
 open MilUnit
 
-
 let tests = [
 
   "mil_unit_trivial_test" >:: (fun () -> ());
