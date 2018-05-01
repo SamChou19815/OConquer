@@ -51,7 +51,7 @@ let increase_soldier_by (n: int) (m: t) : t =
   else { m with num_soliders = m.num_soliders + n }
 
 (**
- * [turn right m] lets the military unit [m] turn right or left depending on
+ * [turn left m] lets the military unit [m] turn right or left depending on
  * whether [right] is true.
  *
  * Requires: [m] is a legal military unit.
