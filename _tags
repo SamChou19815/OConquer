@@ -1,2 +1,2 @@
-true: thread, use_menhir, package(oUnit), package(str), package(qcheck), package(unix), package(lwt), package(threads), package(cohttp), package(cohttp-lwt-unix), package(yojson), debug
+true: thread, package(oUnit), package(str), package(qcheck), package(unix), package(lwt), package(threads), package(cohttp), package(cohttp-lwt-unix), package(yojson), debug
 <web-app/*>: -traverse
