@@ -16,13 +16,10 @@
 
 ### Introduction
 
-Your input program should be a valid java program that specifies what you want
-your soldiers to do at each point. You are free to initialize new variables and
-classes as you want, and use if conditions, for loops or recursion to control
-your units. Besides all the existing java features we supply an API of
-the information you can access from the position of your units.
-
-
+Instead of controlling your military unit by specifying command at each round,
+you write a Java program to control them automatically. You are almost free to
+use any Java 8 features, which some restrictions described below. We provided
+some APIs for you to interact with the world.
 
 ### Requirement for your program
 
