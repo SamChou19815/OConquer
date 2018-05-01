@@ -60,8 +60,8 @@ val same_mil_unit : t -> t -> bool
 val identity : t -> player_identity
 
 (**
- * [identity_string mil_unit] returns a string representation
- * of the player identiy of the given [mil_unit].
+ * [identity_string mil_unit] returns a string representation of the player
+ * identiy of the given [mil_unit], which are either "BLACK" or "WHITE".
  *
  * Requires: [mil_unit] is a legal military unit.
  * @return the string representation identity of [mil_unit].
@@ -87,7 +87,7 @@ val direction : t -> int
 
 (**
  * [direction_string mil_unit] reports the string representation of the
- * direction of the military unit.
+ * direction of the military unit, which are "EAST", "NORTH", "WEST" or "SOUTH".
  *
  * Requires: [mil_unit] is a legal military unit.
  * @return the direction string of the military unit [mil_unit].
@@ -149,6 +149,7 @@ val turn_right : t -> t
 
 (**
  * [train m] increases the fighting ability of a military unit after training.
+ * The number of increase is specified in the game manual.
  *
  * Requires: [m] is a legal military unit.
  * @return the result of training the military unit.
@@ -158,6 +159,7 @@ val train : t -> t
 (**
  * [apply_retreat_penalty n] decreases the fighting ability of a military unit
  * after retreating.
+ * The amount of penalty applied is specified in the game manual.
  *
  * Requires: [m] is a legal military unit.
  * @return the result of retreating for the military unit.
@@ -170,6 +172,7 @@ val apply_retreat_penalty : t -> t
  * correspondes to the resultant state after attack for [m1] and [m2].
  * If the component is [None], it means that the military unit has been
  * eliminated as a result of attack.
+ * The numerical result of attack is specified in the game manual.
  *
  * Requires: [m1] and [m2] are legal military units.
  * @return the result of attack stored in a tuple.

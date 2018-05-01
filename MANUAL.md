@@ -24,7 +24,21 @@ actions under different situations.
 ## How to Play
 
 You play the game by submitting a program that control your military unit.
-Besides the program control, if your military unit is in a city, the
+If the programs compile, then the game will start.
+
+The game runs in descrete rounds on a `map_width` times `map_height` world map.
+In each round, we will sequentially execute all the programs of all the existing
+military unit in the world map to decide their action, then we execute their
+action. The new produced military unit in this round will also execute their
+program.
+
+The game ends when one sides completely wipes the other side from the map, or
+when the game round reached `max_turns`, and we count the number of occupied
+territory to declare the winner (which may be a draw).
+
+Besides the program control, if your military unit is in a city, then its number
+of soldiers will increase by city level times `increase_soldier_factor`.
+
 In each round, the program should decide the action of itself, which is one
 of the followings:
 
@@ -36,11 +50,34 @@ You literally do nothing. Nothing changes.
 
 #### Attack
 
-`TODO`
+The attack works as follows:
+
+Firstly, if there is nothing to be attacked or the military unit in the front
+is on the same side as your military unit, then it will end by doing nothing.
+
+If attack can happen, then the attacker will first increase its morale by
+`attack_morale_change` and then inflict some damage on the attacked. The
+attacked may be completely eliminated in this stage, then the attacker will not
+incur any damage on itself.
+
+If the attacked survived, its morale will drop by `attack_morale_change`. Then
+it will launch a retaliation attack on the attacker, which may wipes the
+attacker from the map.
+
+The damage can be calculated as follows:
+
+```
+raw_damage = base_attack_damage * logistic(attacker's number of soldiers
+                * attacker's morale * attacker's leadership)
+if the attacked is in a city or fort, its damage will be reduced by a factor of
+        fort_city_bonus_factor
+```
 
 #### Train
 
-`TODO`
+Training your military unit will increase its fighting capability. It will
+increase the morale of the military unit by `training_morale_boost` and its
+leadership by `training_leadership_boost`. This action always succeeds.
 
 #### Turn Left
 
@@ -60,11 +97,15 @@ nothing happens.
 
 Your military unit will first turn back. Turning back always succeeds. Then it
 will move forward as defined above. This action will incur morale and leadership
-penalty, so be careful.
+penalty, which are `retreat_morale_penalty` and `retreat_leadership_penalty`,
+so be careful.
 
 #### Divide
 
-`TODO`
+It will split the military unit into two with equal morale and leadership, each
+with half of the original soldiers. The new one will be placed in front of the
+old military unit. If the military unit trying to split's front has a mountain
+or another military unit, the action will fail and nothing happens.
 
 #### Upgrade
 
@@ -116,3 +157,29 @@ strings.
 
 The SDK functions are available via the `SDK` object passed to the constructor
 of your program classes. You can see `GameSDK.java` for more details.
+
+## Constants of Game
+
+```ocaml
+let map_width = 10
+
+let map_height = 10
+
+let max_turns = 100
+
+let training_morale_boost = 1
+
+let training_leadership_boost = 1
+
+let retreat_morale_penalty = 1
+
+let retreat_leadership_penalty = 1
+
+let increase_soldier_factor = 0.5
+
+let base_attack_damage = 5
+
+let fort_city_bonus_factor = 1.5
+
+let attack_morale_change = 1
+```
