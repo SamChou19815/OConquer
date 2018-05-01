@@ -1,9 +1,9 @@
 <div [class]="cellStyle">
   <div class="city-level" *ngIf="mapContent.cityLevel">
-    {{mapContent.cityLevel}}
+    City: {{mapContent.cityLevel}}
   </div>
   <div *ngIf="mapContent.milUnit">
-    <div> Direction: {{directionString}}</div>
+    <div>&nbsp;</div><div>&nbsp;</div>
     <div> Soldiers: {{mapContent.milUnit?.numberOfSoldiers}}</div>
     <div> Morale: {{mapContent.milUnit?.morale}}</div>
     <div> Leadership: {{mapContent.milUnit?.leadership}}</div>

@@ -49,6 +49,20 @@ export class MapContentComponent implements OnInit {
         classes += ' white-player';
         break;
     }
+    switch (this.mapContent.milUnit.direction) {
+      case Direction.EAST:
+        classes += ' dir-east';
+        break;
+      case Direction.NORTH:
+        classes += ' dir-north';
+        break;
+      case Direction.WEST:
+        classes += ' dir-west';
+        break;
+      case Direction.SOUTH:
+        classes += ' dir-south';
+        break;
+    }
     return classes;
   }
 

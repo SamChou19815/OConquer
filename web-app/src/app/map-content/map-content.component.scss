@@ -3,6 +3,8 @@
 $orange-palette: mat-palette($mat-orange, 400);
 $green-palette: mat-palette($mat-green, 400);
 $brown-palette: mat-palette($mat-brown, 400);
+$red-palette: mat-palette($mat-red, 400);
+$blue-palette: mat-palette($mat-blue, 400);
 
 :host {
   display: flex;
@@ -16,9 +18,10 @@ $brown-palette: mat-palette($mat-brown, 400);
   height: 100px;
   min-width: 100px;
   min-height: 100px;
-  margin: 5px;
+  margin: 7px;
   position: relative;
-  border: 2px solid;
+  color: white;
+  border: 3px solid transparent;
 }
 
 .city-level {
@@ -27,32 +30,60 @@ $brown-palette: mat-palette($mat-brown, 400);
   top: 2px;
 }
 
+// tile modifier
+
 .cell.empty {
-  border-color: black;
+  background-color: #9E9E9E;
 }
 
 .cell.mountain {
-  border-color: mat-color($brown-palette);
+  background-color: mat-color($brown-palette);
 }
 
 .cell.fort {
-  border-color: mat-color($orange-palette);
+  background-color: mat-color($orange-palette);
 }
 
 .cell.city {
-  border-color: mat-color($green-palette);
+  background-color: mat-color($green-palette);
 }
+
+// player modifier
 
 .cell.no-player {
-  background-color: transparent;
+  border-color: transparent;
 }
 
-.cell.black-player {
-  background-color: #666666;
-  color: #EEEEEE;
+// direction modifier
+
+.cell.dir-east.black-player {
+  border-right: 3px solid mat-color($red-palette);
 }
 
-.cell.white-player {
-  background-color: #DDDDDD;
-  color: #666666;
+.cell.dir-north.black-player {
+  border-top: 3px solid mat-color($red-palette);
+}
+
+.cell.dir-west.black-player {
+  border-left: 3px solid mat-color($red-palette);
+}
+
+.cell.dir-south.black-player {
+  border-bottom: 3px solid mat-color($red-palette);
+}
+
+.cell.dir-east {
+  border-right: 3px solid mat-color($blue-palette);
+}
+
+.cell.dir-north {
+  border-top: 3px solid mat-color($blue-palette);
+}
+
+.cell.dir-west {
+  border-left: 3px solid mat-color($blue-palette);
+}
+
+.cell.dir-south {
+  border-bottom: 3px solid mat-color($blue-palette);
 }
