@@ -40,7 +40,7 @@ let mil_unit_to_json (mil_unit: MilUnit.t) : json =
     "identity", `String (MilUnit.identity_string mil_unit);
     "id", `Int (MilUnit.id mil_unit);
     "direction", `String (MilUnit.direction_string mil_unit);
-    "numberOfSoldiers", `Int (MilUnit.num_soliders mil_unit);
+    "numberOfSoldiers", `Int (MilUnit.num_soldiers mil_unit);
     "morale", `Int (MilUnit.morale mil_unit);
     "leadership", `Int (MilUnit.leadership mil_unit);
   ]
@@ -70,7 +70,6 @@ let map_content_to_json (map_content: map_content) : json =
     "tileType", tile_type;
     "cityLevel", city_level;
   ]
-
 
 (**
  * [diff_record_to_json r] converts a diff record into json format.

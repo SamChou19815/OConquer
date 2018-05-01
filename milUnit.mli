@@ -12,14 +12,14 @@ open Definitions
 type t
 
 (**
- * [init identity id direction num_soliders morale leadership] creates a
+ * [init identity id direction num_soldiers morale leadership] creates a
  * new military unit with the given initial value of [identity] [id] [direction]
- * [num_soliders] [morale] [leadership].
+ * [num_soldiers] [morale] [leadership].
  *
  * Requires:
  * - [id] must be unique in the system and non-negative.
  * - [direction] must be 0, 1, 2, 3.
- * - [num_soliders], [morale], [leadership] must be positive.
+ * - [num_soldiers], [morale], [leadership] must be positive.
  * @return: a new legal military unit with the prescribed information specified
  * in arguments.
 *)
@@ -95,13 +95,13 @@ val direction : t -> int
 val direction_string : t -> string
 
 (**
- * [num_soliders mil_unit] reports the number of soldiers for the given
+ * [num_soldiers mil_unit] reports the number of soldiers for the given
  * military unit [mil_unit].
  *
  * Requires: [mil_unit] is a legal military unit.
  * @return the number of soldiers for the given military unit [mil_unit].
 *)
-val num_soliders : t -> int
+val num_soldiers : t -> int
 
 (**
  * [morale mil_unit] reports the morale for the given military unit [mil_unit].
@@ -127,7 +127,7 @@ val leadership : t -> int
  * Requires:
  * - [n] is non-negative.
  * - [m] is a legal military unit.
- * @return the result of increasing soliders for that military unit.
+ * @return the result of increasing soldiers for that military unit.
 *)
 val increase_soldier_by : int -> t -> t
 
@@ -179,7 +179,7 @@ val attack : (Tile.t * Tile.t) -> (t * t) -> (t option * t option)
 (**
  * [divide next_id mil_unit] divides a military unit into two units, each with
  * half of number of original soldiers (+- 1), equal morale and equal leadership.
- * If the military unit has only 1 solider, division will fail and return
+ * If the military unit has only 1 soldier, division will fail and return
  * [None].
  *
  * Requires:

@@ -5,14 +5,14 @@ type t = {
   identity: player_identity;
   id: int;
   direction: int; (* 0 -> east, 1 -> north, 2 -> west, 3 -> south *)
-  num_soliders: int;
+  num_soldiers: int;
   morale: int;
   leadership: int;
 }
 
 let init (identity: player_identity) (id: int) (direction: int)
-    (num_soliders: int) (morale: int) (leadership: int) =
-  { identity; id; direction; num_soliders; morale; leadership }
+    (num_soldiers: int) (morale: int) (leadership: int) =
+  { identity; id; direction; num_soldiers; morale; leadership }
 
 let default_init (identity: player_identity) (id: int) (direction: int) =
   init identity id direction 10000 1 1
@@ -39,7 +39,7 @@ let direction_string (m: t) : string =
   | 3 -> "SOUTH"
   | _ -> failwith "Corrupted Direction Data!"
 
-let num_soliders (m: t) : int = m.num_soliders
+let num_soldiers (m: t) : int = m.num_soldiers
 
 let morale (m: t) : int = m.morale
 
@@ -48,7 +48,7 @@ let leadership (m: t) : int = m.leadership
 let increase_soldier_by (n: int) (m: t) : t =
   if n < 0 then failwith "Bad Input n!"
   else if n = 0 then m
-  else { m with num_soliders = m.num_soliders + n }
+  else { m with num_soldiers = m.num_soldiers + n }
 
 (**
  * [turn left m] lets the military unit [m] turn right or left depending on
@@ -127,7 +127,7 @@ let logistic (x: float) : float = 1. /. (1. +. exp (0. -. x))
 *)
 let single_round_attack_power (attacker: t) (defender_tile: Tile.t) : int =
   let attacking_output_raw =
-    attacker.num_soliders * attacker.leadership * attacker.morale
+    attacker.num_soldiers * attacker.leadership * attacker.morale
     |> float_of_int
     |> logistic
     |> ( *. ) (float_of_int base_attack_damage)
@@ -141,31 +141,31 @@ let attack (t1, t2: Tile.t * Tile.t) (m1, m2: t * t) : (t option * t option) =
     (* Let attacker attack first, then let defender retaliate. *)
     let m1 = { m1 with morale = m1.morale + attack_morale_change } in
     let m1_attack_power = single_round_attack_power m1 t2 in
-    let m2_soldiers_left = m2.num_soliders - m1_attack_power in
+    let m2_soldiers_left = m2.num_soldiers - m1_attack_power in
     if m2_soldiers_left <= 0 then (Some m1, None) (* m2 is gone *)
     else
       (* Apply attack result *)
       let m2 = { m2 with
-                 num_soliders = m2_soldiers_left;
+                 num_soldiers = m2_soldiers_left;
                  morale = m2.morale - attack_morale_change
                } in
       (* Retaliate! *)
       let m2_attack_power = single_round_attack_power m2 t1 in
-      let m1_soliders_left = m1.num_soliders - m2_attack_power in
+      let m1_soliders_left = m1.num_soldiers - m2_attack_power in
       if m1_soliders_left <= 0 then (None, Some m2) (* m1 is gone *)
-      else (Some { m1 with num_soliders = m1_soliders_left }, Some m2)
+      else (Some { m1 with num_soldiers = m1_soliders_left }, Some m2)
 
 let divide (next_id: int) (m: t) : (t * t) option =
-  if m.num_soliders <= 1 then None
+  if m.num_soldiers <= 1 then None
   else
     (* Divide number of soldiers. *)
-    let num_soliders_1 = m.num_soliders / 2 in
-    let num_soliders_2 = m.num_soliders - num_soliders_1 in
-    let m1 = { m with num_soliders = num_soliders_1 } in
-    let m2 = { m with id = next_id; num_soliders = num_soliders_2 } in
+    let num_soldiers_1 = m.num_soldiers / 2 in
+    let num_soldiers_2 = m.num_soldiers - num_soldiers_1 in
+    let m1 = { m with num_soldiers = num_soldiers_1 } in
+    let m2 = { m with id = next_id; num_soldiers = num_soldiers_2 } in
     Some (m1, m2)
 
 let to_string (m: t) : string =
   let identity = identity_string m in
   Printf.sprintf "MIL_UNIT %s %d %d %d %d %d"
-    identity m.id m.direction m.num_soliders m.morale m.leadership
+    identity m.id m.direction m.num_soldiers m.morale m.leadership

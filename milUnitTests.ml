@@ -84,7 +84,7 @@ let tests = [
 
   "mil_num_soldiers" >:: (fun () ->
       let m1 = default_init White 9 3 in
-      assert_equal 10000 (num_soliders m1)
+      assert_equal 10000 (num_soldiers m1)
     );
 
   "mil_morale" >:: (fun () ->
@@ -100,19 +100,19 @@ let tests = [
 
   "increase_soldier" >:: (fun () ->
       let m1 = increase_soldier_by 5 (default_init White 9 3) in
-      assert_equal 10005 (num_soliders m1)
+      assert_equal 10005 (num_soldiers m1)
     );
 
 
   "increase_soldier2" >:: (fun () ->
       let m1 = increase_soldier_by 0 (default_init White 9 3) in
-      assert_equal 10000 (num_soliders m1)
+      assert_equal 10000 (num_soldiers m1)
     );
 
 
   "increase_soldier3" >:: (fun () ->
       let m1 = increase_soldier_by 1000000 (default_init White 9 3) in
-      assert_equal 1010000 (num_soliders m1)
+      assert_equal 1010000 (num_soldiers m1)
     );
 
   "turn_left" >:: (fun () ->
