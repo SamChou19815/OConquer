@@ -78,6 +78,7 @@ val id : t -> int
 
 (**
  * [direction mil_unit] reports the direction of the military unit.
+ * Direction is 0, 1, 2, 3, which are east, north, west, and south.
  *
  * Requires: [mil_unit] is a legal military unit.
  * @return the direction of the military unit [mil_unit].
