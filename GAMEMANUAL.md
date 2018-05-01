@@ -1,16 +1,17 @@
 # CS 3110 Final Project - OConquer GAME MANUAL
 
-# H1 System Requirement
+# System Requirement
 
-# H1 Background
+# Background
 
-# H1 How to Play
+# Goal
 
-# H2 Goal
+# How to Play
 
-## H2 Actions
+
+## Actions
 
 <!-- ------------------------- -->
-## H2 JAVA Methods
+## JAVA Methods
 
-## H2 Create a program
+## Create a program
