@@ -39,6 +39,8 @@ module PosMap = Map.Make (Position)
 
 module IntMap = Map.Make (Int)
 
+module StringMap = Map.Make (String)
+
 module HashSet = struct
   type 'a t = ('a, unit) Hashtbl.t
 

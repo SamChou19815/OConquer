@@ -60,6 +60,9 @@ module PosMap : (Map.S with type key = Position.t)
 (** [IntMap] is a map where the key is always an int. *)
 module IntMap : (Map.S with type key = int)
 
+(** [StringMap] is a map where the key is always a string. *)
+module StringMap : (Map.S with type key = string)
+
 (** [HashSet] is a mutable HashSet. *)
 module HashSet : sig
 
