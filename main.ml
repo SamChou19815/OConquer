@@ -7,6 +7,7 @@ open RemoteServer
 *)
 
 module LocalServer = LocalServer.Make (ServerKernels.LocalServerKernel)
+module RemoteServer = RemoteServer.Make (ServerKernels.RemoteServerKernel)
 
 let main () = LocalServer.start_local_server ()
 

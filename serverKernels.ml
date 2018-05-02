@@ -86,3 +86,30 @@ module LocalServerKernel : LocalServer.Kernel = struct
     |> Yojson.Basic.to_string
 
 end
+
+module RemoteServerKernel = struct
+
+  type state = {
+    mutex: Mutex.t;
+    (** [user_db] records user related information. *)
+    mutable user_db: User.Database.t;
+    (* TODO add more fields! *)
+  }
+
+  let init () : state = {
+    mutex = Mutex.create ();
+    user_db = User.Database.empty;
+  }
+
+  let register (username: string) (password: string) (s: state) : int option =
+    None
+
+  let sign_in (username: string) (password: string) (s: state) : int option =
+    None
+
+  let submit_programs (token: int) (b: string) (w: string) : bool = false
+
+  let query_match (token: int) (round_id: int) : string option = None
+
+  let score_board (s: state) : string = "TODO"
+end

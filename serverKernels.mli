@@ -4,3 +4,6 @@
 
 (** [LocalServerKernel] is the kernel of local server. *)
 module LocalServerKernel : LocalServer.Kernel
+
+(** [RemoteServerKernel] is the kernel of the remote server.  *)
+module RemoteServerKernel : RemoteServer.Kernel
