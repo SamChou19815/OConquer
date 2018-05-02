@@ -1,8 +1,14 @@
-let scoreboard () : string list = []
+module type Kernel = sig
+  type state
 
-let accept_program (p: Command.program) : unit = ()
+  val init : unit -> state
+  val register : string -> string -> state -> int option
+  val sign_in : string -> string -> state -> int option
+  val submit_programs : int -> string -> string -> bool
+  val query_match : int -> int -> string option
+  val score_board : state -> string
+end
 
-let match_and_start () : int option = None
-
-let query_match (matching_id: int) (round_id: int) : WorldMap.t =
-  failwith "Unimplemented"
+module Make (K: Kernel) = struct
+  let start_remote_server () : unit = ()
+end
