@@ -31,7 +31,7 @@ Secondly, start Frontend Server:
 cd web-app
 npm install # this may take a while
 npm run start
-``
+```
 
 Then you can visit `http://localhost:4200` to start playing the game.
 
