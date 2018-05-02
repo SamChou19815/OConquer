@@ -16,7 +16,9 @@ cleandocs:
 	rm -rf ./docs
 
 zip:
-	zip submission.zip *.ml* ./sample_sdk/* _tags Makefile
+	zip submission.zip \
+	*.ml* ./programs/src/* ./web-app/* _tags Makefile .merlin .ocamlinit *.md \
+	-x ./web-app/node_modules/*
 
 clean:
 	ocamlbuild -clean
