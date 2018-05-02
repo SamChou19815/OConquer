@@ -1,12 +1,5 @@
 # CS 3110 Final Project - OConquer GAME MANUAL
 
-## System Requirement
-
-- Java JDK 8
-- OCaml
-- npm
-- node.js
-
 ## Background
 
 Inspired by the Heart of Iron series and Red Alert Series, OConquer is a sandbox
