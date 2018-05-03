@@ -121,4 +121,12 @@ module Database : sig
    * @return the new database with the updated game ratings.
   *)
   val update_rating : Definitions.game_status -> int -> int -> t -> t
+
+  (**
+   * [score_board db] gives the json representation of the score board.
+   *
+   * Requires: [db] is a legal database.
+   * @return json representation of the score board.
+  *)
+  val score_board : t -> Yojson.Basic.json
 end

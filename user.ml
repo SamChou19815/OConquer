@@ -1,4 +1,5 @@
 open Common
+open Yojson.Basic
 
 type user = {
   username: string;
@@ -101,4 +102,13 @@ module Database = struct
           db.token_map |> add u1'.token u1' |> add u2'.token u2'
         );
     }
+
+  let score_board (db: t) : json =
+    let p_to_json (_, user: 'a * user) : json = `Assoc [
+        "username", `String user.username;
+        "rating", `Float user.rating
+      ]
+    in
+    `List (db.token_map |> IntMap.bindings |> List.map p_to_json)
+
 end

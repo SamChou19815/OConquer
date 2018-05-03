@@ -158,5 +158,10 @@ module RemoteServerKernel = struct
         Some json
       end
 
-  let score_board (s: state) : string = "TODO"
+  let score_board (s: state) : string =
+    Mutex.lock s.mutex;
+    let json = User.Database.score_board s.user_db in
+    Mutex.unlock s.mutex;
+    Yojson.Basic.to_string json
+
 end
