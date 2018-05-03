@@ -31,6 +31,39 @@ val password : user -> string
 val token : user -> int
 
 (**
+ * [rating user] reports the rating of the user [user].
+ *
+ * Requires: [user] is a legal user.
+ * @return the rating of the user [user].
+*)
+val rating : user -> float
+
+(**
+ * [Elo] module is responsible for the computation of ELO rating.
+ * @see <https://en.wikipedia.org/wiki/Elo_rating_system> Wikipedia Page, where
+ * we find the basic idea of the algorithm.
+ * @see <https://www.geeksforgeeks.org/elo-rating-algorithm/> GeeksForGeeks,
+ * where we base our implementation on.
+*)
+module Elo : sig
+
+  (**
+   * [update_rating p1_wins (rating1, rating2)] gives the new ratings after
+   * a game, in which its result has been indicated by [p1_wins]. Old ratings
+   * [(rating1, rating2)] are provided to help determine the new ratings.
+   *
+   * Requires:
+   * - [p1_wins] represents whether player 1 (with [rating1]) wins. If it wins,
+   *   then the value should be [1.]. If it loses, then the value should be
+   *   [0.]. If there is a draw, then the value should be 0.5.
+   * - [rating1, rating2] are ratings of player 1 and player 2.
+   * @return a pair of updated ratings.
+  *)
+  val update_rating : float -> float * float -> float * float
+
+end
+
+(**
  * [Database] is the module that handles the in-memory database operation
  * related to users. The database will be indexed by the users.
 *)
@@ -76,38 +109,16 @@ module Database : sig
    * @return whether the given [token] is in [db].
   *)
   val has_token : int -> t -> bool
-end
-
-(**
- * [Elo] module is responsible for the computation of ELO rating.
- * @see <https://en.wikipedia.org/wiki/Elo_rating_system> Wikipedia Page, where
- * we find the basic idea of the algorithm.
- * @see <https://www.geeksforgeeks.org/elo-rating-algorithm/> GeeksForGeeks,
- * where we base our implementation on.
-*)
-module Elo : sig
 
   (**
-   * [winning_probability rating1 rating2] calculates the expected winning
-   * probability pair of the players of [rating1] and [rating2].
-   *
-   * Requires: [rating1] [rating2] are valid ELO ratings.
-   * @return expected winning probability pair.
-  *)
-  val winning_probability : float -> float -> float * float
-
-  (**
-   * [update_rating p1_wins (rating1, rating2)] gives the new ratings after
-   * a game, in which its result has been indicated by [p1_wins]. Old ratings
-   * [(rating1, rating2)] are provided to help determine the new ratings.
+   * [update_rating game_result black_token white_token db] updates and creates
+   * a new DB that reflected the updated ratings.
    *
    * Requires:
-   * - [p1_wins] represents whether player 1 (with [rating1]) wins. If it wins,
-   *   then the value should be [1.]. If it loses, then the value should be
-   *   [0.]. If there is a draw, then the value should be 0.5.
-   * - [rating1, rating2] are ratings of player 1 and player 2.
-   * @return a pair of updated ratings.
+   * - [game_result] cannot be [InProgress].
+   * - [black_token] and [white_token] must be the token of existing user.
+   * - [db] is a legal database.
+   * @return the new database with the updated game ratings.
   *)
-  val update_rating : float -> float * float -> float * float
-
+  val update_rating : Definitions.game_status -> int -> int -> t -> t
 end
