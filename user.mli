@@ -7,6 +7,30 @@
 type user
 
 (**
+ * [username user] reports the username of the user [user].
+ *
+ * Requires: [user] is a legal user.
+ * @return the username of the user [user].
+*)
+val username : user -> string
+
+(**
+ * [password user] reports the password of the user [user].
+ *
+ * Requires: [user] is a legal user.
+ * @return the password of the user [user].
+*)
+val password : user -> string
+
+(**
+ * [token user] reports the token of the user [user].
+ *
+ * Requires: [user] is a legal user.
+ * @return the token of the user [user].
+*)
+val token : user -> int
+
+(**
  * [Database] is the module that handles the in-memory database operation
  * related to users. The database will be indexed by the users.
 *)

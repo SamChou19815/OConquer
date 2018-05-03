@@ -6,6 +6,12 @@ type user = {
   token: int
 }
 
+let username (user: user) : string = user.username
+
+let password (user: user) : string = user.password
+
+let token (user: user) : int = user.token
+
 module Database = struct
   (** [t] should always been synced between [token_map] and [username_map]. *)
   type t = {

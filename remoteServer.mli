@@ -36,31 +36,34 @@ module type Kernel = sig
   val sign_in : string -> string -> state -> int option
 
   (**
-   * [submit_programs token b w] submits a program of black [b] and white [w]
-   * of the user with token [token].
+   * [submit_programs token b w s] submits a program of black [b] and white [w]
+   * of the user with token [token] under a given state [s].
    * It can fail either because the user's programs do not compile or there is
    * no such user with token [token].
    *
    * Requires:
    * - [token] is the user's token.
    * - [b] [w] are the black and white programs given by the users.
+   * - [s] is a legal state.
    * @return [true] if the program gets submitted or [false] if [b] [w] do not
    * compile or no such user with token [token].
   *)
-  val submit_programs : int -> string -> string -> bool
+  val submit_programs : int -> string -> string -> state -> bool
 
   (**
    * [query_match token round_id] gives the match change associated with the
-   * user of a given token [token]. The changes given are since [round_id].
+   * user of a given token [token]. The changes given are since [round_id]
+   * under a given state [s].
    *
    * Requires:
    * - [token] is the user's token.
    * - [round_id] must be between 0 and the id of the current round.
+   * - [s] is a legal state.
    * Returns: [Some s] where [s] is a string representation of the world that
    * has changed since [round_id]; [None] if there is no running or executed
    * match with this given ID or no such user with token [token].
   *)
-  val query_match : int -> int -> string option
+  val query_match : int -> int -> state -> string option
 
   (**
    * [scoreboard s] returns the score board of the current state [s].

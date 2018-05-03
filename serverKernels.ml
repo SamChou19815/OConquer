@@ -89,27 +89,74 @@ end
 
 module RemoteServerKernel = struct
 
+  (**
+   * [game_record] is a mutable record that contains the information of one
+   * single game.
+  *)
+  type game_record = {
+    mutable game_state: Engine.state;
+    mutable game_status: Definitions.game_status;
+    diff_logs: diff_record ArrayList.t;
+  }
+
   type state = {
     mutex: Mutex.t;
     (** [user_db] records user related information. *)
     mutable user_db: User.Database.t;
-    (* TODO add more fields! *)
+    (** [game_records] stores a collection of game histories. *)
+    mutable game_records: game_record IntMap.t;
+    (** [score_board] records the score board of the users. *)
+    mutable score_board: int IntMap.t;
+    (* TODO add more relevent fields. *)
   }
 
   let init () : state = {
     mutex = Mutex.create ();
     user_db = User.Database.empty;
+    game_records = IntMap.empty;
+    score_board = IntMap.empty;
   }
 
   let register (username: string) (password: string) (s: state) : int option =
-    None
+    Mutex.lock s.mutex;
+    let resp =
+      match User.Database.register username password s.user_db with
+      | None -> None
+      | Some (db', token) ->
+        let () = s.user_db <- db' in
+        Some token
+    in
+    Mutex.unlock s.mutex;
+    resp
 
   let sign_in (username: string) (password: string) (s: state) : int option =
-    None
+    Mutex.lock s.mutex;
+    let token_opt = User.Database.sign_in username password s.user_db in
+    Mutex.unlock s.mutex;
+    token_opt
 
-  let submit_programs (token: int) (b: string) (w: string) : bool = false
+  let submit_programs (token: int) (b: string) (w: string)
+      (s: state) : bool = false
 
-  let query_match (token: int) (round_id: int) : string option = None
+  let query_match (token: int) (round_id: int) (s: state) : string option =
+    match IntMap.find_opt token s.game_records with
+    | None -> None
+    | Some game_record ->
+      begin
+        let id = round_id + 1 in
+        let start_i = if id >= 0 then id else 0 in
+        Mutex.lock s.mutex;
+        let end_i = ArrayList.size game_record.diff_logs in
+        let diff_logs_lst = ArrayList.sub start_i end_i game_record.diff_logs in
+        let status = game_record.game_status in
+        Mutex.unlock s.mutex;
+        let diff_logs = create_diff_logs diff_logs_lst in
+        let json = create_game_report diff_logs status
+                   |> game_report_to_json
+                   |> Yojson.Basic.to_string
+        in
+        Some json
+      end
 
   let score_board (s: state) : string = "TODO"
 end
