@@ -1,6 +1,21 @@
 open Common
 open Data
 
+(**
+ * [synchronized m f] simulates the Java's synchronized keyword.
+ *
+ * Requires:
+ * - [m] is a mutex.
+ * - [f] is a function that is performed between the mutex section code.
+ * @return: f's value.
+ * Effect: [f] is run in a thread safe way.
+*)
+let synchronized (m: Mutex.t) (f: unit -> 'a) : 'a =
+  let () = Mutex.lock m in
+  let v = f () in
+  let () = Mutex.unlock m in
+  v
+
 module LocalServerKernel : LocalServer.Kernel = struct
 
   type state = {
@@ -36,11 +51,10 @@ module LocalServerKernel : LocalServer.Kernel = struct
     match s.game_state with
     | None -> failwith "Unexpected state!"
     | Some game_state ->
-      begin
-        Mutex.lock s.mutex;
-        let game_status = Engine.get_game_status game_state in
-        s.game_status <- game_status;
-        let ended = match game_status with
+      let ended = synchronized s.mutex (fun () ->
+          let game_status = Engine.get_game_status game_state in
+          s.game_status <- game_status;
+          match game_status with
           | BlackWins | WhiteWins | Draw ->
             s.game_state <- None;
             true
@@ -49,37 +63,38 @@ module LocalServerKernel : LocalServer.Kernel = struct
             s.game_state <- Some next_state;
             ArrayList.add diff_record s.diff_logs;
             false
-        in
-        Mutex.unlock s.mutex;
-        if ended then Command.stop_program p else run_simulation p s
-      end
+        )
+      in
+      if ended then Command.stop_program p else run_simulation p s
 
   let start_simulation (p1: string) (p2: string) (s: state) =
     if s.game_state <> None then `AlreadyRunning
     else match Command.from_string p1 p2 with
       | None -> `DoesNotCompile
-      | Some p -> begin
-          let (b, w) = p in
-          Mutex.lock s.mutex;
-          (* Clear old diff logs *)
-          s.diff_logs <- ArrayList.make (create_diff_record []);
-          let (init_state, diff_record) = Engine.init b w in
-          s.game_state <- Some init_state;
-          s.game_status <- InProgress;
-          ArrayList.add diff_record s.diff_logs;
-          Mutex.unlock s.mutex;
-          let _ = Thread.create (run_simulation p) s in
-          `OK
-        end
+      | Some p ->
+        let (b, w) = p in
+        let () = synchronized s.mutex (fun () ->
+            (* Clear old diff logs *)
+            s.diff_logs <- ArrayList.make (create_diff_record []);
+            let (init_state, diff_record) = Engine.init b w in
+            s.game_state <- Some init_state;
+            s.game_status <- InProgress;
+            ArrayList.add diff_record s.diff_logs;
+          )
+        in
+        let _ = Thread.create (run_simulation p) s in
+        `OK
 
   let query (last_seen_round_id: int) (s: state) : string =
-    Mutex.lock s.mutex;
-    let id = last_seen_round_id + 1 in
-    let start_i = if id >= 0 then id else 0 in
-    let end_i = ArrayList.size s.diff_logs in
-    let diff_logs_lst = ArrayList.sub start_i end_i s.diff_logs in
-    let status = s.game_status in
-    Mutex.unlock s.mutex;
+    let (diff_logs_lst, status) = synchronized s.mutex (fun () ->
+        let id = last_seen_round_id + 1 in
+        let start_i = if id >= 0 then id else 0 in
+        let end_i = ArrayList.size s.diff_logs in
+        let diff_logs_lst = ArrayList.sub start_i end_i s.diff_logs in
+        let status = s.game_status in
+        diff_logs_lst, status
+      )
+    in
     let diff_logs = create_diff_logs diff_logs_lst in
     create_game_report diff_logs status
     |> game_report_to_json
@@ -122,22 +137,17 @@ module RemoteServerKernel = struct
   }
 
   let register (username: string) (password: string) (s: state) : int option =
-    Mutex.lock s.mutex;
-    let resp =
-      match User.Database.register username password s.user_db with
-      | None -> None
-      | Some (db', token) ->
-        let () = s.user_db <- db' in
-        Some token
-    in
-    Mutex.unlock s.mutex;
-    resp
+    synchronized s.mutex (fun () ->
+        match User.Database.register username password s.user_db with
+        | None -> None
+        | Some (db', token) ->
+          let () = s.user_db <- db' in
+          Some token
+      )
 
   let sign_in (username: string) (password: string) (s: state) : int option =
-    Mutex.lock s.mutex;
-    let token_opt = User.Database.sign_in username password s.user_db in
-    Mutex.unlock s.mutex;
-    token_opt
+    synchronized s.mutex
+      (fun () -> User.Database.sign_in username password s.user_db)
 
   (**
    * [run_simulation (bt, wt) (bp, wp) s] runs the simulation for player with
@@ -168,34 +178,35 @@ module RemoteServerKernel = struct
     let game_records = IntMap.(
         s.game_records |> add bt b_record |> add wt w_record
       ) in
-    Mutex.lock s.mutex;
-    s.game_records <- game_records;
-    Mutex.unlock s.mutex;
     (* Run *)
-    let game_state = ref state_init in
-    let () = s.running <- true in
+    let game_state: Engine.state ref = synchronized s.mutex (fun () ->
+        s.game_records <- game_records;
+        let () = s.running <- true in
+        ref state_init
+      )
+    in
     let rec run_on_game_state () : unit =
-      let game_status = Engine.get_game_status !game_state in
-      Mutex.lock s.mutex;
-      (* Update Game Status *)
-      b_record.game_status <- game_status;
-      w_record.game_status <- game_status;
-      (* Update Diff Record *)
-      let ended = match game_status with
-        | BlackWins | WhiteWins | Draw ->
-          let () = s.running <- false in
-          let () = Command.stop_program p in
-          true
-        | InProgress ->
-          let (next_state, diff_record) = Engine.next !game_state in
-          let () = game_state := next_state in
-          let () = ArrayList.add diff_record b_record.diff_logs in
-          let () = ArrayList.add diff_record w_record.diff_logs in
-          false
+      let ended = synchronized s.mutex (fun () ->
+          let game_status = Engine.get_game_status !game_state in
+          (* Update Game Status *)
+          b_record.game_status <- game_status;
+          w_record.game_status <- game_status;
+          (* Update Diff Record *)
+          match game_status with
+          | BlackWins | WhiteWins | Draw ->
+            let () = s.running <- false in
+            let () = Command.stop_program p in
+            true
+          | InProgress ->
+            let (next_state, diff_record) = Engine.next !game_state in
+            let () = game_state := next_state in
+            let () = ArrayList.add diff_record b_record.diff_logs in
+            let () = ArrayList.add diff_record w_record.diff_logs in
+            false
+        )
       in
-      Mutex.unlock s.mutex;
       (* Stop Simulation *)
-      if ended then Condition.signal s.signal
+      if ended then Condition.broadcast s.signal
       else run_on_game_state ()
     in
     run_on_game_state ()
@@ -224,28 +235,30 @@ module RemoteServerKernel = struct
     in
     (* DO the main processing. To be run in a new thread. *)
     let processing () =
-      Mutex.lock s.mutex;
-      match User.Database.get_user_opt_by_token token s.user_db with
-      | None -> Mutex.unlock s.mutex
-      | Some user ->
-        let player = create_player user b w in
-        let queue = accept_player player s.match_making_queue in
-        let () = s.match_making_queue <- queue in
-        match form_match queue with
-        | None -> Mutex.unlock s.mutex
-        | Some (queue', p1, p2) ->
-          let bt = p1 |> get_user_from_player |> User.token in
-          let wt = p2 |> get_user_from_player |> User.token in
-          let () = s.match_making_queue <- queue' in
-          (* Start next part only if the simulation stops *)
-          let () = wait_until_simulation_stops () in
-          let program_opt = find_program_opt p1 p2 in
-          let () = Mutex.unlock s.mutex in
-          match program_opt with
-          | None -> ()
-          | Some (bp, wp) ->
-            let () = Mutex.unlock s.mutex in
-            ignore (Thread.create (run_simulation (bt, wt) (bp, wp)) s)
+      let info_opt = synchronized s.mutex (fun () ->
+          match User.Database.get_user_opt_by_token token s.user_db with
+          | None -> None
+          | Some user ->
+            let player = create_player user b w in
+            let queue = accept_player player s.match_making_queue in
+            let () = s.match_making_queue <- queue in
+            match form_match queue with
+            | None -> None
+            | Some (queue', p1, p2) ->
+              let bt = p1 |> get_user_from_player |> User.token in
+              let wt = p2 |> get_user_from_player |> User.token in
+              let () = s.match_making_queue <- queue' in
+              (* Start next part only if the simulation stops *)
+              let () = wait_until_simulation_stops () in
+              match find_program_opt p1 p2 with
+              | None -> None
+              | Some (bp, wp) -> Some (bt, wt, bp, wp)
+        )
+      in
+      match info_opt with
+      | None -> ()
+      | Some (bt, wt, bp, wp) ->
+        ignore (Thread.create (run_simulation (bt, wt) (bp, wp)) s)
     in
     ignore (Thread.create processing ())
 
@@ -256,11 +269,13 @@ module RemoteServerKernel = struct
       begin
         let id = round_id + 1 in
         let start_i = if id >= 0 then id else 0 in
-        Mutex.lock s.mutex;
-        let end_i = ArrayList.size game_record.diff_logs in
-        let diff_logs_lst = ArrayList.sub start_i end_i game_record.diff_logs in
-        let status = game_record.game_status in
-        Mutex.unlock s.mutex;
+        let (diff_logs_lst, status) = synchronized s.mutex (fun () ->
+            let end_i = ArrayList.size game_record.diff_logs in
+            let lst = ArrayList.sub start_i end_i game_record.diff_logs in
+            let status = game_record.game_status in
+            lst, status
+          )
+        in
         let diff_logs = create_diff_logs diff_logs_lst in
         let json = create_game_report diff_logs status
                    |> game_report_to_json
@@ -270,9 +285,9 @@ module RemoteServerKernel = struct
       end
 
   let score_board (s: state) : string =
-    Mutex.lock s.mutex;
-    let json = User.Database.score_board s.user_db in
-    Mutex.unlock s.mutex;
+    let json =
+      synchronized s.mutex (fun () -> User.Database.score_board s.user_db)
+    in
     Yojson.Basic.to_string json
 
 end
