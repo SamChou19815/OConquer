@@ -110,6 +110,12 @@ module Database = struct
 
 end
 
+module FloatMap = Map.Make (struct
+    type t = float
+
+    let compare = Pervasives.compare
+  end)
+
 module MatchMaking = struct
 
   type player = {
@@ -118,7 +124,7 @@ module MatchMaking = struct
     white_program: string;
   }
 
-  type queue = player list
+  type queue = player FloatMap.t
 
   let create_player (user: user)
       (black_program: string) (white_program: string) : player =
@@ -132,13 +138,40 @@ module MatchMaking = struct
   let get_white_program_from_player (player: player) : string =
     player.white_program
 
-  let empty_queue : queue = []
+  let empty_queue : queue = FloatMap.empty
 
-  let accept_player (player: player) (queue: queue) : queue = player::queue
+  let accept_player (player: player) : queue -> queue =
+    FloatMap.add player.user.rating player
 
-  let form_match : queue -> (queue * player * player) option =
-    function
+  let rec form_match_helper (queue: (float * player) list) (target: float)
+      (player1: player) (player2: player):
+    (float * player * player)  =
+    match queue with
+    | [] | _::[] -> (target,player1,player2)
+    | (rating1, p1)::(rating2, p2)::queue' ->
+      let temp_rating = rating2 -. rating1 in
+      if (temp_rating < target) then
+        form_match_helper ((rating2, p2)::queue') temp_rating p1 p2
+      else form_match_helper ((rating2, p2)::queue') target player1 player2
+
+  let form_match (queue: queue) : (queue * player * player) option =
+    match FloatMap.bindings queue with
     | [] | _::[] -> None
-    | p1::p2::queue' -> Some (queue', p1, p2)
+    | (rating1, p1)::(rating2, p2)::queue' ->
+      let temp_rating = rating2 -. rating1 in
+      match (form_match_helper ((rating2, p2)::queue')
+               temp_rating p1 p2) with
+      | (target, player1, player2) ->
+        Some ((queue |> FloatMap.remove player1.user.rating
+               |> FloatMap.remove player2.user.rating), player1, player2)
+
+
+
+
+
+
+
+
+      (*Some (queue', p1, p2)*)
 
 end
