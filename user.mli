@@ -7,38 +7,6 @@
 type user
 
 (**
- * [username user] reports the username of the user [user].
- *
- * Requires: [user] is a legal user.
- * @return the username of the user [user].
-*)
-val username : user -> string
-
-(**
- * [password user] reports the password of the user [user].
- *
- * Requires: [user] is a legal user.
- * @return the password of the user [user].
-*)
-val password : user -> string
-
-(**
- * [token user] reports the token of the user [user].
- *
- * Requires: [user] is a legal user.
- * @return the token of the user [user].
-*)
-val token : user -> int
-
-(**
- * [rating user] reports the rating of the user [user].
- *
- * Requires: [user] is a legal user.
- * @return the rating of the user [user].
-*)
-val rating : user -> float
-
-(**
  * [Elo] module is responsible for the computation of ELO rating.
  * @see <https://en.wikipedia.org/wiki/Elo_rating_system> Wikipedia Page, where
  * we find the basic idea of the algorithm.
@@ -104,11 +72,22 @@ module Database : sig
    * [has_token token db] checks whether the given [token] is in [db].
    *
    * Requires:
-   * - [t] can be any int.
+   * - [token] can be any int.
    * - [db] must be a legal database.
    * @return whether the given [token] is in [db].
   *)
   val has_token : int -> t -> bool
+
+  (**
+   * [get_user_by_token token db] obtains the user with [token] in [db].
+   *
+   * Requires:
+   * - [token] must be an existing user token.
+   * - [db] must be a legal database.
+   * @return user with given [token].
+   * @raise Not_found if the [token] does not exist.
+  *)
+  val get_user_by_token : int -> t -> user
 
   (**
    * [update_rating game_result black_token white_token db] updates and creates

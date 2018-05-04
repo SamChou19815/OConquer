@@ -2,19 +2,11 @@ open Common
 open Yojson.Basic
 
 type user = {
-  username: string;
-  password: string;
-  token: int;
-  rating: float;
+  username: string; (** [username] is the username. *)
+  password: string; (** [password] is the password. *)
+  token: int; (** [token] is the security token of the user. *)
+  rating: float; (** [rating] is the rating of the user. *)
 }
-
-let username (user: user) : string = user.username
-
-let password (user: user) : string = user.password
-
-let token (user: user) : int = user.token
-
-let rating (user: user) : float = user.rating
 
 module Elo = struct
 
@@ -79,6 +71,9 @@ module Database = struct
 
   let has_token (token: int) (db: t) : bool = IntMap.mem token db.token_map
 
+  let get_user_by_token (token: int) (db: t) : user =
+    IntMap.find token db.token_map
+
   let update_rating (game_result: Definitions.game_status)
       (black_token: int) (white_token: int) (db: t) : t =
     let p1_wins = match game_result with
@@ -110,5 +105,36 @@ module Database = struct
       ]
     in
     `List (db.token_map |> IntMap.bindings |> List.map p_to_json)
+
+end
+
+module MatchMaking = struct
+
+  (**
+   * [player] contains the basic user info and the programs submitted by the
+   * user.
+  *)
+  type player = {
+    user: user;
+    black_program: string;
+    white_program: string;
+  }
+
+  type queue = player list
+
+  let accept_player (user: user) (black_program: string) (white_program: string)
+      (queue: queue) : queue =
+    let player = { user; black_program; white_program; } in
+    player::queue
+
+  let form_match : queue -> (queue * (int * int) * (string * string)) option =
+    function
+    | [] | _::[] -> None
+    | p1::p2::rest ->
+      Some (
+        rest,
+        (p1.user.token, p2.user.token),
+        (p1.black_program, p2.white_program)
+      )
 
 end
