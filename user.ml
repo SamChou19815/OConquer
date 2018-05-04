@@ -110,10 +110,6 @@ end
 
 module MatchMaking = struct
 
-  (**
-   * [player] contains the basic user info and the programs submitted by the
-   * user.
-  *)
   type player = {
     user: user;
     black_program: string;
@@ -122,19 +118,25 @@ module MatchMaking = struct
 
   type queue = player list
 
-  let accept_player (user: user) (black_program: string) (white_program: string)
-      (queue: queue) : queue =
-    let player = { user; black_program; white_program; } in
-    player::queue
+  let create_player (user: user)
+      (black_program: string) (white_program: string) : player =
+    { user; black_program; white_program; }
 
-  let form_match : queue -> (queue * (int * int) * (string * string)) option =
+  let get_user_from_player (player: player) : user = player.user
+
+  let get_black_program_from_player (player: player) : string =
+    player.black_program
+
+  let get_white_program_from_player (player: player) : string =
+    player.white_program
+
+  let empty : queue = []
+
+  let accept_player (player: player) (queue: queue) : queue = player::queue
+
+  let form_match : queue -> (queue * player * player) option =
     function
     | [] | _::[] -> None
-    | p1::p2::rest ->
-      Some (
-        rest,
-        (p1.user.token, p2.user.token),
-        (p1.black_program, p2.white_program)
-      )
+    | p1::p2::queue' -> Some (queue', p1, p2)
 
 end

@@ -109,3 +109,80 @@ module Database : sig
   *)
   val score_board : t -> Yojson.Basic.json
 end
+
+
+(** [MatchMaking] is a module for matching making between players. *)
+module MatchMaking : sig
+
+  (**
+   * [player] contains the basic user info and the programs submitted by the
+   * user.
+  *)
+  type player
+
+  (** [queue] is the abstract type of the matching queue. *)
+  type queue = player list
+
+  (**
+   * [create_player user black_program white_program] creates a player from
+   * the user info [user] and [black_program] and [white_program].
+   *
+   * Requires:
+   * - [user] is a legal user object.
+   * - [black_program] and [white_program] can be any string.
+   * @return the created player with above-mentioned info.
+  *)
+  val create_player : user -> string -> string -> player
+
+  (**
+   * [get_user_from_player player] obtains the user info from [player].
+   *
+   * Requires: [player] is a legal player.
+   * @return user info of the player.
+  *)
+  val get_user_from_player : player -> user
+
+  (**
+   * [get_black_program_from_player player] obtains the black program from
+   * [player].
+   *
+   * Requires: [player] is a legal player.
+   * @return the black program of the player.
+  *)
+  val get_black_program_from_player : player -> string
+
+  (**
+   * [get_white_program_from_player player] obtains the white program from
+   * [player].
+   *
+   * Requires: [player] is a legal player.
+   * @return the black program of the player.
+  *)
+  val get_white_program_from_player : player -> string
+
+  (** [empty] is an empty matching queue. *)
+  val empty : queue
+
+  (**
+   * [accept_player player queue] accepts a [player] a matching queue [queue].
+   *
+   * Requires:
+   * - [player] is a legal player.
+   * - [queue] is a legal queue.
+   * @return the resultant matching queue with the accepted user.
+  *)
+  val accept_player : player -> queue -> queue
+
+  (**
+   * [form_match queue] tries to form a match from the given [queue].
+   * If it can form a match, a new unformed queue and the matching results will
+   * be returned. If not, [None] will be returned.
+   *
+   * Requires: [queue] is a legal queue.
+   * @return [None] if matching is impossible; [Some (queue', tokens, programs)]
+   * where [queue'] is the new resultant queue, and [tokens] and [programs] are
+   * those selected for a match.
+  *)
+  val form_match : queue -> (queue * player * player) option
+
+end
