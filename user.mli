@@ -7,6 +7,14 @@
 type user
 
 (**
+ * [token user] reports the token of the user [user].
+ *
+ * Requires: [user] is a legal user.
+ * @return the token of the user [user].
+*)
+val token : user -> int
+
+(**
  * [Elo] module is responsible for the computation of ELO rating.
  * @see <https://en.wikipedia.org/wiki/Elo_rating_system> Wikipedia Page, where
  * we find the basic idea of the algorithm.
@@ -84,10 +92,10 @@ module Database : sig
    * Requires:
    * - [token] must be an existing user token.
    * - [db] must be a legal database.
-   * @return user with given [token].
-   * @raise Not_found if the [token] does not exist.
+   * @return [Some user] where the user has the given [token] or [None] if there
+   * is no such user.
   *)
-  val get_user_by_token : int -> t -> user
+  val get_user_opt_by_token : int -> t -> user option
 
   (**
    * [update_rating game_result black_token white_token db] updates and creates
@@ -160,8 +168,8 @@ module MatchMaking : sig
   *)
   val get_white_program_from_player : player -> string
 
-  (** [empty] is an empty matching queue. *)
-  val empty : queue
+  (** [empty_queue] is an empty matching queue. *)
+  val empty_queue : queue
 
   (**
    * [accept_player player queue] accepts a [player] a matching queue [queue].

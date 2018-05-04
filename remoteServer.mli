@@ -45,10 +45,10 @@ module type Kernel = sig
    * - [token] is the user's token.
    * - [b] [w] are the black and white programs given by the users.
    * - [s] is a legal state.
-   * @return [true] if the program gets submitted or [false] if [b] [w] do not
-   * compile or no such user with token [token].
+   * @return None.
+   * Effect: the submitted info will later be used for match making.
   *)
-  val submit_programs : int -> string -> string -> state -> bool
+  val submit_programs : int -> string -> string -> state -> unit
 
   (**
    * [query_match token round_id] gives the match change associated with the

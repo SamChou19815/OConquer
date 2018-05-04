@@ -100,17 +100,25 @@ module RemoteServerKernel = struct
 
   type state = {
     mutex: Mutex.t;
+    (** [running] reports whether the server is running a simulation. *)
+    mutable running: bool;
+    (** [signal] is used for thread waiting communication. *)
+    mutable signal: Condition.t;
     (** [user_db] records user related information. *)
     mutable user_db: User.Database.t;
     (** [game_records] stores a collection of game histories. *)
     mutable game_records: game_record IntMap.t;
-    (* TODO add more relevent fields. *)
+    (** [match_making_queue] contains the queue for match making. *)
+    mutable match_making_queue: User.MatchMaking.queue;
   }
 
   let init () : state = {
     mutex = Mutex.create ();
+    signal = Condition.create ();
+    running = false;
     user_db = User.Database.empty;
     game_records = IntMap.empty;
+    match_making_queue = User.MatchMaking.empty_queue;
   }
 
   let register (username: string) (password: string) (s: state) : int option =
@@ -165,13 +173,18 @@ module RemoteServerKernel = struct
     Mutex.unlock s.mutex;
     (* Run *)
     let game_state = ref state_init in
+    let () = s.running <- true in
     let rec run_on_game_state () : unit =
       let game_status = Engine.get_game_status !game_state in
       Mutex.lock s.mutex;
+      (* Update Game Status *)
       b_record.game_status <- game_status;
       w_record.game_status <- game_status;
+      (* Update Diff Record *)
       let ended = match game_status with
-        | BlackWins | WhiteWins | Draw -> true
+        | BlackWins | WhiteWins | Draw ->
+          let () = s.running <- false in
+          true
         | InProgress ->
           let (next_state, diff_record) = Engine.next !game_state in
           let () = game_state := next_state in
@@ -180,12 +193,61 @@ module RemoteServerKernel = struct
           false
       in
       Mutex.unlock s.mutex;
-      if ended then Command.stop_program p else run_on_game_state ()
+      (* Stop Simulation *)
+      if ended then
+        let () = Command.stop_program p in
+        Condition.signal s.signal
+      else run_on_game_state ()
     in
     run_on_game_state ()
 
-  let submit_programs (token: int) (b: string) (w: string)
-      (s: state) : bool = false
+  let submit_programs (token: int) (b: string) (w: string) (s: state) : unit =
+    let open User.MatchMaking in
+    (* Find best possible legal program from two players. *)
+    let find_program_opt p1 p2 =
+      let bp_str = get_black_program_from_player p1 in
+      let wp_str = get_white_program_from_player p2 in
+      match Command.from_string bp_str wp_str with
+      | Some p -> Some p
+      | None ->
+        let bp_str = get_black_program_from_player p2 in
+        let wp_str = get_white_program_from_player p1 in
+        Command.from_string bp_str wp_str
+    in
+    (**
+     * [wait_until_simulation_stops ()] waits until simulation stops.
+     * It's not thread safe.
+    *)
+    let wait_until_simulation_stops () =
+      while s.running do
+        Condition.wait s.signal s.mutex
+      done
+    in
+    (* DO the main processing. To be run in a new thread. *)
+    let processing () =
+      Mutex.lock s.mutex;
+      match User.Database.get_user_opt_by_token token s.user_db with
+      | None -> Mutex.unlock s.mutex
+      | Some user ->
+        let player = create_player user b w in
+        let queue = accept_player player s.match_making_queue in
+        let () = s.match_making_queue <- queue in
+        (* Start next part only if the simulation stops *)
+        let () = wait_until_simulation_stops () in
+        match form_match queue with
+        | None -> Mutex.unlock s.mutex
+        | Some (queue', p1, p2) ->
+          let bt = p1 |> get_user_from_player |> User.token in
+          let wt = p2 |> get_user_from_player |> User.token in
+          match find_program_opt p1 p2 with
+          | None ->
+            let () = s.match_making_queue <- queue' in
+            Mutex.unlock s.mutex
+          | Some (bp, wp) ->
+            let () = Mutex.unlock s.mutex in
+            ignore (Thread.create (run_simulation (bt, wt) (bp, wp)) s)
+    in
+    ignore (Thread.create processing ())
 
   let query_match (token: int) (round_id: int) (s: state) : string option =
     match IntMap.find_opt token s.game_records with

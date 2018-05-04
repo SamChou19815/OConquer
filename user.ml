@@ -8,6 +8,8 @@ type user = {
   rating: float; (** [rating] is the rating of the user. *)
 }
 
+let token (user: user) : int = user.token
+
 module Elo = struct
 
   (** [k] is the constant used in the ELO rating algorithm. *)
@@ -71,8 +73,8 @@ module Database = struct
 
   let has_token (token: int) (db: t) : bool = IntMap.mem token db.token_map
 
-  let get_user_by_token (token: int) (db: t) : user =
-    IntMap.find token db.token_map
+  let get_user_opt_by_token (token: int) (db: t) : user option =
+    IntMap.find_opt token db.token_map
 
   let update_rating (game_result: Definitions.game_status)
       (black_token: int) (white_token: int) (db: t) : t =
@@ -130,7 +132,7 @@ module MatchMaking = struct
   let get_white_program_from_player (player: player) : string =
     player.white_program
 
-  let empty : queue = []
+  let empty_queue : queue = []
 
   let accept_player (player: player) (queue: queue) : queue = player::queue
 
