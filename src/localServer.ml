@@ -10,8 +10,16 @@ end
 module Make (K: Kernel) = struct
   open ServerCore
 
+  (** [current_state] records the current mutable state of local server. *)
   let current_state = K.init ()
 
+  (**
+   * [handle_start_simulation_request _ body] handles the start simulation
+   * request with the given [body].
+   *
+   * Requires: [body] contains black and white program in JSON format.
+   * @return server response.
+  *)
   let handle_start_simulation_request _ (body: string) : string =
     let open Yojson.Basic in
     let open Util in
@@ -27,6 +35,13 @@ module Make (K: Kernel) = struct
     | `DoesNotCompile -> "DOES_NOT_COMPILE"
     | `AlreadyRunning -> "ALREADY_RUNNING"
 
+  (**
+   * [handle_query_request params] handles the query request with the given
+   * [params].
+   *
+   * Requires: [params] should contain an int [round_id].
+   * @return server response.
+  *)
   let handle_query_request (param: params) _ : string =
     let id =
       try param |> List.assoc "round_id" |> int_of_string
@@ -34,6 +49,7 @@ module Make (K: Kernel) = struct
     in
     K.query id current_state
 
+  (** [handlers] contains a list of defined handlers. *)
   let handlers = [
     create_handler POST "/apis/local/start_simulation"
       handle_start_simulation_request;

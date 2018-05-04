@@ -19,9 +19,9 @@ let print_usage () =
 
 (** [main] is the entrance function. *)
 let main (args: string array) =
-  if Array.length args = 0 then print_usage ()
+  if Array.length args < 2 then print_usage ()
   else
-    match args.(0) with
+    match args.(1) with
     | "local" -> LocalServer.start_local_server ()
     | "remote" -> RemoteServer.start_remote_server ()
     | _ -> print_usage ()
