@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * The Program runner. The user should not worry about this.
  */
 public final class ProgramRunner {
-    
+
     /**
      * The settings for timeout.
      */
@@ -14,20 +14,16 @@ public final class ProgramRunner {
      * Test code that is used to test user's code.
      */
     private AtomicReference<Action> actionAtomic = new AtomicReference<>(Action.DO_NOTHING);
-    
+
     /**
      * Forbidden instantiation.
      */
     private ProgramRunner() {}
-    
+
     @SuppressWarnings("deprecation")
     private void computeAction(Program p) {
         Thread tester = new Thread(() -> {
-            try {
-                actionAtomic.set(p.getAction());
-            } catch (TooManySDKCallsException e) {
-                actionAtomic.set(Action.DO_NOTHING);
-            }
+            actionAtomic.set(p.getAction());
         });
         tester.start();
         try {
@@ -40,7 +36,7 @@ public final class ProgramRunner {
             tester.stop();
         }
     }
-    
+
     public static void main(String... args) {
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -62,5 +58,5 @@ public final class ProgramRunner {
             System.out.println("COMMAND " + r.actionAtomic.get().name());
         }
     }
-    
+
 }
