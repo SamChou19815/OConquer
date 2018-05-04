@@ -129,7 +129,7 @@ module MatchMaking : sig
   type player
 
   (** [queue] is the abstract type of the matching queue. *)
-  type queue = player list
+  type queue
 
   (**
    * [create_player user black_program white_program] creates a player from
