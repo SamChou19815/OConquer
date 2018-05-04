@@ -94,7 +94,6 @@ module RemoteServerKernel = struct
    * single game.
   *)
   type game_record = {
-    mutable game_state: Engine.state;
     mutable game_status: Definitions.game_status;
     diff_logs: diff_record ArrayList.t;
   }
@@ -105,8 +104,6 @@ module RemoteServerKernel = struct
     mutable user_db: User.Database.t;
     (** [game_records] stores a collection of game histories. *)
     mutable game_records: game_record IntMap.t;
-    (** [score_board] records the score board of the users. *)
-    mutable score_board: int IntMap.t;
     (* TODO add more relevent fields. *)
   }
 
@@ -114,7 +111,6 @@ module RemoteServerKernel = struct
     mutex = Mutex.create ();
     user_db = User.Database.empty;
     game_records = IntMap.empty;
-    score_board = IntMap.empty;
   }
 
   let register (username: string) (password: string) (s: state) : int option =
@@ -134,6 +130,59 @@ module RemoteServerKernel = struct
     let token_opt = User.Database.sign_in username password s.user_db in
     Mutex.unlock s.mutex;
     token_opt
+
+  (**
+   * [run_simulation (bt, wt) (bp, wp) s] runs the simulation for player with
+   * token [bt] [wt] with program [bp, wp] on server state [s].
+   *
+   * Requires:
+   * - [bt] [wt] are existing user tokens.
+   * - [bp] [wp] are legal programs.
+   * - [s] is a legal server state.
+   * @return None.
+   * Effect: one simulation has been run and the game records are updated
+   * accordingly.
+  *)
+  let run_simulation (bt, wt: int * int)
+      (bp, wp as p: Command.program * Command.program) (s: state) : unit =
+    (* Prep *)
+    let (state_init, diff_record_init) = Engine.init bp wp in
+    let b_record = {
+      game_status = Engine.get_game_status state_init;
+      diff_logs = ArrayList.make (create_diff_record []);
+    } in
+    ArrayList.add diff_record_init b_record.diff_logs;
+    let w_record = {
+      game_status = Engine.get_game_status state_init;
+      diff_logs = ArrayList.make (create_diff_record []);
+    } in
+    ArrayList.add diff_record_init w_record.diff_logs;
+    let game_records = IntMap.(
+        s.game_records |> add bt b_record |> add wt w_record
+      ) in
+    Mutex.lock s.mutex;
+    s.game_records <- game_records;
+    Mutex.unlock s.mutex;
+    (* Run *)
+    let game_state = ref state_init in
+    let rec run_on_game_state () : unit =
+      let game_status = Engine.get_game_status !game_state in
+      Mutex.lock s.mutex;
+      b_record.game_status <- game_status;
+      w_record.game_status <- game_status;
+      let ended = match game_status with
+        | BlackWins | WhiteWins | Draw -> true
+        | InProgress ->
+          let (next_state, diff_record) = Engine.next !game_state in
+          let () = game_state := next_state in
+          let () = ArrayList.add diff_record b_record.diff_logs in
+          let () = ArrayList.add diff_record w_record.diff_logs in
+          false
+      in
+      Mutex.unlock s.mutex;
+      if ended then Command.stop_program p else run_on_game_state ()
+    in
+    run_on_game_state ()
 
   let submit_programs (token: int) (b: string) (w: string)
       (s: state) : bool = false
