@@ -1,4 +1,4 @@
-#directory "_build";;
+#directory "_build/src";;
 #load "gameConstants.cmo";;
 #load "tile.cmo";;
 #load "milUnit.cmo";;
