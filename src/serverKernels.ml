@@ -231,17 +231,18 @@ module RemoteServerKernel = struct
         let player = create_player user b w in
         let queue = accept_player player s.match_making_queue in
         let () = s.match_making_queue <- queue in
-        (* Start next part only if the simulation stops *)
-        let () = wait_until_simulation_stops () in
         match form_match queue with
         | None -> Mutex.unlock s.mutex
         | Some (queue', p1, p2) ->
           let bt = p1 |> get_user_from_player |> User.token in
           let wt = p2 |> get_user_from_player |> User.token in
-          match find_program_opt p1 p2 with
-          | None ->
-            let () = s.match_making_queue <- queue' in
-            Mutex.unlock s.mutex
+          let () = s.match_making_queue <- queue' in
+          (* Start next part only if the simulation stops *)
+          let () = wait_until_simulation_stops () in
+          let program_opt = find_program_opt p1 p2 in
+          let () = Mutex.unlock s.mutex in
+          match program_opt with
+          | None -> ()
           | Some (bp, wp) ->
             let () = Mutex.unlock s.mutex in
             ignore (Thread.create (run_simulation (bt, wt) (bp, wp)) s)
