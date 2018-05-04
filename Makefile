@@ -1,8 +1,8 @@
 main:
-	ocamlbuild -use-ocamlfind main.byte
+	ocamlbuild -use-ocamlfind src/main.byte
 
 test:
-	ocamlbuild -use-ocamlfind test.byte && ./test.byte
+	ocamlbuild -use-ocamlfind src/test.byte && ./test.byte
 
 docs:
 	mkdir -p docs

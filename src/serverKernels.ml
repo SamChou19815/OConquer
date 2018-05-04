@@ -184,6 +184,7 @@ module RemoteServerKernel = struct
       let ended = match game_status with
         | BlackWins | WhiteWins | Draw ->
           let () = s.running <- false in
+          let () = Command.stop_program p in
           true
         | InProgress ->
           let (next_state, diff_record) = Engine.next !game_state in
@@ -194,9 +195,7 @@ module RemoteServerKernel = struct
       in
       Mutex.unlock s.mutex;
       (* Stop Simulation *)
-      if ended then
-        let () = Command.stop_program p in
-        Condition.signal s.signal
+      if ended then Condition.signal s.signal
       else run_on_game_state ()
     in
     run_on_game_state ()
