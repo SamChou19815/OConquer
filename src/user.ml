@@ -143,35 +143,29 @@ module MatchMaking = struct
   let accept_player (player: player) : queue -> queue =
     FloatMap.add player.user.rating player
 
-  let rec form_match_helper (queue: (float * player) list) (target: float)
-      (player1: player) (player2: player):
-    (float * player * player)  =
-    match queue with
-    | [] | _::[] -> (target,player1,player2)
-    | (rating1, p1)::(rating2, p2)::queue' ->
-      let temp_rating = rating2 -. rating1 in
-      if (temp_rating < target) then
-        form_match_helper ((rating2, p2)::queue') temp_rating p1 p2
-      else form_match_helper ((rating2, p2)::queue') target player1 player2
-
   let form_match (queue: queue) : (queue * player * player) option =
+    (* Helps to the the min diff pair. *)
+    let rec form_match_helper (q: (float * player) list)
+        (acc: float * player * player) : (float * player * player) =
+      let (acc_min, p1, p2) = acc in
+      match q with
+      | [] | _::[] -> acc
+      | (rating1, p3)::((rating2, p4)::_ as tl) ->
+        let temp_rating = rating2 -. rating1 in
+        let acc' =
+          if temp_rating < acc_min then (temp_rating, p3, p4)
+          else (acc_min, p1, p2)
+        in
+        form_match_helper tl acc'
+    in
     match FloatMap.bindings queue with
     | [] | _::[] -> None
-    | (rating1, p1)::(rating2, p2)::queue' ->
-      let temp_rating = rating2 -. rating1 in
-      match (form_match_helper ((rating2, p2)::queue')
-               temp_rating p1 p2) with
-      | (target, player1, player2) ->
-        Some ((queue |> FloatMap.remove player1.user.rating
-               |> FloatMap.remove player2.user.rating), player1, player2)
-
-
-
-
-
-
-
-
-      (*Some (queue', p1, p2)*)
+    | (rating1, p1)::((rating2, p2)::_ as tl) ->
+      let curr_diff_min = rating2 -. rating1 in
+      let (target, player1, player2) =
+        form_match_helper tl (curr_diff_min, p1, p2)
+      in
+      let queue' = FloatMap.(queue |> remove rating1 |> remove rating2) in
+      Some (queue', player1, player2)
 
 end
