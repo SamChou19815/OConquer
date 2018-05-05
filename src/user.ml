@@ -110,12 +110,6 @@ module Database = struct
 
 end
 
-module FloatMap = Map.Make (struct
-    type t = float
-
-    let compare = Pervasives.compare
-  end)
-
 module MatchMaking = struct
 
   type player = {

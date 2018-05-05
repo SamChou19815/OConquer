@@ -35,9 +35,17 @@ module Int = struct
   let compare = Pervasives.compare
 end
 
+(** [Float] is the float adapter module for [Map]. *)
+module Float = struct
+  type t = float
+  let compare = Pervasives.compare
+end
+
 module PosMap = Map.Make (Position)
 
 module IntMap = Map.Make (Int)
+
+module FloatMap = Map.Make (Float)
 
 module StringMap = Map.Make (String)
 
