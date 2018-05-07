@@ -1,1 +1,22 @@
-<app-register-login (submitted)="registerOrLogin($event)"></app-register-login>
+<mat-card *ngIf="!remoteServerWorks">
+  <mat-card-title>Choose the remote server</mat-card-title>
+  <mat-card-content>
+    <mat-form-field>
+      <input matInput
+             [(ngModel)]="host"
+             placeholder="Remote Server (Domain Only)"
+             type="text"/>
+    </mat-form-field>
+  </mat-card-content>
+  <mat-card-actions>
+    <button color="primary" mat-button (click)="chooseRemoteServer()"
+            [disabled]="host == null || host == undefined">
+      Confirm
+    </button>
+  </mat-card-actions>
+</mat-card>
+<app-register-login *ngIf="remoteServerWorks && !loggedIn"
+                    (submitted)="registerOrLogin($event)"></app-register-login>
+<app-programs-input
+  *ngIf="remoteServerWorks && loggedIn && !inQueryMode"
+  (submitted)="programSubmitted($event)"></app-programs-input>

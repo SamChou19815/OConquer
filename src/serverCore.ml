@@ -71,10 +71,8 @@ let create_handler (m: accepted_method) (path: string)
     (* Refuse to handle unknown methods *)
     | None -> None
     | Some m' ->
-      if m <> m' then None (* Refuse to handle wrong methods *)
-      else if m' = OPTIONS then
-        (* Deal with CORS *)
-        Some (fun _ -> "OK")
+      if m' = OPTIONS then Some (fun _ -> "OK") (* Deal with CORS *)
+      else if m <> m' then None (* Refuse to handle wrong methods *)
       else (
         let uri = Request.uri req in
         (* Refuse to handle wrong paths. *)
