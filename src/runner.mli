@@ -6,6 +6,21 @@ open Definitions
 type running_program
 
 (**
+ * [compile_program is_temp bp wp] will compile the given black and white
+ * programs [bp] [wp]. Depending on whether [is_temp] is true, the output will
+ * be in ["./programs/out-temp"] or in ["./programs/out"].
+ * By default, [is_temp = false].
+ *
+ * Require:
+ * - [is_temp] can be either true/false.
+ * - [bp] [wp] would better be black and white programs.
+ * @return whether the given programs [bp] [wp] compile.
+ * Effect: If program compiles, .class files will be generated in the specified
+ * directory.
+*)
+val compile_program : ?is_temp:bool -> string -> string -> bool
+
+(**
  * [compile_program black_program white_program] compiles a Java program with
  * the specified [class_name] and [program_string].
  * If it compiles, a compiled .class file will be generated and return true.

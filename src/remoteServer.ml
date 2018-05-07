@@ -4,7 +4,7 @@ module type Kernel = sig
   val init : unit -> state
   val register : string -> string -> state -> int option
   val sign_in : string -> string -> state -> int option
-  val submit_programs : int -> string -> string -> state -> unit
+  val submit_programs : int -> string -> string -> state -> bool
   val query_match : int -> int -> state -> string option
   val score_board : state -> string
 end
@@ -85,8 +85,9 @@ module Make (K: Kernel) = struct
         (to_string "black_program", to_string "white_program")
       with _ -> report_bad_input "Bad submit program request!"
     in
-    K.submit_programs token black_program white_program current_state;
-    "OK"
+    if K.submit_programs token black_program white_program current_state then
+      "OK"
+    else "DOES_NOT_COMPILE"
 
   (**
    * [handle_query_request params] handles the query request with the given

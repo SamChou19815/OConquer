@@ -211,18 +211,15 @@ module RemoteServerKernel = struct
     in
     run_on_game_state ()
 
-  let submit_programs (token: int) (b: string) (w: string) (s: state) : unit =
+  let submit_programs (token: int) (b: string) (w: string) (s: state) : bool =
     let open User.MatchMaking in
     (* Find best possible legal program from two players. *)
-    let find_program_opt p1 p2 =
+    let find_program p1 p2 =
       let bp_str = get_black_program_from_player p1 in
       let wp_str = get_white_program_from_player p2 in
       match Command.from_string bp_str wp_str with
-      | Some p -> Some p
-      | None ->
-        let bp_str = get_black_program_from_player p2 in
-        let wp_str = get_white_program_from_player p1 in
-        Command.from_string bp_str wp_str
+      | Some p -> p
+      | None -> failwith "Bad programs got leaked into this step!"
     in
     (**
      * [wait_until_simulation_stops ()] waits until simulation stops.
@@ -248,19 +245,21 @@ module RemoteServerKernel = struct
               let bt = p1 |> get_user_from_player |> User.token in
               let wt = p2 |> get_user_from_player |> User.token in
               let () = s.match_making_queue <- queue' in
-              (* Start next part only if the simulation stops *)
-              let () = wait_until_simulation_stops () in
-              match find_program_opt p1 p2 with
-              | None -> None
-              | Some (bp, wp) -> Some (bt, wt, bp, wp)
+              let (bp, wp) = find_program p1 p2 in
+              Some (bt, wt, bp, wp)
         )
       in
       match info_opt with
       | None -> ()
       | Some (bt, wt, bp, wp) ->
+        (* Start next part only if the simulation stops *)
+        let () = wait_until_simulation_stops () in
         ignore (Thread.create (run_simulation (bt, wt) (bp, wp)) s)
     in
-    ignore (Thread.create processing ())
+    if Runner.compile_program ~is_temp:true b w then
+      let _ = Thread.create processing () in
+      true
+    else false
 
   let query_match (token: int) (round_id: int) (s: state) : string option =
     match IntMap.find_opt token s.game_records with

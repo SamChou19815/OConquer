@@ -2,7 +2,7 @@ open Definitions
 
 type running_program = in_channel * out_channel
 
-let start_program (bp: string) (wp: string) : running_program option =
+let compile_program ?(is_temp: bool = false) (bp: string) (wp: string) : bool =
   let open Unix in
   let program_writer class_name code =
     let f =
@@ -16,12 +16,16 @@ let start_program (bp: string) (wp: string) : running_program option =
   program_writer "BlackProgram" bp;
   program_writer "WhiteProgram" wp;
   (* Compile Code *)
-  match system "javac -d ./programs/out ./programs/src/*.java" with
-  | WSIGNALED _ | WSTOPPED _ -> None
-  | WEXITED id ->
-    if id = 0 then
-      Some (open_process "java -cp ./programs/out ProgramRunner")
-    else None
+  let out_dir = if is_temp then "./programs/out-temp" else "./programs/out" in
+  let cmd = "javac -d " ^ out_dir ^ " ./programs/src/*.java" in
+  match system cmd with
+  | WSIGNALED _ | WSTOPPED _ -> false
+  | WEXITED id -> id = 0
+
+let start_program (bp: string) (wp: string) : running_program option =
+  if compile_program bp wp then
+    Some (Unix.open_process "java -cp ./programs/out ProgramRunner")
+  else None
 
 let get_value
     (reader: string -> 'a)
