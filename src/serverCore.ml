@@ -116,11 +116,14 @@ let create_callback (handlers: handler list) : callback =
                 ~headers:common_header
                 ~status:`Bad_request (* 400 error. *)
                 ~body:("Bad Input. Reason: \n" ^ reason) ()
-            | _ ->
-              Server.respond_error
-                ~headers:common_header
-                ~status:`Internal_server_error (* 500 error. *)
-                ~body:"Internal Error." ()
+            | e ->
+              let r = Server.respond_error
+                  ~headers:common_header
+                  ~status:`Internal_server_error (* 500 error. *)
+                  ~body:"Internal Error." ()
+              in
+              let _= raise e in
+              r
           )
   in
   handle handlers

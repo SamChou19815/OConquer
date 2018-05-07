@@ -52,7 +52,7 @@ module Database = struct
       begin
         Random.self_init ();
         let rec find_non_conflicting_token () =
-          let random_token = Random.int max_int in
+          let random_token = Random.int (1 lsl 25) in
           if IntMap.mem random_token db.token_map then
             find_non_conflicting_token ()
           else random_token
