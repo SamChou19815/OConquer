@@ -6,7 +6,7 @@
 open Cohttp
 
 (** [accepted_method] is all possible accepted methods for this app. *)
-type accepted_method = GET | POST
+type accepted_method = GET | POST | OPTIONS
 
 (** [params] is the type of all the parameter map. *)
 type params = (string * string) list
@@ -59,7 +59,7 @@ val create_handler : accepted_method -> string -> convenient_handler -> handler
  * [test_handler] is a trivial handler that handles GET request at /test which
  * just prints ["It works!"]. It is used as a quick start.
  * As an example, this handler is created by the following code:
- * [create_handler GET "/test" (fun _ b -> "It works!")]
+ * [create_handler GET "/test" (fun _ _ -> "It works!")]
 *)
 val test_handler : handler
 

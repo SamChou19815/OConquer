@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-local-mode-programs-input',
+  selector: 'app-programs-input',
   templateUrl: './programs-input.component.html',
   styleUrls: ['./programs-input.component.css']
 })

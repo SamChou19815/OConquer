@@ -2,7 +2,7 @@ open Lwt
 open Cohttp
 open Cohttp_lwt_unix
 
-type accepted_method = GET | POST
+type accepted_method = GET | POST | OPTIONS
 
 type params = (string * string) list
 
@@ -44,6 +44,19 @@ let query_simplifier : (string * string list) list -> params =
   in
   h []
 
+(** [common_header] is the common header used by all requests. *)
+let common_header : Cohttp.Header.t =
+  let open Cohttp.Header in
+  let add key value h = add h key value in
+  init ()
+  |> add "Access-Control-Allow-Origin" "*"
+  |> add
+    "Access-Control-Allow-Headers"
+    "Content-Type, Authorization, X-Requested-With"
+  |> add "Access-Control-Allow-Methods" "GET, POST, OPTIONS"
+  |> add "Access-Control-Allow-Credentials" "true"
+  |> add "Vary" "Origin"
+
 let create_handler (m: accepted_method) (path: string)
     (h: convenient_handler) : handler =
   fun (conn: Server.conn) (req: Request.t) : (string -> string) option ->
@@ -51,14 +64,17 @@ let create_handler (m: accepted_method) (path: string)
     let method_opt = match Request.meth req with
       | `GET -> Some GET
       | `POST -> Some POST
+      | `OPTIONS -> Some OPTIONS
       | _ -> None
     in
     match method_opt with
     (* Refuse to handle unknown methods *)
     | None -> None
     | Some m' ->
-      (* Refuse to handle wrong methods *)
-      if m <> m' then None
+      if m <> m' then None (* Refuse to handle wrong methods *)
+      else if m' = OPTIONS then
+        (* Deal with CORS *)
+        Some (fun _ -> "OK")
       else (
         let uri = Request.uri req in
         (* Refuse to handle wrong paths. *)
@@ -67,7 +83,7 @@ let create_handler (m: accepted_method) (path: string)
         else None
       )
 
-let test_handler : handler = create_handler GET "/test" (fun _ b -> "It works!")
+let test_handler : handler = create_handler GET "/test" (fun _ _ -> "It works!")
 
 (**
  * [create_callback handlers] automatically creates a callback that can be used
@@ -93,15 +109,19 @@ let create_callback (handlers: handler list) : callback =
             try
               let resp_body = body_handler b in
               Server.respond_string
-                ~status:`OK ~body:resp_body ()
+                ~headers:common_header
+                ~status:`OK
+                ~body:resp_body ()
             with
             | BadInput reason ->
               Server.respond_error
+                ~headers:common_header
                 ~status:`Bad_request (* 400 error. *)
                 ~body:("Bad Input. Reason: \n" ^ reason) ()
             | _ ->
-              Server.respond_error (* 500 error. *)
-                ~status:`Internal_server_error
+              Server.respond_error
+                ~headers:common_header
+                ~status:`Internal_server_error (* 500 error. *)
                 ~body:"Internal Error." ()
           )
   in

@@ -27,6 +27,15 @@ module Make (K: Kernel) = struct
     body |> from_string |> to_assoc
 
   (**
+   * [handle_echo_request _ _] simply prints OK to indicate there is a server
+   * with this address.
+   *
+   * Requires: None.
+   * @return ["OK"].
+  *)
+  let handle_echo_request _ _ : string = "OK"
+
+  (**
    * [handle_register_request _ body] handles the register request with the
    * given [body].
    *
@@ -117,9 +126,10 @@ module Make (K: Kernel) = struct
 
   (** [handlers] contains a list of defined handlers. *)
   let handlers = [
+    create_handler GET "/apis/remote/echo" handle_echo_request;
     create_handler POST "/apis/remote/register" handle_register_request;
-    create_handler GET "/apis/remote/sign_in" handle_sign_in_request;
-    create_handler GET "/apis/remote/submit_programs"
+    create_handler POST "/apis/remote/sign_in" handle_sign_in_request;
+    create_handler POST "/apis/remote/submit_programs"
       handle_submit_programs_request;
     create_handler GET "/apis/remote/query" handle_query_request;
     create_handler GET "/apis/remote/score_board" handle_score_board_request;

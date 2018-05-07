@@ -68,7 +68,18 @@ export interface MapContent {
   milUnit?: MilUnit | null;
 }
 
+/**
+ * Definition for the entire game report.
+ */
 export interface GameReport {
   logs: MapContent[][];
   status: GameStatus;
+}
+
+/**
+ * Definition for one row of score board.
+ */
+export interface ScoreBoardRow {
+  username: string;
+  rating: number;
 }

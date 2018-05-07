@@ -24,7 +24,7 @@ export class LocalModeNetworkService {
    *
    * @param {string} blackProgram the program of black player.
    * @param {string} whiteProgram the program of white player.
-   * @param {(report: string) => void} callback callback processor to process
+   * @param {(report: boolean) => void} callback callback processor to process
    * when submission succeeds to fails (true or false).
    */
   startSimulation(blackProgram: string, whiteProgram: string,
