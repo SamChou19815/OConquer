@@ -58,7 +58,7 @@ module Database = struct
           else random_token
         in
         let token = find_non_conflicting_token () in
-        let user = { username; password; token; rating = 0. } in
+        let user = { username; password; token; rating = 100. } in
         let db' = {
           token_map = IntMap.add token user db.token_map;
           username_map = StringMap.add username user db.username_map;
@@ -134,27 +134,54 @@ module MatchMaking = struct
 
   let empty_queue : queue = FloatMap.empty
 
+  (**
+   * [accept_player player queue] accepts a [player] a matching queue [queue].
+   *
+   * Requires:
+   * - [player] is a legal player and the player's rating cannot be the same
+   *   as someone else's rating in the database.
+   * - [queue] is a legal queue.
+   * @return the resultant matching queue with the accepted user.
+  *)
   let accept_player (player: player) : queue -> queue =
     FloatMap.add player.user.rating player
 
+  (**
+   * [form_match_helper q acc] helps to find the min diff pair in an assoc list
+   * with rating key and player value.
+   *
+   * Requires:
+   * - [q] is the list to find the min diff pair.
+   * - [acc = (currnet_min, player1, player2)] contains the currnet minimum
+   *   [currnet_min] and two players [player1] [player2] whose rating difference
+   *   correspond to that difference.
+   * @return the global min, player1, player2.
+  *)
+  let rec form_match_helper (q: (float * player) list)
+      (acc: float * player * player) : (float * player * player) =
+    let (acc_min, p1, p2) = acc in
+    match q with
+    | [] | _::[] -> acc
+    | (rating1, p3)::((rating2, p4)::_ as tl) ->
+      let temp_rating = rating2 -. rating1 in
+      let acc' =
+        if temp_rating < acc_min then (temp_rating, p3, p4)
+        else (acc_min, p1, p2)
+      in
+      form_match_helper tl acc'
+
+  (**
+   * [form_match queue] tries to form a match from the given [queue].
+   * If it can form a match, a new unformed queue and the matching results will
+   * be returned. If not, [None] will be returned.
+   *
+   * Requires: [queue] is a legal queue.
+   * @return [None] if matching is impossible; [Some (queue', tokens, programs)]
+   * where [queue'] is the new resultant queue, and [tokens] and [programs] are
+   * those selected for a match.
+  *)
   let form_match (queue: queue) : (queue * player * player) option =
-    (* Helps to the the min diff pair. *)
-    let rec form_match_helper (q: (float * player) list)
-        (acc: float * player * player) : (float * player * player) =
-      let (acc_min, p1, p2) = acc in
-      match q with
-      | [] | _::[] -> acc
-      | (rating1, p3)::((rating2, p4)::_ as tl) ->
-        let temp_rating = rating2 -. rating1 in
-        let acc' =
-          if temp_rating < acc_min then (temp_rating, p3, p4)
-          else (acc_min, p1, p2)
-        in
-        form_match_helper tl acc'
-    in
-    let bindings = FloatMap.bindings queue in
-    let () = List.iter (fun (_, p) -> print_string (p.user.username ^ " ")) bindings in
-    match bindings with
+    match FloatMap.bindings queue with
     | [] | _::[] -> None
     | (rating1, p1)::((rating2, p2)::_ as tl) ->
       let curr_diff_min = rating2 -. rating1 in
@@ -163,5 +190,19 @@ module MatchMaking = struct
       in
       let queue' = FloatMap.(queue |> remove rating1 |> remove rating2) in
       Some (queue', player1, player2)
+
+  let accept_and_form_match (new_player: player)
+      (queue: queue) : ((player * player) option * queue) =
+    let new_player_rating = new_player.user.rating in
+    match FloatMap.find_opt new_player_rating queue with
+    | Some existing_player_with_same_rating ->
+      let players = (existing_player_with_same_rating, new_player) in
+      let queue' = FloatMap.remove new_player_rating queue in
+      (Some players, queue')
+    | None ->
+      let queue' = accept_player new_player queue in
+      match form_match queue' with
+      | None -> (None, queue')
+      | Some (queue'', player1, player2) -> (Some (player1, player2), queue'')
 
 end

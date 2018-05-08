@@ -172,25 +172,19 @@ module MatchMaking : sig
   val empty_queue : queue
 
   (**
-   * [accept_player player queue] accepts a [player] a matching queue [queue].
+   * [accept_and_form_match new_player queue] accepts a new player into the
+   * [queue] and immediately tries to form a match.
+   * The resultant match and the queue without the matched will be given back.
    *
    * Requires:
-   * - [player] is a legal player.
+   * - [new_player] is a legal player.
    * - [queue] is a legal queue.
-   * @return the resultant matching queue with the accepted user.
+   * @return if a match cannot be formed, [(None, queue')] will be given where
+   * [queue'] if the queue with the added player. Else, [Some (p1, p2), queue']
+   * will be returned, where [p1] [p2] are the matched players and [queue'] is
+   * the queue with [new_player] added and [p1] [p2] removed.
   *)
-  val accept_player : player -> queue -> queue
-
-  (**
-   * [form_match queue] tries to form a match from the given [queue].
-   * If it can form a match, a new unformed queue and the matching results will
-   * be returned. If not, [None] will be returned.
-   *
-   * Requires: [queue] is a legal queue.
-   * @return [None] if matching is impossible; [Some (queue', tokens, programs)]
-   * where [queue'] is the new resultant queue, and [tokens] and [programs] are
-   * those selected for a match.
-  *)
-  val form_match : queue -> (queue * player * player) option
+  val accept_and_form_match : player
+    -> queue -> (player * player) option * queue
 
 end

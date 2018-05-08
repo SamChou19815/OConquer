@@ -190,6 +190,9 @@ module RemoteServerKernel = struct
         | BlackWins | WhiteWins | Draw ->
           let () = s.running <- false in
           let () = Command.stop_program p in
+          let () =
+            s.user_db <- User.Database.update_rating game_status bt wt s.user_db
+          in
           true
         | InProgress ->
           let (next_state, diff_record) = Engine.next !game_state in
@@ -229,15 +232,15 @@ module RemoteServerKernel = struct
       | None -> ()
       | Some user ->
         let player = create_player user b w in
-        let queue = accept_player player s.match_making_queue in
+        let (players_opt, queue) =
+          accept_and_form_match player s.match_making_queue
+        in
         let () = s.match_making_queue <- queue in
-        match form_match s.match_making_queue with
-        | None -> print_endline "Unable to form a match right now!"
-        | Some (queue', p1, p2) ->
-          let () = print_endline "We can potentially form a match!" in
+        match players_opt with
+        | None -> ()
+        | Some (p1, p2) ->
           let bt = p1 |> get_user_from_player |> User.token in
           let wt = p2 |> get_user_from_player |> User.token in
-          let () = s.match_making_queue <- queue' in
           let (bp, wp) = find_program p1 p2 in
           (* Start next part only if the simulation stops *)
           let () = print_endline "Waiting for another simulation to stop!" in
