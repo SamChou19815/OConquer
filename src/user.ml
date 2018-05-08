@@ -69,7 +69,9 @@ module Database = struct
   let sign_in (username: string) (password: string) (db: t) : int option =
     match StringMap.find_opt username db.username_map with
     | None -> None
-    | Some user -> Some user.token
+    | Some user ->
+      if user.password = password then Some user.token
+      else None
 
   let has_token (token: int) (db: t) : bool = IntMap.mem token db.token_map
 
