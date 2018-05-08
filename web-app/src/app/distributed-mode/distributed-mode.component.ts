@@ -255,6 +255,15 @@ export class DistributedModeComponent implements OnInit {
   }
 
   /**
+   * Let user resubmit their program.
+   */
+  resubmitProgram() {
+    this._gameBoard.reset();
+    this._inQueryMode = false;
+    this._gameDataAvailable = false;
+  }
+
+  /**
    * Display the running game.
    */
   displayRunningGame() {
@@ -267,6 +276,7 @@ export class DistributedModeComponent implements OnInit {
    */
   hideGameDisplay() {
     this._inQueryMode = false;
+    this._gameDataAvailable = false;
   }
 
 }
