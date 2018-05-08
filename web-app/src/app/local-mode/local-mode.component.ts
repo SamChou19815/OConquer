@@ -65,6 +65,15 @@ export class LocalModeComponent implements OnInit {
   }
 
   /**
+   * Report whether the game data is available.
+   *
+   * @returns {boolean} whether the game data is available.
+   */
+  get gameDataAvailable(): boolean {
+    return this._gameBoard !== null && this._gameBoard !== undefined;
+  }
+
+  /**
    * Sleep for a while.
    */
   private async sleep(): Promise<void> {

@@ -10,13 +10,14 @@ import {
 import {
   DistributedModeNetworkService
 } from './distributed-mode-network.service';
+import { ScoreBoardComponent } from './score-board/score-board.component';
 
 @NgModule({
   imports: [
     SharedModule,
     DistributedModeRoutingModule
   ],
-  declarations: [DistributedModeComponent, RegisterLoginComponent],
+  declarations: [DistributedModeComponent, RegisterLoginComponent, ScoreBoardComponent],
   providers: [DistributedModeNetworkService]
 })
 export class DistributedModeModule {

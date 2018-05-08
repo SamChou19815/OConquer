@@ -12,6 +12,10 @@ export class GameDisplayComponent implements OnInit {
    * The current game board to be displayed.
    */
   @Input() game: GameBoard;
+  /**
+   * Report whether the game data is available.
+   */
+  @Input() gameDataAvailable: boolean;
 
   constructor() {
   }

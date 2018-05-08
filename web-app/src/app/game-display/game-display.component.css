@@ -5,3 +5,6 @@
   column-fill: initial;
 }
 
+.not-available {
+  opacity: 0.7;
+}

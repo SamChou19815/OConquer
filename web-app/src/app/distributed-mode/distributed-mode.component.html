@@ -1,3 +1,30 @@
+<mat-card *ngIf="remoteServerWorks">
+  <mat-card-title>Control Panel</mat-card-title>
+  <mat-card-actions>
+    <button color="primary" mat-button (click)="tryAnotherServer()">
+      Try Another Server
+    </button>
+    <button color="primary" mat-button
+            *ngIf="loggedIn" (click)="logout()">
+      Log Out
+    </button>
+    <button color="primary"
+            *ngIf="loggedIn"
+            mat-button (click)="reset()">
+      Resubmit Program
+    </button>
+    <button color="primary"
+            *ngIf="loggedIn && !inQueryMode"
+            mat-button (click)="displayRunningGame()">
+      Display Running Game
+    </button>
+    <button color="primary"
+            *ngIf="loggedIn && inQueryMode"
+            mat-button (click)="hideGameDisplay()">
+      Hide Game Display
+    </button>
+  </mat-card-actions>
+</mat-card>
 <mat-card *ngIf="!remoteServerWorks">
   <mat-card-title>Choose the remote server</mat-card-title>
   <mat-card-content>
@@ -20,3 +47,8 @@
 <app-programs-input
   *ngIf="remoteServerWorks && loggedIn && !inQueryMode"
   (submitted)="programSubmitted($event)"></app-programs-input>
+<app-game-display *ngIf="inQueryMode"
+                  [game]="game"
+                  [gameDataAvailable]="gameDataAvailable"></app-game-display>
+<app-score-board *ngIf="remoteServerWorks"
+                 [scoreBoard]="scoreBoard"></app-score-board>

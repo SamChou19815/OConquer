@@ -125,9 +125,15 @@ export class DistributedModeNetworkService {
    * @param {(report: GameReport) => void} callback callback processor.
    */
   query(host: string, token: string, roundID: number,
-        callback: (report: GameReport) => void): void {
+        callback: (report: GameReport | null) => void): void {
     const url = getUrl(host, `query?token=${token}&round_id=${roundID}`);
-    this.http.get<GameReport>(url).subscribe(callback);
+    this.http.get<GameReport | string>(url).subscribe(resp => {
+      if (typeof resp === 'string') {
+        callback(null);
+      } else {
+        callback(resp);
+      }
+    });
   }
 
   /**

@@ -1,9 +1,15 @@
-<mat-card>
-  <mat-card-title>Game Status: {{game.status}}</mat-card-title>
-  <mat-card-title *ngIf="game.numberOfTurns !== 1">
+<mat-card [class.not-available]="!gameDataAvailable"
+          [attr.disabled]="!gameDataAvailable">
+  <mat-card-title *ngIf="!gameDataAvailable">
+    Game data is currently unavailable. :(
+  </mat-card-title>
+  <mat-card-title *ngIf="gameDataAvailable">
+    Game Status: {{game.status}}
+  </mat-card-title>
+  <mat-card-title *ngIf="gameDataAvailable && game.numberOfTurns > 1">
     Number of turns: {{game.numberOfTurns}}
   </mat-card-title>
-  <mat-card-content class="tile-container">
+  <mat-card-content class="tile-container" *ngIf="gameDataAvailable">
     <div *ngFor="let row of game.board; let i = index"
          [attr.data-index]="i">
       <app-map-content *ngFor="let mapContent of row"

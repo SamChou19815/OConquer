@@ -114,7 +114,7 @@ module Make (K: Kernel) = struct
     in
     match K.query_match token id current_state with
     | Some s -> s
-    | None -> "NOT_AVAILABLE"
+    | None -> {|"NOT_AVAILABLE"|}
 
   (**
    * [handle_score_board_request _ _] handles the score board request.
