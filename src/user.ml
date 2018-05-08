@@ -152,7 +152,9 @@ module MatchMaking = struct
         in
         form_match_helper tl acc'
     in
-    match FloatMap.bindings queue with
+    let bindings = FloatMap.bindings queue in
+    let () = List.iter (fun (_, p) -> print_string (p.user.username ^ " ")) bindings in
+    match bindings with
     | [] | _::[] -> None
     | (rating1, p1)::((rating2, p2)::_ as tl) ->
       let curr_diff_min = rating2 -. rating1 in

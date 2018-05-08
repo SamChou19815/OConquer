@@ -231,38 +231,40 @@ module RemoteServerKernel = struct
       done
     in
     (* DO the main processing. To be run in a new thread. *)
-    let processing () =
-      let info_opt = synchronized s.mutex (fun () ->
-          match User.Database.get_user_opt_by_token token s.user_db with
-          | None -> None
-          | Some user ->
-            let player = create_player user b w in
-            let queue = accept_player player s.match_making_queue in
-            let () = s.match_making_queue <- queue in
-            match form_match queue with
-            | None -> None
-            | Some (queue', p1, p2) ->
-              let bt = p1 |> get_user_from_player |> User.token in
-              let wt = p2 |> get_user_from_player |> User.token in
-              let () = s.match_making_queue <- queue' in
-              let (bp, wp) = find_program p1 p2 in
-              Some (bt, wt, bp, wp)
-        )
-      in
-      match info_opt with
-      | None -> ()
-      | Some (bt, wt, bp, wp) ->
-        (* Start next part only if the simulation stops *)
-        let () = wait_until_simulation_stops () in
-        ignore (Thread.create (run_simulation (bt, wt) (bp, wp)) s)
+    let processing () = synchronized s.mutex (fun () ->
+        match User.Database.get_user_opt_by_token token s.user_db with
+        | None -> ()
+        | Some user ->
+          let player = create_player user b w in
+          let queue = accept_player player s.match_making_queue in
+          let () = s.match_making_queue <- queue in
+          match form_match queue with
+          | None -> print_endline "Unable to form a match right now!"
+          | Some (queue', p1, p2) ->
+            let () = print_endline "We can potentially form a match!" in
+            let bt = p1 |> get_user_from_player |> User.token in
+            let wt = p2 |> get_user_from_player |> User.token in
+            let () = s.match_making_queue <- queue' in
+            let (bp, wp) = find_program p1 p2 in
+            (* Start next part only if the simulation stops *)
+            let () = print_endline "Waiting for another simulation to stop!" in
+            let () = wait_until_simulation_stops () in
+            let () = print_endline "Simulation Started!" in
+            ignore (Thread.create (run_simulation (bt, wt) (bp, wp)) s)
+      )
     in
-    if Runner.compile_program ~is_temp:true b w then
-      let _ = Thread.create processing () in
-      true
-    else false
+    let programs_compile =
+      synchronized s.mutex
+        (fun () -> Runner.compile_program ~is_temp:true b w)
+    in
+    let () = if programs_compile then ignore(Thread.create processing ()) in
+    programs_compile
 
   let query_match (token: int) (round_id: int) (s: state) : string option =
-    match IntMap.find_opt token s.game_records with
+    let game_record_opt =
+      synchronized s.mutex (fun () -> IntMap.find_opt token s.game_records)
+    in
+    match game_record_opt with
     | None -> None
     | Some game_record ->
       begin
