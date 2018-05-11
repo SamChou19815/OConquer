@@ -5,8 +5,7 @@ exception BadTileInput
 let num_of_soldier_increase : t -> int = function
   | Mountain -> raise BadTileInput
   | Empty | Fort -> 0
-  | City i ->
-    int_of_float (GameConstants.increase_soldier_factor *. float_of_int i)
+  | City i -> GameConstants.increase_soldier_factor * i
 
 let defender_bonus : t -> float = function
   | Mountain -> raise BadTileInput

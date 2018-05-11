@@ -37,7 +37,7 @@ val retreat_leadership_penalty : int
  * [increase_soldier_factor] defines how the number of soldiers increase scales
  * with city level.
 *)
-val increase_soldier_factor : float
+val increase_soldier_factor : int
 
 (**
  * [base_attack_damage] defines the number of soldiers died due to an single
