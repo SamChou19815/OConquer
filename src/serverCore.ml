@@ -92,42 +92,56 @@ let create_handler (m: accepted_method) (path: string)
 let create_callback (handlers: handler list) : callback =
   let rec handle (lst: handler list) (conn: Server.conn)
       (req: Request.t) (body: Cohttp_lwt__Body.t) : response =
-    match req |> Request.uri |> Uri.path with
-    (** Serve some files. *)
-    | "/downloads/MANUAL" -> Server.respond_file "MANUAL.md" ()
-    | "/downloads/SDK" -> Server.respond_file "programs/dist/SDK.zip" ()
-    | _ -> match lst with
-      (* Case 1: No handler can handle this request, give a 404 error. *)
-      | [] -> Server.respond_error ~status:`Not_found ~body:"Not Found" ()
-      | h::others ->
-        match h conn req with
-        (* If cannot handle, move on to the next ones. *)
-        | None -> handle others conn req body
-        | Some body_handler ->
-          (* Handle the request.
-           * It does the dirty callback hell for the clients. *)
-          body |> Cohttp_lwt.Body.to_string >>= (fun b ->
-              try
-                let resp_body = body_handler b in
-                Server.respond_string
-                  ~headers:common_header
-                  ~status:`OK
-                  ~body:resp_body ()
-              with
-              | BadInput reason ->
-                Server.respond_error
-                  ~headers:common_header
-                  ~status:`Bad_request (* 400 error. *)
-                  ~body:("Bad Input. Reason: \n" ^ reason) ()
-              | e ->
-                let r = Server.respond_error
+    let path = req |> Request.uri |> Uri.path in
+    if path = "/" then
+      Server.respond_file ("web-app/dist/index.html") ()
+    else if path = "/home" then
+      Server.respond_file ("web-app/dist/index.html") ()
+    else if path = "/local" then
+      Server.respond_file ("web-app/dist/index.html") ()
+    else if path = "/distributed" then
+      Server.respond_file ("web-app/dist/index.html") ()
+    else if path = "/downloads/MANUAL" then
+      Server.respond_file "MANUAL.md" ()
+    else if path = "/downloads/SDK" then
+      Server.respond_file "programs/dist/SDK.zip" ()
+    else
+      let is_not_api = try String.sub path 0 6 <> "/apis/" with _ -> true in
+      if is_not_api then
+        Server.respond_file ("web-app/dist" ^ path) ()
+      else
+        match lst with
+        (* Case 1: No handler can handle this request, give a 404 error. *)
+        | [] -> Server.respond_error ~status:`Not_found ~body:"Not Found" ()
+        | h::others ->
+          match h conn req with
+          (* If cannot handle, move on to the next ones. *)
+          | None -> handle others conn req body
+          | Some body_handler ->
+            (* Handle the request.
+             * It does the dirty callback hell for the clients. *)
+            body |> Cohttp_lwt.Body.to_string >>= (fun b ->
+                try
+                  let resp_body = body_handler b in
+                  Server.respond_string
                     ~headers:common_header
-                    ~status:`Internal_server_error (* 500 error. *)
-                    ~body:"Internal Error." ()
-                in
-                let _= raise e in
-                r
-            )
+                    ~status:`OK
+                    ~body:resp_body ()
+                with
+                | BadInput reason ->
+                  Server.respond_error
+                    ~headers:common_header
+                    ~status:`Bad_request (* 400 error. *)
+                    ~body:("Bad Input. Reason: \n" ^ reason) ()
+                | e ->
+                  let r = Server.respond_error
+                      ~headers:common_header
+                      ~status:`Internal_server_error (* 500 error. *)
+                      ~body:"Internal Error." ()
+                  in
+                  let _= raise e in
+                  r
+              )
   in
   handle handlers
 

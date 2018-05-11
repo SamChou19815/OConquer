@@ -4,6 +4,13 @@ main:
 test:
 	ocamlbuild -use-ocamlfind src/test.byte && ./test.byte
 
+build:
+	mkdir -p programs/out
+	mkdir -p programs/out-temp
+	mkdir -p programs/dist
+	cd web-app; npm install && npm run build
+	ocamlbuild -use-ocamlfind src/main.byte
+
 docs:
 	mkdir -p docs
 	ocamldoc -html -d docs/ -colorize-code -short-functors -stars -keep-code \
