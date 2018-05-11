@@ -2,5 +2,9 @@
   "/apis/": {
     "target": "http://localhost:8080",
     "secure": false
+  },
+  "/downloads/": {
+    "target": "http://localhost:8080",
+    "secure": false
   }
 }

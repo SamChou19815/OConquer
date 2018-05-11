@@ -26,6 +26,7 @@ docs/
 
 /programs/.idea/*
 /programs/*.iml
+/programs/dist/
 *.class
 
 ## START for web app

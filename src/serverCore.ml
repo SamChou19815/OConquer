@@ -2,7 +2,7 @@ open Lwt
 open Cohttp
 open Cohttp_lwt_unix
 
-type accepted_method = GET | POST | OPTIONS
+type accepted_method = GET | POST
 
 type params = (string * string) list
 
@@ -61,27 +61,26 @@ let create_handler (m: accepted_method) (path: string)
     (h: convenient_handler) : handler =
   fun (conn: Server.conn) (req: Request.t) : (string -> string) option ->
     (* Only accept GET or POST *)
-    let method_opt = match Request.meth req with
-      | `GET -> Some GET
-      | `POST -> Some POST
-      | `OPTIONS -> Some OPTIONS
-      | _ -> None
-    in
-    match method_opt with
-    (* Refuse to handle unknown methods *)
-    | None -> None
-    | Some m' ->
-      if m' = OPTIONS then Some (fun _ -> "OK") (* Deal with CORS *)
-      else if m <> m' then None (* Refuse to handle wrong methods *)
-      else (
-        let uri = Request.uri req in
-        (* Refuse to handle wrong paths. *)
-        if Uri.path uri = path then
-          Some (uri |> Uri.query |> query_simplifier |> h)
-        else None
-      )
-
-let test_handler : handler = create_handler GET "/test" (fun _ _ -> "It works!")
+    if Request.meth req = `OPTIONS then
+      Some (fun _ -> "OK") (* Deal with CORS *)
+    else
+      let method_opt = match Request.meth req with
+        | `GET -> Some GET
+        | `POST -> Some POST
+        | _ -> None
+      in
+      match method_opt with
+      (* Refuse to handle unknown methods *)
+      | None -> None
+      | Some m' ->
+        if m <> m' then None (* Refuse to handle wrong methods *)
+        else (
+          let uri = Request.uri req in
+          (* Refuse to handle wrong paths. *)
+          if Uri.path uri = path then
+            Some (uri |> Uri.query |> query_simplifier |> h)
+          else None
+        )
 
 (**
  * [create_callback handlers] automatically creates a callback that can be used
@@ -93,38 +92,42 @@ let test_handler : handler = create_handler GET "/test" (fun _ _ -> "It works!")
 let create_callback (handlers: handler list) : callback =
   let rec handle (lst: handler list) (conn: Server.conn)
       (req: Request.t) (body: Cohttp_lwt__Body.t) : response =
-    match lst with
-    (* Case 1: No handler can handle this request, give a 404 error. *)
-    | [] -> Server.respond_error ~status:`Not_found ~body:"Not Found" ()
-    | h::others ->
-      match h conn req with
-      (* If cannot handle, move on to the next ones. *)
-      | None -> handle others conn req body
-      | Some body_handler ->
-        (* Handle the request.
-         * It does the dirty callback hell for the clients. *)
-        body |> Cohttp_lwt.Body.to_string >>= (fun b ->
-            try
-              let resp_body = body_handler b in
-              Server.respond_string
-                ~headers:common_header
-                ~status:`OK
-                ~body:resp_body ()
-            with
-            | BadInput reason ->
-              Server.respond_error
-                ~headers:common_header
-                ~status:`Bad_request (* 400 error. *)
-                ~body:("Bad Input. Reason: \n" ^ reason) ()
-            | e ->
-              let r = Server.respond_error
+    match req |> Request.uri |> Uri.path with
+    (** Serve some files. *)
+    | "/downloads/MANUAL" -> Server.respond_file "MANUAL.md" ()
+    | "/downloads/SDK" -> Server.respond_file "programs/dist/SDK.zip" ()
+    | _ -> match lst with
+      (* Case 1: No handler can handle this request, give a 404 error. *)
+      | [] -> Server.respond_error ~status:`Not_found ~body:"Not Found" ()
+      | h::others ->
+        match h conn req with
+        (* If cannot handle, move on to the next ones. *)
+        | None -> handle others conn req body
+        | Some body_handler ->
+          (* Handle the request.
+           * It does the dirty callback hell for the clients. *)
+          body |> Cohttp_lwt.Body.to_string >>= (fun b ->
+              try
+                let resp_body = body_handler b in
+                Server.respond_string
                   ~headers:common_header
-                  ~status:`Internal_server_error (* 500 error. *)
-                  ~body:"Internal Error." ()
-              in
-              let _= raise e in
-              r
-          )
+                  ~status:`OK
+                  ~body:resp_body ()
+              with
+              | BadInput reason ->
+                Server.respond_error
+                  ~headers:common_header
+                  ~status:`Bad_request (* 400 error. *)
+                  ~body:("Bad Input. Reason: \n" ^ reason) ()
+              | e ->
+                let r = Server.respond_error
+                    ~headers:common_header
+                    ~status:`Internal_server_error (* 500 error. *)
+                    ~body:"Internal Error." ()
+                in
+                let _= raise e in
+                r
+            )
   in
   handle handlers
 
