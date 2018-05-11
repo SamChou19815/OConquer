@@ -1,4 +1,4 @@
-# CS 3110 Final Project - OConquer GAME MANUAL
+# CS 3110 Final Project - OConquer Manual
 
 ## Background
 
@@ -19,7 +19,7 @@ actions under different situations.
 You play the game by submitting a program that control your military unit.
 If the programs compile, then the game will start.
 
-The game runs in descrete rounds on a `map_width` times `map_height` world map.
+The game runs in discrete rounds on a `map_width` times `map_height` world map.
 In each round, we will sequentially execute all the programs of all the existing
 military unit in the world map to decide their action, then we execute their
 action. The new produced military unit in this round will also execute their
@@ -158,7 +158,7 @@ let map_width = 10
 
 let map_height = 10
 
-let max_turns = 100
+let max_turns = 500
 
 let training_morale_boost = 1
 

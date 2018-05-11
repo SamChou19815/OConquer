@@ -2,9 +2,10 @@
   *ngIf="!isInGame" (submitted)="programSubmitted($event)"></app-programs-input>
 <app-game-display *ngIf="isInGame"
                   [game]="game"
-                  [gameDataAvailable]="gameDataAvailable"></app-game-display>
+                  [gameDataAvailable]="true"></app-game-display>
 <mat-card *ngIf="isInGameButStopped">
   <mat-card-actions>
     <button color="primary" mat-button (click)="reset()">Reset</button>
+    <button color="primary" mat-button (click)="replay()">Replay</button>
   </mat-card-actions>
 </mat-card>

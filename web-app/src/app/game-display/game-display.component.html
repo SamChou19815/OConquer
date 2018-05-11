@@ -4,7 +4,7 @@
     Game data is currently unavailable. :(
   </mat-card-title>
   <mat-card-title *ngIf="gameDataAvailable">
-    Game Status: {{game.status}}
+    Game Status: {{gameStatus}}
   </mat-card-title>
   <mat-card-title *ngIf="gameDataAvailable && game.numberOfTurns > 1">
     Number of turns: {{game.numberOfTurns}}

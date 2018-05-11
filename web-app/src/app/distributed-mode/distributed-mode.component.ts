@@ -3,7 +3,9 @@ import {
   DistributedModeNetworkService
 } from './distributed-mode-network.service';
 import { GameStatus, ScoreBoardRow } from '../definitions';
-import { GameBoard } from '../game-state';
+import { GameBoard } from '../game-board';
+import { GameState } from '../game-state';
+import { sleep } from '../util';
 
 @Component({
   selector: 'app-distributed-mode',
@@ -21,9 +23,13 @@ export class DistributedModeComponent implements OnInit {
    */
   private token: string;
   /**
+   * The current game state.
+   */
+  private readonly _gameState: GameState;
+  /**
    * The current game board.
    */
-  private readonly _gameBoard: GameBoard;
+  // private readonly _gameBoard: GameBoard;
   /**
    * The current displayed score board.
    */
@@ -44,6 +50,11 @@ export class DistributedModeComponent implements OnInit {
    */
   private _inQueryMode = false;
   /**
+   * A flag to record whether the user is in query mode and the game has ended.
+   * @type {boolean}
+   */
+  private _inQueryModeAndEnded = false;
+  /**
    * A flag to record whether the game data is available.
    * @type {boolean}
    */
@@ -55,7 +66,8 @@ export class DistributedModeComponent implements OnInit {
    * @param {LocalModeNetworkService} networkService the network service.
    */
   constructor(private networkService: DistributedModeNetworkService) {
-    this._gameBoard = new GameBoard();
+    this._gameState = new GameState();
+    // this._gameBoard = new GameBoard();
   }
 
   ngOnInit() {
@@ -89,6 +101,15 @@ export class DistributedModeComponent implements OnInit {
   }
 
   /**
+   * Report whether the user is in query mode and ended.
+   *
+   * @returns {boolean} whether the user is in query mode and ended.
+   */
+  get inQueryModeAndEnded(): boolean {
+    return this._inQueryModeAndEnded;
+  }
+
+  /**
    * Report whether the game data is available.
    *
    * @returns {boolean} whether the game data is available.
@@ -103,7 +124,7 @@ export class DistributedModeComponent implements OnInit {
    * @returns {GameBoard} the current game board.
    */
   get game(): GameBoard {
-    return this._gameBoard;
+    return this._gameState.gameBoard;
   }
 
   /**
@@ -172,22 +193,12 @@ export class DistributedModeComponent implements OnInit {
       blackProgram, whiteProgram, isSuccessful => {
         if (isSuccessful) {
           this._inQueryMode = true;
-          this.makeQuery();
+          sleep(2000).then(() => this.makeQuery());
         } else {
           this._inQueryMode = false;
           alert('Your code does not compile!');
         }
       });
-  }
-
-  /**
-   * Sleep for a while.
-   *
-   * @param {number} time number of MS to sleep.
-   * @returns {Promise<void>} the promise after sleep.
-   */
-  private async sleep(time: number): Promise<void> {
-    await new Promise<void>(resolve => setTimeout(resolve, time));
   }
 
   /**
@@ -198,20 +209,22 @@ export class DistributedModeComponent implements OnInit {
       return;
     }
     this.networkService.query(this.host, this.token,
-      this._gameBoard.numberOfTurns, report => {
+      this._gameState.gameBoard.numberOfTurns, report => {
         if (report === null) {
           this._gameDataAvailable = false;
           this._inQueryMode = true;
-          this.sleep(2000).then(() => this.makeQuery());
+          sleep(2000).then(() => this.makeQuery());
           return;
         }
         this._gameDataAvailable = true;
-        this._gameBoard.applyChanges(report);
+        this._gameState.applyChanges(report);
         if (report.status === GameStatus.IN_PROGRESS) {
           this._inQueryMode = true;
-          this.sleep(400).then(() => this.makeQuery());
+          this._inQueryModeAndEnded = false;
+          sleep(400).then(() => this.makeQuery());
         } else {
           this._inQueryMode = true;
+          this._inQueryModeAndEnded = true;
         }
       });
   }
@@ -225,7 +238,7 @@ export class DistributedModeComponent implements OnInit {
     }
     this.networkService.scoreBoard(this.host, scoreBord => {
       this._scoreBoard = scoreBord;
-      this.sleep(3000).then(() => this.reloadScoreBoard());
+      sleep(2000).then(() => this.reloadScoreBoard());
     });
   }
 
@@ -235,11 +248,12 @@ export class DistributedModeComponent implements OnInit {
   tryAnotherServer(): void {
     this.host = undefined;
     this.token = undefined;
-    this._gameBoard.reset();
+    this._gameState.reset();
     this._scoreBoard = undefined;
     this._remoteServerWorks = false;
     this._loggedIn = false;
     this._inQueryMode = false;
+    this._inQueryModeAndEnded = false;
     this._gameDataAvailable = false;
   }
 
@@ -248,9 +262,10 @@ export class DistributedModeComponent implements OnInit {
    */
   logout(): void {
     this.token = undefined;
-    this._gameBoard.reset();
+    this._gameState.reset();
     this._loggedIn = false;
     this._inQueryMode = false;
+    this._inQueryModeAndEnded = false;
     this._gameDataAvailable = false;
   }
 
@@ -258,9 +273,21 @@ export class DistributedModeComponent implements OnInit {
    * Let user resubmit their program.
    */
   resubmitProgram() {
-    this._gameBoard.reset();
+    this._gameState.reset();
     this._inQueryMode = false;
+    this._inQueryModeAndEnded = false;
     this._gameDataAvailable = false;
+  }
+
+  /**
+   * Replay the entire game. It can be called only after game finished.
+   */
+  replay(): void {
+    this._inQueryMode = true;
+    this._inQueryModeAndEnded = false;
+    this._gameState.replay(() => {
+      this._inQueryModeAndEnded = true;
+    });
   }
 
   /**

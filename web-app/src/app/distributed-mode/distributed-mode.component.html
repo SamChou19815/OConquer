@@ -14,9 +14,14 @@
       Resubmit Program
     </button>
     <button color="primary"
+            *ngIf="loggedIn && inQueryMode && inQueryModeAndEnded"
+            mat-button (click)="replay()">
+      Replay
+    </button>
+    <button color="primary"
             *ngIf="loggedIn && !inQueryMode"
             mat-button (click)="displayRunningGame()">
-      Display Running Game
+      Display Last/Current Game
     </button>
     <button color="primary"
             *ngIf="loggedIn && inQueryMode"

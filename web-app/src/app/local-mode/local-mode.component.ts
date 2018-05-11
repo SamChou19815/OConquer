@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { LocalModeNetworkService } from './local-mode-network.service';
-import { GameBoard } from '../game-state';
+import { GameState } from '../game-state';
 import { GameStatus } from '../definitions';
+import { sleep } from '../util';
+import { GameBoard } from '../game-board';
 
 @Component({
   selector: 'app-local-mode',
@@ -19,9 +21,9 @@ export class LocalModeComponent implements OnInit {
    */
   private _inGameAndStopped: boolean;
   /**
-   * The current game board.
+   * The current game state.
    */
-  private readonly _gameBoard: GameBoard;
+  private readonly _gameState: GameState;
 
   /**
    * Construct itself from supporting services.
@@ -31,7 +33,7 @@ export class LocalModeComponent implements OnInit {
   constructor(private networkService: LocalModeNetworkService) {
     this._inGame = false;
     this._inGameAndStopped = false;
-    this._gameBoard = new GameBoard();
+    this._gameState = new GameState();
   }
 
   ngOnInit() {
@@ -61,37 +63,20 @@ export class LocalModeComponent implements OnInit {
    * @returns {GameBoard} the current game board.
    */
   get game(): GameBoard {
-    return this._gameBoard;
-  }
-
-  /**
-   * Report whether the game data is available.
-   *
-   * @returns {boolean} whether the game data is available.
-   */
-  get gameDataAvailable(): boolean {
-    return this._gameBoard !== null && this._gameBoard !== undefined;
-  }
-
-  /**
-   * Sleep for a while.
-   */
-  private async sleep(): Promise<void> {
-    await new Promise<void>(resolve => setTimeout(resolve, 300));
+    return this._gameState.gameBoard;
   }
 
   /**
    * Start to make query to the server.
    */
   private makeQuery(): void {
-    this.networkService.query(this._gameBoard.numberOfTurns,
+    this.networkService.query(this._gameState.gameBoard.numberOfTurns,
       report => {
-        this._gameBoard.applyChanges(report);
+        this._gameState.applyChanges(report);
         if (report.status === GameStatus.IN_PROGRESS) {
           this._inGame = true;
           this._inGameAndStopped = false;
-          // noinspection JSIgnoredPromiseFromCall
-          this.sleep().then(() => this.makeQuery());
+          sleep(400).then(() => this.makeQuery());
         } else {
           this._inGame = true;
           this._inGameAndStopped = true;
@@ -124,7 +109,18 @@ export class LocalModeComponent implements OnInit {
   reset(): void {
     this._inGame = false;
     this._inGameAndStopped = false;
-    this._gameBoard.reset();
+    this._gameState.reset();
+  }
+
+  /**
+   * Replay the entire game. It can be called only after game finished.
+   */
+  replay(): void {
+    this._inGame = true;
+    this._inGameAndStopped = false;
+    this._gameState.replay(() => {
+      this._inGameAndStopped = true;
+    });
   }
 
 }

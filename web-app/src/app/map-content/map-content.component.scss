@@ -1,7 +1,7 @@
 @import '~@angular/material/theming';
 
 $orange-palette: mat-palette($mat-orange, 400);
-$green-palette: mat-palette($mat-green, 400);
+$blue-gray-palette: mat-palette($mat-blue-gray, 400);
 $brown-palette: mat-palette($mat-brown, 400);
 $red-palette: mat-palette($mat-red, 400);
 $blue-palette: mat-palette($mat-blue, 400);
@@ -45,7 +45,7 @@ $blue-palette: mat-palette($mat-blue, 400);
 }
 
 .cell.city {
-  background-color: mat-color($green-palette);
+  background-color: mat-color($blue-gray-palette);
 }
 
 // player modifier

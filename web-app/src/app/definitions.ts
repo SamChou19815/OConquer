@@ -42,44 +42,52 @@ export enum Direction {
  * Definition for position.
  */
 export interface Position {
-  x: number;
-  y: number;
+  readonly x: number;
+  readonly y: number;
 }
 
 /**
  * Definition for military unit.
  */
 export interface MilUnit {
-  identity: PlayerIdentity;
-  id: number;
-  direction: Direction;
-  numberOfSoldiers: number;
-  morale: number;
-  leadership: number;
+  readonly identity: PlayerIdentity;
+  readonly id: number;
+  readonly direction: Direction;
+  readonly numberOfSoldiers: number;
+  readonly morale: number;
+  readonly leadership: number;
 }
 
 /**
  * Definition for map content.
  */
 export interface MapContent {
-  position: Position;
-  tileType: TileType;
-  cityLevel?: number | null;
-  milUnit?: MilUnit | null;
+  readonly position: Position;
+  readonly tileType: TileType;
+  readonly cityLevel?: number | null;
+  readonly milUnit?: MilUnit | null;
 }
 
 /**
  * Definition for the entire game report.
  */
 export interface GameReport {
-  logs: MapContent[][];
-  status: GameStatus;
+  readonly logs: MapContent[][];
+  readonly status: GameStatus;
+}
+
+/**
+ * Definition for the grouped round record.
+ */
+export interface RoundRecord {
+  readonly status: GameStatus;
+  readonly record: MapContent[];
 }
 
 /**
  * Definition for one row of score board.
  */
 export interface ScoreBoardRow {
-  username: string;
-  rating: number;
+  readonly username: string;
+  readonly rating: number;
 }

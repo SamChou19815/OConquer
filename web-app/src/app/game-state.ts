@@ -1,150 +1,24 @@
-import {
-  GameReport,
-  GameStatus,
-  MapContent,
-  MAX_HEIGHT,
-  MAX_WIDTH,
-  TileType
-} from './definitions';
-
-/**
- * Definition for the grouped round record.
- */
-interface RoundRecord {
-  status: GameStatus;
-  record: MapContent[];
-}
-
-/**
- * The definition of a game board.
- */
-export class GameBoard {
-
-  /**
-   * The backing field of status.
-   */
-  private _status: GameStatus;
-  /**
-   * The backing board field.
-   */
-  private _board: MapContent[][];
-  /**
-   * Number of turns passed.
-   */
-  private _numberOfTurns: number;
-
-  /**
-   * Construct an initial board.
-   */
-  constructor() {
-    this.reset();
-  }
-
-  /**
-   * Obtain the current status.
-   *
-   * @returns {GameStatus} the current status.
-   */
-  get status() {
-    return this._status;
-  }
-
-  /**
-   * Obtain the current board.
-   *
-   * @returns {MapContent[][]} the current board.
-   */
-  get board(): MapContent[][] {
-    return this._board;
-  }
-
-  /**
-   * Obtain the number of turns passed.
-   *
-   * @returns {number} Obtain the number of turns passed.
-   */
-  get numberOfTurns(): number {
-    return this._numberOfTurns;
-  }
-
-  /**
-   * Obtain the content at the specified position.
-   *
-   * @param {number} x x coordinate.
-   * @param {number} y y coordinate.
-   * @returns {MapContent}
-   */
-  getContent(x: number, y: number): MapContent {
-    return this._board[x][y];
-  }
-
-  /**
-   * Apply a diff record to update itself.
-   *
-   * @param {RoundRecord} roundRecord the board change.
-   */
-  applyRoundRecord(roundRecord: RoundRecord) {
-    this._numberOfTurns++;
-    this._status = roundRecord.status;
-    for (const change of roundRecord.record) {
-      this._board[change.position.x][change.position.y] = change;
-    }
-  }
-
-  /**
-   * Apply changes from the given report from server.
-   *
-   * @param {GameReport} report the report that is the basis for change.
-   */
-  applyChanges(report: GameReport) {
-    for (const record of report.logs) {
-      const roundRecord = {
-        status: report.status,
-        record: [...record]
-      };
-      this.applyRoundRecord(roundRecord);
-    }
-  }
-
-  /**
-   * Reset the board.
-   */
-  reset(): void {
-    this._status = GameStatus.IN_PROGRESS;
-    const initialRecord = new Array(MAX_HEIGHT);
-    for (let j = 0; j < MAX_HEIGHT; j++) {
-      const row = new Array(MAX_WIDTH);
-      for (let i = 0; i < MAX_WIDTH; i++) {
-        row[i] = {
-          position: { x: i, y: j },
-          tileType: TileType.EMPTY,
-          cityLevel: null,
-          militaryUnit: null,
-        };
-      }
-      initialRecord[j] = row;
-    }
-    this._board = initialRecord;
-    this._numberOfTurns = -1;
-  }
-
-}
+import { GameReport, MapContent, RoundRecord } from './definitions';
+import { GameBoard } from './game-board';
+import { gameReportToRoundRecords, sleep } from './util';
 
 /**
  * The definition of all the game state.
  */
-export class GameState {
+export class GameState extends GameBoard {
+
   /**
    * A collection of all the recorded round records.
    * e.g. this._roundRecords[i] means the map of the world at round i.
    */
-  private readonly _roundRecords: RoundRecord[];
+  private _roundRecords: RoundRecord[];
 
   /**
    * Construct an game state from an empty template, which represents the start
    * of the game.
    */
   constructor() {
+    super();
     this._roundRecords = [];
   }
 
@@ -158,13 +32,12 @@ export class GameState {
   }
 
   /**
-   * Obtain the round record at a particular round ID.
+   * Obtain the game board.
    *
-   * @param {number} roundID the ID of the round.
-   * @returns {MapContent[]} the content of the record.
+   * @returns {GameBoard} the game board.
    */
-  getRoundRecord(roundID: number): RoundRecord {
-    return this._roundRecords[roundID];
+  get gameBoard(): GameBoard {
+    return this;
   }
 
   /**
@@ -173,13 +46,49 @@ export class GameState {
    * @param {GameReport} report the report that is the basis for change.
    */
   applyChanges(report: GameReport) {
-    for (const record of report.logs) {
-      const roundRecord = {
-        status: report.status,
-        record: [...record]
-      };
-      this._roundRecords.push(roundRecord);
+    super.applyChanges(report);
+    const records = gameReportToRoundRecords(report);
+    for (const record of records) {
+      this._roundRecords.push(record);
     }
+  }
+
+  /**
+   * Helper function for replay.
+   * It apply the record record at the given index, and it reports when it
+   * reaches the end.
+   *
+   * @param {number} index index index of the record record applied.
+   * @param {() => void} doneReporter the reporter called when finished.
+   */
+  private replayHelper(index: number, doneReporter: () => void) {
+    if (index >= this._roundRecords.length) {
+      doneReporter();
+      return; // end of replay
+    }
+    super.applyRoundRecord(this._roundRecords[index]);
+    sleep(50).then(
+      () => this.replayHelper(index + 1, doneReporter));
+  }
+
+  /**
+   * Replay the entire game.
+   * This function can be only called after the entire game has finished.
+   *
+   * @param {() => void} doneReporter the reporter called when finished
+   * replaying.
+   */
+  replay(doneReporter: () => void) {
+    super.reset();
+    this.replayHelper(0, doneReporter);
+  }
+
+  /**
+   * Reset the entire game state.
+   */
+  reset() {
+    super.reset();
+    this._roundRecords = [];
   }
 
 }

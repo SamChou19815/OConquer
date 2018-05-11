@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { GameBoard } from '../game-state';
+import { GameStatus } from '../definitions';
+import { GameBoard } from '../game-board';
 
 @Component({
   selector: 'app-game-display',
@@ -21,6 +22,24 @@ export class GameDisplayComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  /**
+   * Report the game status.
+   *
+   * @returns {string} the game status.
+   */
+  get gameStatus(): string {
+    switch (this.game.status) {
+      case GameStatus.IN_PROGRESS:
+        return 'In Progress';
+      case GameStatus.BLACK_WINS:
+        return 'Black Wins';
+      case GameStatus.WHITE_WINS:
+        return 'White Wins';
+      case GameStatus.DRAW:
+        return 'Draw';
+    }
   }
 
 }

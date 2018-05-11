@@ -2,7 +2,7 @@ let map_width = 10
 
 let map_height = 10
 
-let max_turns = 100
+let max_turns = 500
 
 let training_morale_boost = 1
 
