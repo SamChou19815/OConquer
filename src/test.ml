@@ -7,9 +7,11 @@ let all_tests =
     MilUnitTests.tests;
     TileTests.tests;
     WorldMapTests.tests;
-    EngineTests.tests;
-    ServerKernelsTests.tests;
-    ProgramRunnerTests.tests;
+    (*
+       EngineTests.tests;
+       ServerKernelsTests.tests;
+       ProgramRunnerTests.tests;
+    *)
   ]
 
 let suite = "Final Project Test Suite" >::: all_tests

@@ -170,7 +170,7 @@ let retreat_leadership_penalty = 1
 
 let increase_soldier_factor = 0.5
 
-let base_attack_damage = 5
+let base_attack_damage = 200
 
 let fort_city_bonus_factor = 1.5
 
