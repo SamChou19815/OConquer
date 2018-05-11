@@ -3,9 +3,11 @@
 ## System Requirement
 
 - Java JDK 8
-- OCaml
-- npm
-- node.js
+- OCaml 4.06
+- npm 6.0.0
+- node.js 9.4.0
+
+(Higher versions may work.)
 
 ## How to play with the code
 
