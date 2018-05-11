@@ -5,10 +5,15 @@ test:
 	ocamlbuild -use-ocamlfind src/test.byte && ./test.byte
 
 build:
+	# Prepare for directories for runtime file generation
 	mkdir -p programs/out
 	mkdir -p programs/out-temp
+	# Prepare SDK
 	mkdir -p programs/dist
+	cd programs; zip dist/SDK.zip ./src/*.java
+	# Build Frontend
 	cd web-app; npm install && npm run build
+	# Build Ocaml
 	ocamlbuild -use-ocamlfind src/main.byte
 
 docs:
@@ -31,3 +36,6 @@ clean:
 	ocamlbuild -clean
 	rm -f submission.zip
 	rm -rf ./docs
+	rm -rf ./programs/out
+	rm -rf ./programs/out-temp
+	rm -rf ./programs/dist
