@@ -39,6 +39,9 @@ exception IllegalWorldMapOperation of string
 *)
 exception DataNotSyncedException
 
+(** [run_rep_ok] is a flag to decide whether to run [rep_ok]. *)
+let run_rep_ok = false
+
 (**
  * [rep_ok m] checks that the value [m]'s maps are all in sync.
  * i.e. Their records of military units and tiles agree with each other.
@@ -49,7 +52,34 @@ exception DataNotSyncedException
  * Returns: [m].
  * Raises: [DataNotSyncedException] if [m] is not well-formed.
 *)
-let rep_ok (m: t) : t = m (* TODO check that all maps are in sync. *)
+let rep_ok (m: t) : t =
+  if not run_rep_ok then m
+  else if m.changed_pos <> ChangedPosSet.empty then raise DataNotSyncedException
+  else
+    let maps = m.maps in
+    (* All elements in queue must also be in the map. *)
+    let () = Queue.iter (fun id ->
+        if IntMap.(mem id maps.id_2_pos_map && mem id maps.id_2_mil_unit_map)
+        then () else raise DataNotSyncedException
+      ) m.execution_queue in
+    (* [next_id] must be a natural number. *)
+    let () = if m.next_id >= 0 then () else raise DataNotSyncedException in
+    (* id and pos bidirectional map are in sync. *)
+    let () =
+      let im = maps.id_2_pos_map in
+      let pm = maps.pos_2_id_map in
+      if IntMap.for_all (fun id pos -> PosMap.find pos pm = id) im &&
+         PosMap.for_all (fun pos id -> IntMap.find id im = pos) pm
+      then () else raise DataNotSyncedException
+    in
+    (** Positions are in bound. *)
+    let () =
+      if PosMap.for_all (fun (x, y) _ ->
+          x >= 0 && y >= 0 && x < map_width && y < map_height)
+          maps.pos_2_tile_map
+      then () else raise DataNotSyncedException
+    in
+    m (* All maps are in sync. We are happy. :) *)
 
 (**
  * [illegal_ops error_msg] raises an [IllegalWorldMapOperation] with error
@@ -419,4 +449,4 @@ let next (process_mil_unit: int -> t -> t) (m: t) : t * diff_record =
     let map = { map with changed_pos = ChangedPosSet.empty } in
     (map, diff_record)
   in
-  m |> next_process |> end_of_turn_processing
+  m |> rep_ok |> next_process |> end_of_turn_processing
