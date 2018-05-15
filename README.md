@@ -4,7 +4,7 @@
 
 - Java JDK 8
 - OCaml 4.06
-- npm 6.0.0
+- npm 6.0.1
 - node.js 9.4.0
 
 (Higher versions may work.)
