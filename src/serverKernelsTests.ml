@@ -1,15 +1,15 @@
-open OUnit
+open OUnit2
 open ProgramLists
 
 (**
- * [server_client_interaction_test ()] tests the server kernel by simulating
+ * [server_client_interaction_test _] tests the server kernel by simulating
  * the server client interaction.
  *
  * Requires: None.
  * @return None.
  * Effect: a test is run.
 *)
-let server_client_interaction_test () : unit =
+let server_client_interaction_test _ : unit =
   let open ServerKernels.LocalServerKernel in
   let server_state = init () in
   let contains s1 s2 =

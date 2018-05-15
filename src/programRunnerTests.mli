@@ -4,4 +4,4 @@
 *)
 
 (** [tests] contains a list of tests for program runner functionality. *)
-val tests : OUnit.test list
+val tests : OUnit2.test list

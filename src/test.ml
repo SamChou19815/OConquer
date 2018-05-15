@@ -1,4 +1,4 @@
-open OUnit
+open OUnit2
 
 (** [all_tests] is the collection of all tests. *)
 let all_tests =
@@ -14,4 +14,7 @@ let all_tests =
     ServerKernelsTests.tests;
   ]
 
-let _ = "Final Project Test Suite" >::: all_tests |> run_test_tt_main
+(** [suite] is the test suite. *)
+let suite = "FinalProjectTestSuite" >::: all_tests
+
+let () = run_test_tt_main suite

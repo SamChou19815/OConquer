@@ -1,9 +1,9 @@
-open OUnit
+open OUnit2
 open Concurrent
 
 let tests = [
   (* Ensure the synchronized section is safe. *)
-  "concurrent_synchronized_and_latch_test" >:: (fun () ->
+  "concurrent_synchronized_and_latch_test" >:: (fun _ ->
       let repeat = 100000 in
       let a = ref 0 in
       let lock = Mutex.create () in
@@ -28,7 +28,7 @@ let tests = [
     );
 
   (* Test the rw lock on an array. *)
-  "concurrent_rw_lock_test" >:: (fun () ->
+  "concurrent_rw_lock_test" >:: (fun _ ->
       let len = 100000 in
       let array = Array.make len 0 in
       let unsafe_write () =

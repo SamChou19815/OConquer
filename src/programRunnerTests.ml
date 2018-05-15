@@ -1,4 +1,4 @@
-open OUnit
+open OUnit2
 open Common
 open ProgramLists
 
@@ -18,19 +18,11 @@ let get_compiled_programs () : Command.program * Command.program =
 (** A pair of compiled black and white programs. *)
 let (compiled_black, compiled_white) as p = get_compiled_programs ()
 
-(**
- * [simple_program_tests] is a set of simple programs that always do nothing.
-*)
-let simple_program_tests = [
-  "simple_programs_do_get_result" >:: (fun _ ->
+let tests = [
+  "program_runner_simple_programs_do_get_result" >:: (fun _ ->
       let state_init = Engine.init compiled_black compiled_white in
       let next (s, _) = Engine.next s in
       ignore(repeats 10 next state_init)
     );
-  "program_does_end" >:: (fun _ -> Command.stop_program p)
+  "program_runner_program_does_end" >:: (fun _ -> Command.stop_program p)
 ]
-
-let tests =
-  List.flatten [
-    simple_program_tests;
-  ]

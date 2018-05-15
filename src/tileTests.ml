@@ -1,18 +1,18 @@
-open OUnit
+open OUnit2
 open Tile
 open GameConstants
 
 (** [test_exc] takes in a function [f] and [input] the input
  * and runs [f input] to check if it has a [BadTileInput] exception. *)
-let test_exc f (input: Tile.t) () : unit =
+let test_exc f (input: Tile.t) _ : unit =
   assert_raises BadTileInput (fun () -> f input)
 
 (** [num_soldier_city_test] takes in a integer [k] denoting city level and
  * returns the right number of soldiers the city will increase. *)
 let num_soldier_city_test : int -> int = ( * ) increase_soldier_factor
 
-(** [test_equal v1 v2 ()] tests whether [v1] [v2] are equal. *)
-let test_equal v1 v2 () = assert_equal v1 v2
+(** [test_equal v1 v2 _] tests whether [v1] [v2] are equal. *)
+let test_equal v1 v2 _ = assert_equal v1 v2
 
 let tests = [
   (** Tile Tests 1-5: Test [num_of_soldier_increase] function. *)

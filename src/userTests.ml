@@ -1,4 +1,4 @@
-open OUnit
+open OUnit2
 open User
 
 (** [float_pair_equal p1 p2] compares whether two float pairs are equal. *)
@@ -33,63 +33,63 @@ let two_users : user * user =
 
 let tests = [
   (** Tests for [Elo] sub-module. *)
-  "user_elo_test1" >:: (fun () ->
+  "user_elo_test1" >:: (fun _ ->
       let prev_rating = (100., 100.) in
       let curr_rating = Elo.update_rating 0.5 prev_rating in
       float_pair_equal (100., 100.) curr_rating
     );
-  "user_elo_test2" >:: (fun () ->
+  "user_elo_test2" >:: (fun _ ->
       let prev_rating = (200., 100.) in
       let curr_rating = Elo.update_rating 0.5 prev_rating in
       float_pair_equal (204., 96.) curr_rating
     );
-  "user_elo_test3" >:: (fun () ->
+  "user_elo_test3" >:: (fun _ ->
       let prev_rating = (100., 200.) in
       let curr_rating = Elo.update_rating 0.5 prev_rating in
       float_pair_equal (96., 204.) curr_rating
     );
-  "user_elo_test4" >:: (fun () ->
+  "user_elo_test4" >:: (fun _ ->
       let prev_rating = (100., 100.) in
       let curr_rating = Elo.update_rating 1. prev_rating in
       float_pair_equal (115., 85.) curr_rating
     );
-  "user_elo_test5" >:: (fun () ->
+  "user_elo_test5" >:: (fun _ ->
       let prev_rating = (200., 100.) in
       let curr_rating = Elo.update_rating 1. prev_rating in
       float_pair_equal (219., 81.) curr_rating
     );
-  "user_elo_test6" >:: (fun () ->
+  "user_elo_test6" >:: (fun _ ->
       let prev_rating = (100., 200.) in
       let curr_rating = Elo.update_rating 1. prev_rating in
       float_pair_equal (111., 189.) curr_rating
     );
-  "user_elo_test7" >:: (fun () ->
+  "user_elo_test7" >:: (fun _ ->
       let prev_rating = (100., 100.) in
       let curr_rating = Elo.update_rating 0. prev_rating in
       float_pair_equal (85., 115.) curr_rating
     );
-  "user_elo_test8" >:: (fun () ->
+  "user_elo_test8" >:: (fun _ ->
       let prev_rating = (200., 100.) in
       let curr_rating = Elo.update_rating 0. prev_rating in
       float_pair_equal (189., 111.) curr_rating
     );
-  "user_elo_test9" >:: (fun () ->
+  "user_elo_test9" >:: (fun _ ->
       let prev_rating = (100., 200.) in
       let curr_rating = Elo.update_rating 0. prev_rating in
       float_pair_equal (81., 219.) curr_rating
     );
 
   (** Tests for [Database] sub-module. *)
-  "user_db_test1" >:: (fun () ->
+  "user_db_test1" >:: (fun _ ->
       assert_equal None Database.(empty |> sign_in "" "")
     );
-  "user_db_test2" >:: (fun () ->
+  "user_db_test2" >:: (fun _ ->
       assert_equal false Database.(empty |> has_token 1)
     );
-  "user_db_test3" >:: (fun () ->
+  "user_db_test3" >:: (fun _ ->
       assert_equal None Database.(empty |> get_user_opt_by_token 1)
     );
-  "user_db_test4" >:: (fun () ->
+  "user_db_test4" >:: (fun _ ->
       let open Database in
       match register "Sam" "1" empty with
       | None -> failwith "Bad! Cannot register Sam!"
@@ -136,7 +136,7 @@ let tests = [
     );
 
   (** Tests for the [MatchMaking] sub-module. *)
-  "user_matchmaking_test" >:: (fun () ->
+  "user_matchmaking_test" >:: (fun _ ->
       let (sam, san) = two_users in
       let open MatchMaking in
       let player_sam = create_player sam "" "" in
