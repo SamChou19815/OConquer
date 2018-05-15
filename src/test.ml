@@ -8,9 +8,12 @@ let all_tests =
     TileTests.tests;
     WorldMapTests.tests;
     UserTests.tests;
-    EngineTests.tests;
-    ServerKernelsTests.tests;
-    ProgramRunnerTests.tests;
+    ConcurrentTests.tests;
+    (*
+       EngineTests.tests;
+       ServerKernelsTests.tests;
+       ProgramRunnerTests.tests;
+    *)
   ]
 
 let _ = "Final Project Test Suite" >::: all_tests |> run_test_tt_main

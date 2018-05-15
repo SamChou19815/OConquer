@@ -1,20 +1,6 @@
 open Common
 open Data
-
-(**
- * [m >>==>> f] simulates the Java's synchronized keyword.
- *
- * Requires:
- * - [m] is a mutex.
- * - [f] is a function that is performed between the mutex section code.
- * @return: f's value.
- * Effect: [f] is run in a thread safe way.
-*)
-let (>>==>>) (m: Mutex.t) (f: unit -> 'a) : 'a =
-  let () = Mutex.lock m in
-  let v = f () in
-  let () = Mutex.unlock m in
-  v
+open Concurrent
 
 module LocalServerKernel : LocalServer.Kernel = struct
 
@@ -115,7 +101,7 @@ module RemoteServerKernel = struct
     (** [running] reports whether the server is running a simulation. *)
     mutable running: bool;
     (** [signal] is used for thread waiting communication. *)
-    mutable signal: Condition.t;
+    mutable condition: Condition.t;
     (** [user_db] records user related information. *)
     mutable user_db: User.Database.t;
     (** [game_records] stores a collection of game histories. *)
@@ -126,7 +112,7 @@ module RemoteServerKernel = struct
 
   let init () : state = {
     mutex = Mutex.create ();
-    signal = Condition.create ();
+    condition = Condition.create ();
     running = false;
     user_db = User.Database.empty;
     game_records = IntMap.empty;
@@ -202,7 +188,7 @@ module RemoteServerKernel = struct
           false
       in
       (* Stop Simulation *)
-      if ended then Condition.broadcast s.signal
+      if ended then Condition.broadcast s.condition
       else run_on_game_state ()
     in
     run_on_game_state ()
@@ -223,7 +209,7 @@ module RemoteServerKernel = struct
     *)
     let wait_until_simulation_stops () =
       while s.running do
-        Condition.wait s.signal s.mutex
+        Condition.wait s.condition s.mutex
       done
     in
     (* DO the main processing. To be run in a new thread. *)
