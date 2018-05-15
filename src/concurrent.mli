@@ -48,8 +48,8 @@ end
 (** [ReadWriteLock] is the Ocaml version of Java's [ReadWriteLock]. *)
 module ReadWriteLock : sig
 
-  (** [t] is the type of the read write lock. *)
-  type t
+  (** [rw_lock] is the type of the read write lock. *)
+  type rw_lock
 
   (**
    * [create ()] will create a legal read write lock.
@@ -57,7 +57,7 @@ module ReadWriteLock : sig
    * Requires: None.
    * @return a legal read write lock.
   *)
-  val create : unit -> t
+  val create : unit -> rw_lock
 
   (**
    * [lock >>=>> f] secures a block of read code in [f].
@@ -68,7 +68,7 @@ module ReadWriteLock : sig
    * @return f's value.
    * Effect: [f] is run in a thread safe way.
   *)
-  val (>>=>>) : t -> (unit -> 'a) -> 'a
+  val (>>=>>) : rw_lock -> (Mutex.t -> 'a) -> 'a
 
   (**
    * [lock >>===>> f] secures a block of write code in [f].
@@ -79,6 +79,6 @@ module ReadWriteLock : sig
    * @return f's value.
    * Effect: [f] is run in a thread safe way.
   *)
-  val (>>===>>) : t -> (unit -> 'a) -> 'a
+  val (>>===>>) : rw_lock -> (Mutex.t -> 'a) -> 'a
 
 end
