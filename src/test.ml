@@ -13,6 +13,4 @@ let all_tests =
     ProgramRunnerTests.tests;
   ]
 
-let suite = "Final Project Test Suite" >::: all_tests
-
-let _ = run_test_tt_main suite
+let _ = "Final Project Test Suite" >::: all_tests |> run_test_tt_main
