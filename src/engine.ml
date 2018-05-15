@@ -10,7 +10,7 @@ type state = {
 
 let init (p1: Command.program) (p2: Command.program) =
   let m1 = MilUnit.default_init Black 0 0 in
-  let m2 = MilUnit.default_init White 1 3 in
+  let m2 = MilUnit.default_init White 1 2 in
   let turns = 0 in
   let world_map = WorldMap.init m1 m2 in
   let (world_map, diff_record) = WorldMap.randomize_map world_map in
