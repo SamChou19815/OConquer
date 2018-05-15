@@ -2,7 +2,7 @@ main:
 	ocamlbuild -use-ocamlfind src/main.byte
 
 test:
-	ocamlbuild -use-ocamlfind src/test.byte && ./test.byte
+	ocamlbuild -use-ocamlfind src/test.byte && ./test.byte -runner sequential
 
 build:
 	# Prepare for directories for runtime file generation

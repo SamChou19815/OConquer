@@ -8,9 +8,9 @@ let all_tests =
     TileTests.tests;
     WorldMapTests.tests;
     UserTests.tests;
-    ConcurrentTests.tests;
     EngineTests.tests;
     ProgramRunnerTests.tests;
+    ConcurrentTests.tests;
     ServerKernelsTests.tests;
   ]
 
