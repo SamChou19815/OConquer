@@ -1,0 +1,12 @@
+#legend-list {
+  display: block;
+  text-align: center;
+}
+
+.legend-item {
+  width: 400px;
+  height: 150px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+}

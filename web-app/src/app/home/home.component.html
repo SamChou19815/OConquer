@@ -10,3 +10,48 @@
     </a>
   </mat-card-content>
 </mat-card>
+<mat-card>
+  <mat-card-title>Writing Your Program</mat-card-title>
+  <mat-card-content>
+    You only need to implement the getAction() method in BlackProgram.java and
+    WhiteProgram.java. While submitting, you only need to submit BlackProgram
+    and WhiteProgram. The SDK
+  </mat-card-content>
+</mat-card>
+<mat-card>
+  <mat-card-title>Legends</mat-card-title>
+  <mat-card-content id="legend-list">
+    <div class="legend-item">
+      <div>An empty tile with nothing on it.</div>
+      <app-map-content [mapContent]="emptyTile"></app-map-content>
+    </div>
+    <div class="legend-item">
+      <div>A mountain tile.</div>
+      <app-map-content [mapContent]="mountainTile"></app-map-content>
+    </div>
+    <div class="legend-item">
+      <div>A fort tile with nothing on it.</div>
+      <app-map-content [mapContent]="fortTile"></app-map-content>
+    </div>
+    <div class="legend-item">
+      <div>A city tile with nothing on it.</div>
+      <app-map-content [mapContent]="cityTile"></app-map-content>
+    </div>
+    <div class="legend-item">
+      <div>An empty tile with a black military unit facing west on it.</div>
+      <app-map-content [mapContent]="emptyTileBlack"></app-map-content>
+    </div>
+    <div class="legend-item">
+      <div>A fort tile with a white military unit facing north on it.</div>
+      <app-map-content [mapContent]="fortTileWhite"></app-map-content>
+    </div>
+    <div class="legend-item">
+      <div>A city tile with a black military unit facing west on it.</div>
+      <app-map-content [mapContent]="cityTileBlack"></app-map-content>
+    </div>
+    <div class="legend-item">
+      <div>A city tile with a white military unit facing north on it.</div>
+      <app-map-content [mapContent]="cityTileWhite"></app-map-content>
+    </div>
+  </mat-card-content>
+</mat-card>
