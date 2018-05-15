@@ -64,7 +64,7 @@ module ReadWriteLock = struct
     writer = None;
   }
 
-  let (>>=>>) (lock: rw_lock) (f: Mutex.t -> 'a) : 'a =
+  let (>>=>>) (lock: rw_lock) (f: unit -> 'a) : 'a =
     (* lock *)
     let () = lock.mutex >>==>> fun () -> (
         while lock.num_writers_waiting > 0 || lock.writer <> None do
@@ -73,7 +73,7 @@ module ReadWriteLock = struct
         lock.num_readers <- lock.num_readers + 1
       )
     in
-    let v = f lock.mutex in
+    let v = f () in
     (* unlock *)
     let () = lock.mutex >>==>> fun () -> (
         lock.num_readers <- lock.num_readers - 1;
@@ -84,7 +84,7 @@ module ReadWriteLock = struct
     in
     v
 
-  let (>>===>>) (lock: rw_lock) (f: Mutex.t -> 'a) : 'a =
+  let (>>===>>) (lock: rw_lock) (f: unit -> 'a) : 'a =
     (* lock *)
     let () =
       let me = Thread.self () in
@@ -103,7 +103,7 @@ module ReadWriteLock = struct
         lock.writer <- Some me
       )
     in
-    let v = f lock.mutex in
+    let v = f () in
     (* unlock *)
     let () = lock.mutex >>==>> fun () -> (
         lock.held_count <- lock.held_count - 1;

@@ -68,7 +68,7 @@ module ReadWriteLock : sig
    * @return f's value.
    * Effect: [f] is run in a thread safe way.
   *)
-  val (>>=>>) : rw_lock -> (Mutex.t -> 'a) -> 'a
+  val (>>=>>) : rw_lock -> (unit -> 'a) -> 'a
 
   (**
    * [lock >>===>> f] secures a block of write code in [f].
@@ -79,6 +79,6 @@ module ReadWriteLock : sig
    * @return f's value.
    * Effect: [f] is run in a thread safe way.
   *)
-  val (>>===>>) : rw_lock -> (Mutex.t -> 'a) -> 'a
+  val (>>===>>) : rw_lock -> (unit -> 'a) -> 'a
 
 end
