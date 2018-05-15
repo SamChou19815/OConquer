@@ -25,7 +25,7 @@ let simple_program_tests = [
   "simple_programs_do_get_result" >:: (fun _ ->
       let state_init = Engine.init compiled_black compiled_white in
       let next (s, _) = Engine.next s in
-      ignore(repeats 100 next state_init)
+      ignore(repeats 10 next state_init)
     );
   "program_does_end" >:: (fun _ -> Command.stop_program p)
 ]
