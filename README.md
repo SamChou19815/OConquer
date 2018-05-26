@@ -46,5 +46,5 @@ simply tell them your IP address.
 
 ## Game Description
 
-Read the [Game Manual](https://github.com/SamChou19815/CS3110-Final-Project/blob/master/MANUAL.md)
+Read the [Game Manual](./MANUAL.md)
 for more information.
