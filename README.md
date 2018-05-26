@@ -1,4 +1,4 @@
-# CS 3110 Final Project
+# OConquer - CS 3110 Final Project
 
 ## System Requirement
 
